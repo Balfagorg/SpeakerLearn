@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>EDU-EQ Speaker Calibration</title>
+
+<style>
+
+:root{
+--light:#a2faa3;
+--mint:#92c9b1;
+--blue:#4f759b;
+--purple:#5d5179;
+--dark:#571f4e;
+}
+
+body{
+font-family:Arial, sans-serif;
+background:var(--dark);
+color:white;
+padding:30px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.card{
+background:var(--purple);
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+h1{
+color:var(--light);
+}
+
+input[type="range"]{
+width:100%;
+}
+
+button{
+background:var(--light);
+border:none;
+padding:10px 15px;
+border-radius:6px;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+margin-right:5px;
+}
+
+button:hover{
+background:var(--mint);
+}
+
+.sliderRow{
+margin-bottom:18px;
+}
+
+.value{
+color:var(--mint);
+float:right;
+}
+
+select{
+width:100%;
+padding:8px;
+border-radius:5px;
+margin-top:10px;
+}
+
+audio{
+width:100%;
+margin-top:15px;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>EDU-EQ Speaker Calibration</h1>
+
+<div class="card">
+
+<label>Speaker Name</label>
+<input id="speakerName" placeholder="Example: My Headphones">
+
+<br>
+
+<button onclick="savePreset()">Save Preset</button>
+
+<label>Saved Presets</label>
+
+<select id="presetMenu" onchange="loadSelectedPreset()">
+<option value="">Select preset...</option>
+</select>
+
+<button onclick="deletePreset()">Delete Preset</button>
+
+</div>
+
+<div class="card">
+
+<h3>Frequency Calibration</h3>
+
+<div id="sliders"></div>
+
+</div>
+
+<div class="card">
+
+<h3>Test Music</h3>
+
+<input type="file" id="fileInput">
+
+<br>
+
+<button onclick="playAudio()">Play</button>
+<button onclick="pauseAudio()">Pause</button>
+
+<audio id="player" controls></audio>
+
+</div>
+
+</div>
+
+<script>
+
+const frequencies=[60,170,350,1000,3500,8000,16000]
+
+let slidersDiv=document.getElementById("sliders")
+
+let audioContext
+let filters=[]
+let audioElement=document.getElementById("player")
+
+/* CREATE SLIDERS */
+
+frequencies.forEach(freq=>{
+
+let row=document.createElement("div")
+row.className="sliderRow"
+
+row.innerHTML=`
+<label>${freq} Hz <span class="value" id="v${freq}">0 dB</span></label>
+<input type="range" min="-12" max="12" step="0.1" value="0" id="s${freq}">
+`
+
+slidersDiv.appendChild(row)
+
+document.getElementById("s"+freq).addEventListener("input",(e)=>{
+
+document.getElementById("v"+freq).innerText=e.target.value+" dB"
+
+updateEQ()
+
+})
+
+})
+
+/* AUDIO SETUP */
+
+function setupAudio(){
+
+audioContext=new AudioContext()
+
+let track=audioContext.createMediaElementSource(audioElement)
+
+filters=frequencies.map(freq=>{
+
+let filter=audioContext.createBiquadFilter()
+
+filter.type="peaking"
+filter.frequency.value=freq
+filter.Q.value=1
+filter.gain.value=0
+
+return filter
+
+})
+
+let chain=[track,...filters,audioContext.destination]
+
+for(let i=0;i<chain.length-1;i++){
+chain[i].connect(chain[i+1])
+}
+
+}
+
+/* UPDATE EQ */
+
+function updateEQ(){
+
+filters.forEach((filter,i)=>{
+
+let slider=document.getElementById("s"+frequencies[i])
+
+filter.gain.value = -parseFloat(slider.value)
+
+})
+
+}
+
+/* LOAD AUDIO FILE ONCE */
+
+document.getElementById("fileInput").addEventListener("change",function(){
+
+let file=this.files[0]
+
+if(file){
+
+audioElement.src = URL.createObjectURL(file)
+
+if(!audioContext){
+setupAudio()
+}
+
+}
+
+})
+
+/* PLAY AUDIO */
+
+function playAudio(){
+
+if(!audioContext){
+setupAudio()
+}
+
+audioElement.play()
+
+}
+
+/* PAUSE AUDIO */
+
+function pauseAudio(){
+audioElement.pause()
+}
+
+/* SAVE PRESET */
+
+function savePreset(){
+
+let name=document.getElementById("speakerName").value
+
+if(!name){
+alert("Enter a speaker name")
+return
+}
+
+let preset={}
+
+frequencies.forEach(freq=>{
+preset[freq]=document.getElementById("s"+freq).value
+})
+
+localStorage.setItem("eq_"+name,JSON.stringify(preset))
+
+populatePresetMenu()
+
+alert("Preset saved!")
+
+}
+
+/* LOAD PRESET */
+
+function loadSelectedPreset(){
+
+let key=document.getElementById("presetMenu").value
+
+if(!key) return
+
+let preset=JSON.parse(localStorage.getItem(key))
+
+frequencies.forEach(freq=>{
+
+document.getElementById("s"+freq).value=preset[freq]
+
+document.getElementById("v"+freq).innerText=preset[freq]+" dB"
+
+})
+
+updateEQ()
+
+}
+
+/* DELETE PRESET */
+
+function deletePreset(){
+
+let menu=document.getElementById("presetMenu")
+
+let key=menu.value
+
+if(!key){
+alert("Select a preset to delete")
+return
+}
+
+let confirmDelete=confirm("Delete this preset?")
+
+if(!confirmDelete) return
+
+localStorage.removeItem(key)
+
+populatePresetMenu()
+
+alert("Preset deleted")
+
+}
+
+/* POPULATE PRESET MENU */
+
+function populatePresetMenu(){
+
+let menu=document.getElementById("presetMenu")
+
+menu.innerHTML='<option value="">Select preset...</option>'
+
+for(let i=0;i<localStorage.length;i++){
+
+let key=localStorage.key(i)
+
+if(key.startsWith("eq_")){
+
+let option=document.createElement("option")
+
+option.value=key
+option.textContent=key.replace("eq_","")
+
+menu.appendChild(option)
+
+}
+
+}
+
+}
+
+/* LOAD MENU ON START */
+
+populatePresetMenu()
+
+</script>
+
+</body>
+</html>
