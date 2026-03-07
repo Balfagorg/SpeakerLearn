@@ -1185,7 +1185,7 @@
     lastScrollY = scrollY;
     scrollY = window.scrollY;
     scrollVel = scrollY - lastScrollY;
-    scrollDir = scrollVel > 0 ? 1 : scrollVel < 0 ? -1 : 0;
+    scrollDir = scrollVel > 0 ? 1 : fscrollVel < 0 ? -1 : 0;
     isScrolling = true;
     clearTimeout(scrollTimer);
     scrollTimer = setTimeout(() => {
