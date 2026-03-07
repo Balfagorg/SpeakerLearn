@@ -15,14 +15,14 @@
 }
 
 body{
-font-family:Arial, sans-serif;
+font-family:Arial;
 background:var(--dark);
 color:white;
 padding:30px;
 }
 
 .container{
-max-width:900px;
+max-width:1100px;
 margin:auto;
 }
 
@@ -30,15 +30,63 @@ margin:auto;
 background:var(--purple);
 padding:20px;
 border-radius:10px;
-margin-bottom:20px;
+margin-bottom:25px;
 }
 
 h1{
 color:var(--light);
 }
 
-input[type="range"]{
-width:100%;
+.sectionTitle{
+margin-bottom:15px;
+color:var(--mint);
+}
+
+.instructions{
+line-height:1.6;
+}
+
+.sliderContainer{
+display:flex;
+justify-content:space-between;
+margin-top:20px;
+}
+
+.sliderBlock{
+display:flex;
+flex-direction:column;
+align-items:center;
+width:80px;
+}
+
+.slider{
+writing-mode:bt-lr;
+-webkit-appearance:slider-vertical;
+height:180px;
+}
+
+.sliderLabel{
+margin-top:8px;
+font-size:14px;
+}
+
+.value{
+font-size:13px;
+color:var(--mint);
+}
+
+.locked{
+opacity:.6;
+}
+
+.boost{
+color:#9affc7;
+font-size:11px;
+}
+
+.cut{
+color:#ffb3b3;
+font-size:11px;
 }
 
 button{
@@ -54,15 +102,6 @@ margin-right:5px;
 
 button:hover{
 background:var(--mint);
-}
-
-.sliderRow{
-margin-bottom:18px;
-}
-
-.value{
-color:var(--mint);
-float:right;
 }
 
 select{
@@ -86,6 +125,38 @@ margin-top:15px;
 
 <h1>EDU-EQ Speaker Calibration</h1>
 
+<div class="card instructions">
+
+<h3>How This Works</h3>
+
+<p>
+Enter how your <b>speaker changes sound</b>.
+</p>
+
+<p>
+Example:
+If your speaker boosts <b>8kHz by +2 dB</b>, move the slider to <b>+2</b>.
+</p>
+
+<p>
+EDU-EQ will automatically generate the <b>opposite correction EQ</b> below.
+</p>
+
+<p>
+Example:
+</p>
+
+<p>
+Speaker response: <b>+2 dB at 8kHz</b><br>
+Correction EQ: <b>-2 dB at 8kHz</b>
+</p>
+
+<p>
+This makes audio sound <b>more consistent across different speakers.</b>
+</p>
+
+</div>
+
 <div class="card">
 
 <label>Speaker Name</label>
@@ -107,9 +178,17 @@ margin-top:15px;
 
 <div class="card">
 
-<h3>Frequency Calibration</h3>
+<h3 class="sectionTitle">Speaker Frequency Response (Editable)</h3>
 
-<div id="sliders"></div>
+<div id="speakerSliders" class="sliderContainer"></div>
+
+</div>
+
+<div class="card">
+
+<h3 class="sectionTitle">Correction EQ Applied (Auto Generated)</h3>
+
+<div id="correctionSliders" class="sliderContainer"></div>
 
 </div>
 
@@ -134,33 +213,64 @@ margin-top:15px;
 
 const frequencies=[60,170,350,1000,3500,8000,16000]
 
-let slidersDiv=document.getElementById("sliders")
+let speakerDiv=document.getElementById("speakerSliders")
+let correctionDiv=document.getElementById("correctionSliders")
 
 let audioContext
 let filters=[]
 let audioElement=document.getElementById("player")
 
-/* CREATE SLIDERS */
+/* CREATE BOTH SLIDER SETS */
 
 frequencies.forEach(freq=>{
 
-let row=document.createElement("div")
-row.className="sliderRow"
+/* speaker sliders */
 
-row.innerHTML=`
-<label>${freq} Hz <span class="value" id="v${freq}">0 dB</span></label>
-<input type="range" min="-12" max="12" step="0.1" value="0" id="s${freq}">
+let block=document.createElement("div")
+block.className="sliderBlock"
+
+block.innerHTML=`
+
+<div class="boost">Boost</div>
+
+<input type="range" min="-12" max="12" step="0.1"
+value="0" id="speaker${freq}" class="slider">
+
+<div class="cut">Cut</div>
+
+<div class="sliderLabel">${freq} Hz</div>
+
+<div class="value" id="speakerVal${freq}">0 dB</div>
+
 `
 
-slidersDiv.appendChild(row)
+speakerDiv.appendChild(block)
 
-document.getElementById("s"+freq).addEventListener("input",(e)=>{
+/* correction sliders */
 
-document.getElementById("v"+freq).innerText=e.target.value+" dB"
+let block2=document.createElement("div")
+block2.className="sliderBlock locked"
 
-updateEQ()
+block2.innerHTML=`
 
-})
+<div class="boost">Boost</div>
+
+<input type="range" min="-12" max="12" step="0.1"
+value="0" id="corr${freq}" class="slider" disabled>
+
+<div class="cut">Cut</div>
+
+<div class="sliderLabel">${freq} Hz</div>
+
+<div class="value" id="corrVal${freq}">0 dB</div>
+
+`
+
+correctionDiv.appendChild(block2)
+
+/* update logic */
+
+document.getElementById("speaker"+freq).addEventListener("input",updateEQ)
 
 })
 
@@ -193,21 +303,31 @@ chain[i].connect(chain[i+1])
 
 }
 
-/* UPDATE EQ */
+/* UPDATE EQ + CORRECTION SLIDERS */
 
 function updateEQ(){
 
-filters.forEach((filter,i)=>{
+frequencies.forEach((freq,i)=>{
 
-let slider=document.getElementById("s"+frequencies[i])
+let speakerValue=parseFloat(document.getElementById("speaker"+freq).value)
 
-filter.gain.value = -parseFloat(slider.value)
+let correction=-speakerValue
+
+document.getElementById("speakerVal"+freq).innerText=speakerValue+" dB"
+
+document.getElementById("corr"+freq).value=correction
+
+document.getElementById("corrVal"+freq).innerText=correction+" dB"
+
+if(filters[i]){
+filters[i].gain.value=correction
+}
 
 })
 
 }
 
-/* LOAD AUDIO FILE ONCE */
+/* LOAD AUDIO FILE */
 
 document.getElementById("fileInput").addEventListener("change",function(){
 
@@ -215,7 +335,7 @@ let file=this.files[0]
 
 if(file){
 
-audioElement.src = URL.createObjectURL(file)
+audioElement.src=URL.createObjectURL(file)
 
 if(!audioContext){
 setupAudio()
@@ -224,8 +344,6 @@ setupAudio()
 }
 
 })
-
-/* PLAY AUDIO */
 
 function playAudio(){
 
@@ -236,8 +354,6 @@ setupAudio()
 audioElement.play()
 
 }
-
-/* PAUSE AUDIO */
 
 function pauseAudio(){
 audioElement.pause()
@@ -257,7 +373,9 @@ return
 let preset={}
 
 frequencies.forEach(freq=>{
-preset[freq]=document.getElementById("s"+freq).value
+
+preset[freq]=-parseFloat(document.getElementById("speaker"+freq).value)
+
 })
 
 localStorage.setItem("eq_"+name,JSON.stringify(preset))
@@ -280,9 +398,9 @@ let preset=JSON.parse(localStorage.getItem(key))
 
 frequencies.forEach(freq=>{
 
-document.getElementById("s"+freq).value=preset[freq]
+let speakerResponse=-preset[freq]
 
-document.getElementById("v"+freq).innerText=preset[freq]+" dB"
+document.getElementById("speaker"+freq).value=speakerResponse
 
 })
 
@@ -299,23 +417,19 @@ let menu=document.getElementById("presetMenu")
 let key=menu.value
 
 if(!key){
-alert("Select a preset to delete")
+alert("Select a preset")
 return
 }
 
-let confirmDelete=confirm("Delete this preset?")
-
-if(!confirmDelete) return
+if(!confirm("Delete this preset?")) return
 
 localStorage.removeItem(key)
 
 populatePresetMenu()
 
-alert("Preset deleted")
-
 }
 
-/* POPULATE PRESET MENU */
+/* POPULATE MENU */
 
 function populatePresetMenu(){
 
@@ -342,9 +456,9 @@ menu.appendChild(option)
 
 }
 
-/* LOAD MENU ON START */
-
 populatePresetMenu()
+
+updateEQ()
 
 </script>
 
