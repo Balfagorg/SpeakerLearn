@@ -160,7 +160,6 @@ function shutdown() {
   process.exit(0);
 }
 
-let backendProc;
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
 
