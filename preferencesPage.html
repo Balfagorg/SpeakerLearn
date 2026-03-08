@@ -41,13 +41,44 @@
     }
 
     /* ── TOPBAR ── */
-    .topbar {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 1.8rem 5vw;
-      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--grape) 50%, var(--cerulean) 100%);
-      position: sticky; top: 0; z-index: 50;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
-    }
+    /* ── HEADER ── */
+header {
+  position: relative;
+  padding: 0 5vw;
+  background: linear-gradient(135deg, var(--deep-purple) 0%, var(--grape) 40%, var(--cerulean) 100%);
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 80%, rgba(162,250,163,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 20%, rgba(146,201,177,0.1) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2rem 0 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.tagline-top {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-title-strip {
+  position: relative;
+  z-index: 5;
+  padding: 3rem 0 3.5rem;
+}
 
     .logo {
       font-family: 'DM Serif Display', serif;
@@ -77,35 +108,45 @@
     nav a.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
 
     /* ── PAGE HEADER ── */
-    .page-hero {
-      padding: 4rem 5vw 3rem;
-      background: linear-gradient(180deg, rgba(93,81,121,0.25) 0%, transparent 100%);
-      border-bottom: 1px solid rgba(255,255,255,0.05);
-    }
-
     .page-eyebrow {
-      font-family: 'Space Mono', monospace; font-size: 0.68rem;
-      letter-spacing: 0.22em; text-transform: uppercase;
-      color: var(--muted-teal); margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.75rem;
-    }
-    .page-eyebrow::before {
-      content: ''; display: block; width: 24px; height: 1px;
-      background: var(--muted-teal);
-    }
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-teal);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
 
-    .page-hero h1 {
-      font-family: 'DM Serif Display', serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      letter-spacing: -0.02em; line-height: 1.1;
-      margin-bottom: 0.75rem;
-    }
-    .page-hero h1 em { font-style: italic; color: var(--light-green); }
+.page-eyebrow::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--muted-teal);
+}
 
-    .page-hero p {
-      font-size: 0.95rem; line-height: 1.7;
-      color: var(--text-muted); max-width: 580px;
-    }
+.page-title-strip h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.page-title-strip h1 em {
+  font-style: italic;
+  color: var(--light-green);
+}
+
+.page-title-strip p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 580px;
+  margin-top: 0.75rem;
+}
 
     /* ── MAIN LAYOUT ── */
     .pref-layout {
@@ -527,23 +568,23 @@
 </head>
 <body>
 
-<!-- ══ TOPBAR ══ -->
-<div class="topbar">
-  <a href="homePage.html" class="logo">Freq<span>Sync</span></a>
-  <nav>
-    <a href="homePage.html">Home</a>
-    <a href="addSpeakerPage.html">Add Speaker</a>
-    <a href="preferencesPage.html" class="active">Preferences</a>
-    <a href="playMusic.html">Play Music</a>
-  </nav>
-</div>
-
-<!-- ══ PAGE HEADER ══ -->
-<div class="page-hero">
-  <div class="page-eyebrow">Your Sound, Your Way</div>
-  <h1>Music <em>Preferences</em></h1>
-  <p>Your speaker is ground zero — its calibration is locked in as the baseline. Here you can shape how your music actually sounds on top of that: boost the bass, tame the highs, dial in exactly what feels right to you.</p>
-</div>
+<header>
+  <div class="topbar">
+    <a href="homePage.html" class="logo">Speak<span>Easy</span></a>
+    <div class="tagline-top">Speaker · Frequency · Balance</div>
+    <nav>
+      <a href="homePage.html">Home</a>
+      <a href="addSpeakerPage.html">Add Speaker</a>
+      <a href="preferencesPage.html" class="active">Preferences</a>
+      <a href="playMusic.html">Play Music</a>
+    </nav>
+  </div>
+  <div class="page-title-strip">
+    <div class="page-eyebrow">Your Sound, Your Way</div>
+    <h1>Music <em>Preferences</em></h1>
+    <p>Your speaker's calibration is set as the baseline, but here you can shape how your music actually sounds on top of that. You can boost the bass, accentuate the highs, or whatever feels right to you.</p>
+  </div>
+</header>
 
 <!-- ══ MAIN LAYOUT ══ -->
 <div class="pref-layout">
@@ -658,16 +699,14 @@
 
 <!-- ══ FOOTER ══ -->
 <footer>
-  <div class="footer-logo">FreqSync</div>
+  <div class="footer-logo">SpeakEasy</div>
   <div class="footer-links">
     <a href="homePage.html">Home</a>
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
     <a href="playMusic.html">Play Musicccccc</a>
-    <a href="#">Contact</a>
-    <a href="#">Privacy</a>
   </div>
-  <div class="footer-copy">© 2026 FreqSync. All rights reserved.</div>
+  <div class="footer-copy">© 2026 SpeakEasy. All rights reserved.</div>
 </footer>
 
 <!-- ══ TOAST ══ -->

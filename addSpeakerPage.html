@@ -116,7 +116,6 @@
     nav a:hover { background: rgba(162,250,163,0.15); color: var(--light-green); }
     nav a.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
 
-    /* page title strip */
     .page-title-strip {
       position: relative;
       z-index: 5;
@@ -150,9 +149,14 @@
       letter-spacing: -0.03em;
     }
 
-    .page-title-strip h1 em {
-      font-style: italic;
-      color: var(--light-green);
+    .page-title-strip h1 em { font-style: italic; color: var(--light-green); }
+
+    .page-title-strip p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      max-width: 580px;
+      margin-top: 0.75rem;
     }
 
     /* ─── MAIN ─── */
@@ -162,7 +166,7 @@
       margin: 0 auto;
     }
 
-    /* ─── TOP TABS (Learn / Know / My Speakers) ─── */
+    /* ─── TOP TABS ─── */
     .top-tab-bar {
       display: flex;
       gap: 0.5rem;
@@ -190,12 +194,7 @@
     }
 
     .top-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
-
-    .top-tab.active {
-      background: var(--light-green);
-      color: var(--deep-purple);
-      font-weight: 600;
-    }
+    .top-tab.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
 
     /* ─── TAB PANELS ─── */
     .tab-panel { display: none; }
@@ -206,7 +205,7 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── MY SPEAKERS EMPTY STATE ─── */
+    /* ─── EMPTY STATE ─── */
     .empty-state {
       text-align: center;
       padding: 5rem 2rem;
@@ -215,11 +214,7 @@
       border-radius: 24px;
     }
 
-    .empty-icon {
-      font-size: 3.5rem;
-      margin-bottom: 1.5rem;
-      opacity: 0.4;
-    }
+    .empty-icon { font-size: 3.5rem; margin-bottom: 1.5rem; opacity: 0.4; }
 
     .empty-state h3 {
       font-family: 'DM Serif Display', serif;
@@ -236,55 +231,20 @@
       margin: 0 auto 2rem;
     }
 
-    /* ─── ADVANCED TAB PLACEHOLDER ─── */
-    .advanced-placeholder {
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 24px;
-      padding: 4rem 3rem;
-      text-align: center;
-    }
-
-    .advanced-placeholder .badge {
-      display: inline-block;
-      font-family: 'Space Mono', monospace;
-      font-size: 0.68rem;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--cerulean);
-      background: rgba(79,117,155,0.12);
-      border: 1px solid rgba(79,117,155,0.25);
-      padding: 0.4rem 1rem;
-      border-radius: 100px;
-      margin-bottom: 1.5rem;
-    }
-
-    .advanced-placeholder h3 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 2rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .advanced-placeholder h3 em { font-style: italic; color: var(--muted-teal); }
-
-    .advanced-placeholder p {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      max-width: 420px;
-      margin: 0 auto;
-    }
-
     /* ─── I KNOW MY SPEAKER PANEL ─── */
-    #panel-know .know-card {
+    #panel-know .know-card,
+    .edit-speaker-view .know-card {
       background: var(--surface);
       border: 1px solid rgba(255,255,255,0.07);
       border-radius: 24px;
       padding: 2rem;
       margin-bottom: 1.5rem;
     }
-    #panel-know .know-card:last-child { margin-bottom: 0; }
-    #panel-know .know-section-label {
+    #panel-know .know-card:last-child,
+    .edit-speaker-view .know-card:last-child { margin-bottom: 0; }
+
+    #panel-know .know-section-label,
+    .edit-speaker-view .know-section-label {
       font-family: 'Space Mono', monospace;
       font-size: 0.68rem;
       letter-spacing: 0.22em;
@@ -295,38 +255,51 @@
       align-items: center;
       gap: 0.75rem;
     }
-    #panel-know .know-section-label::before {
+    #panel-know .know-section-label::before,
+    .edit-speaker-view .know-section-label::before {
       content: '';
       display: block;
       width: 24px;
       height: 1px;
       background: var(--muted-teal);
     }
-    #panel-know .know-card h3 {
+
+    #panel-know .know-card h3,
+    .edit-speaker-view .know-card h3 {
       font-family: 'DM Serif Display', serif;
       font-size: 1.4rem;
       margin-bottom: 1rem;
     }
-    #panel-know .know-card h3 em { font-style: italic; color: var(--muted-teal); }
-    #panel-know .know-instructions {
+    #panel-know .know-card h3 em,
+    .edit-speaker-view .know-card h3 em { font-style: italic; color: var(--muted-teal); }
+
+    #panel-know .know-instructions,
+    .edit-speaker-view .know-instructions {
       line-height: 1.7;
       color: var(--text-muted);
       font-size: 0.95rem;
     }
-    #panel-know .know-instructions p { margin-bottom: 1rem; }
-    #panel-know .know-instructions b { color: var(--light-green); }
-    #panel-know .know-preset-form {
+    #panel-know .know-instructions p,
+    .edit-speaker-view .know-instructions p { margin-bottom: 1rem; }
+    #panel-know .know-instructions b,
+    .edit-speaker-view .know-instructions b { color: var(--light-green); }
+
+    #panel-know .know-preset-form,
+    .edit-speaker-view .know-preset-form {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
       align-items: flex-end;
       margin-bottom: 1.5rem;
     }
-    #panel-know .know-input-group {
+
+    #panel-know .know-input-group,
+    .edit-speaker-view .know-input-group {
       flex: 1;
       min-width: 200px;
     }
-    #panel-know .know-input-group label {
+    #panel-know .know-input-group label,
+    .edit-speaker-view .know-input-group label {
       display: block;
       font-family: 'Space Mono', monospace;
       font-size: 0.68rem;
@@ -336,7 +309,9 @@
       margin-bottom: 0.5rem;
     }
     #panel-know .know-input-group input,
-    #panel-know .know-input-group select {
+    #panel-know .know-input-group select,
+    .edit-speaker-view .know-input-group input,
+    .edit-speaker-view .know-input-group select {
       width: 100%;
       padding: 0.75rem 1rem;
       background: var(--surface-2);
@@ -348,7 +323,8 @@
       outline: none;
       transition: border-color 0.2s;
     }
-    #panel-know .know-input-group select {
+    #panel-know .know-input-group select,
+    .edit-speaker-view .know-input-group select {
       appearance: none;
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
@@ -356,28 +332,39 @@
       padding-right: 2.5rem;
       cursor: pointer;
     }
-    #panel-know .know-input-group input::placeholder { color: var(--text-muted); }
+    #panel-know .know-input-group input::placeholder,
+    .edit-speaker-view .know-input-group input::placeholder { color: var(--text-muted); }
     #panel-know .know-input-group input:focus,
-    #panel-know .know-input-group select:focus { border-color: var(--muted-teal); }
-    #panel-know .know-preset-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
-    #panel-know .sliderContainer {
+    #panel-know .know-input-group select:focus,
+    .edit-speaker-view .know-input-group input:focus,
+    .edit-speaker-view .know-input-group select:focus { border-color: var(--muted-teal); }
+
+    #panel-know .know-preset-actions,
+    .edit-speaker-view .know-preset-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    #panel-know .sliderContainer,
+    .edit-speaker-view .sliderContainer {
       display: flex;
       justify-content: space-between;
       gap: 1rem;
       margin-top: 1.5rem;
       flex-wrap: wrap;
     }
-    #panel-know .sliderBlock {
+
+    #panel-know .sliderBlock,
+    .edit-speaker-view .sliderBlock {
       display: flex;
       flex-direction: column;
       align-items: center;
       width: 80px;
       flex-shrink: 0;
     }
-    #panel-know .sliderBlock.locked { opacity: 0.7; }
-    #panel-know .sliderBlock input[type="range"] {
+    #panel-know .sliderBlock.locked,
+    .edit-speaker-view .sliderBlock.locked { opacity: 0.7; }
+
+    #panel-know .sliderBlock input[type="range"],
+    .edit-speaker-view .sliderBlock input[type="range"] {
       writing-mode: vertical-lr;
-      -webkit-appearance: slider-vertical;
       width: 8px;
       height: 160px;
       margin: 0.5rem 0;
@@ -387,7 +374,8 @@
       border-radius: 100px;
       outline: none;
     }
-    #panel-know .sliderBlock input[type="range"]::-webkit-slider-thumb {
+    #panel-know .sliderBlock input[type="range"]::-webkit-slider-thumb,
+    .edit-speaker-view .sliderBlock input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 20px;
@@ -398,11 +386,14 @@
       box-shadow: 0 0 0 2px var(--muted-teal);
       cursor: pointer;
     }
-    #panel-know .know-boost { font-size: 0.65rem; color: var(--light-green); font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
-    #panel-know .know-cut { font-size: 0.65rem; color: #f07070; font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
-    #panel-know .know-sliderLabel { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 0.5rem; }
-    #panel-know .know-value { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted-teal); margin-top: 0.25rem; }
-    #panel-know .know-upload-zone {
+
+    #panel-know .know-boost, .edit-speaker-view .know-boost { font-size: 0.65rem; color: var(--light-green); font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
+    #panel-know .know-cut, .edit-speaker-view .know-cut { font-size: 0.65rem; color: #f07070; font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
+    #panel-know .know-sliderLabel, .edit-speaker-view .know-sliderLabel { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 0.5rem; }
+    #panel-know .know-value, .edit-speaker-view .know-value { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted-teal); margin-top: 0.25rem; }
+
+    #panel-know .know-upload-zone,
+    .edit-speaker-view .know-upload-zone {
       border: 2px dashed rgba(146,201,177,0.25);
       border-radius: 14px;
       padding: 2rem 1.5rem;
@@ -413,13 +404,16 @@
       background: rgba(146,201,177,0.03);
     }
     #panel-know .know-upload-zone:hover,
-    #panel-know .know-upload-zone.drag-over { border-color: var(--muted-teal); background: rgba(146,201,177,0.07); }
-    #panel-know .know-upload-zone.has-file { border-color: rgba(162,250,163,0.35); background: rgba(162,250,163,0.05); }
-    #panel-know .know-upload-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
-    #panel-know .know-upload-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; }
-    #panel-know .know-upload-hint { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Mono', monospace; }
-    #panel-know .know-player-controls { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
-    #panel-know .know-player-controls audio { flex: 1; min-width: 200px; height: 36px; }
+    #panel-know .know-upload-zone.drag-over,
+    .edit-speaker-view .know-upload-zone:hover,
+    .edit-speaker-view .know-upload-zone.drag-over { border-color: var(--muted-teal); background: rgba(146,201,177,0.07); }
+    #panel-know .know-upload-zone.has-file,
+    .edit-speaker-view .know-upload-zone.has-file { border-color: rgba(162,250,163,0.35); background: rgba(162,250,163,0.05); }
+    #panel-know .know-upload-icon, .edit-speaker-view .know-upload-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+    #panel-know .know-upload-title, .edit-speaker-view .know-upload-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    #panel-know .know-upload-hint, .edit-speaker-view .know-upload-hint { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+    #panel-know .know-player-controls, .edit-speaker-view .know-player-controls { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
+    #panel-know .know-player-controls audio, .edit-speaker-view .know-player-controls audio { flex: 1; min-width: 200px; height: 36px; }
     #panel-know #knowFileInput { display: none; }
 
     /* ─── SURVEY / LEARN FLOW ─── */
@@ -430,7 +424,6 @@
       overflow: hidden;
     }
 
-    /* progress bar */
     .survey-progress {
       background: var(--surface-2);
       padding: 1.2rem 2rem;
@@ -464,10 +457,7 @@
       transition: width 0.4s ease;
     }
 
-    .progress-steps {
-      display: flex;
-      gap: 6px;
-    }
+    .progress-steps { display: flex; gap: 6px; }
 
     .progress-dot {
       width: 8px;
@@ -481,7 +471,6 @@
     .progress-dot.done { background: var(--muted-teal); }
     .progress-dot.current { background: var(--light-green); box-shadow: 0 0 8px rgba(162,250,163,0.5); }
 
-    /* slide */
     .survey-slide { display: none; padding: 2.5rem 2rem; }
     .survey-slide.active { display: block; animation: fade-up 0.35s ease both; }
 
@@ -514,30 +503,11 @@
       50% { opacity: 0.5; transform: scale(0.7); }
     }
 
-    .slide-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.7rem;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
-
+    .slide-title { font-family: 'DM Serif Display', serif; font-size: 1.7rem; margin-bottom: 0.5rem; line-height: 1.2; }
     .slide-title em { font-style: italic; color: var(--muted-teal); }
+    .slide-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 2rem; max-width: 540px; }
 
-    .slide-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      line-height: 1.7;
-      margin-bottom: 2rem;
-      max-width: 540px;
-    }
-
-    /* play buttons */
-    .play-buttons {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-      margin-bottom: 2.5rem;
-    }
+    .play-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
 
     .play-btn {
       display: flex;
@@ -555,17 +525,8 @@
       transition: all 0.22s ease;
     }
 
-    .play-btn:hover {
-      border-color: var(--light-green);
-      color: var(--light-green);
-      background: rgba(162,250,163,0.06);
-    }
-
-    .play-btn.playing {
-      border-color: var(--light-green);
-      background: rgba(162,250,163,0.12);
-      color: var(--light-green);
-    }
+    .play-btn:hover { border-color: var(--light-green); color: var(--light-green); background: rgba(162,250,163,0.06); }
+    .play-btn.playing { border-color: var(--light-green); background: rgba(162,250,163,0.12); color: var(--light-green); }
 
     .play-btn .btn-icon {
       width: 32px;
@@ -581,15 +542,7 @@
     .play-btn.computer .btn-icon { background: rgba(79,117,155,0.2); }
     .play-btn.speaker  .btn-icon { background: rgba(162,250,163,0.15); }
 
-    .play-btn .mini-bars {
-      display: flex;
-      align-items: center;
-      gap: 2px;
-      height: 14px;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
+    .play-btn .mini-bars { display: flex; align-items: center; gap: 2px; height: 14px; opacity: 0; transition: opacity 0.2s; }
     .play-btn.playing .mini-bars { opacity: 1; }
 
     .mini-bar {
@@ -604,10 +557,7 @@
       to { transform: scaleY(1); }
     }
 
-    /* slider section */
-    .slider-section {
-      margin-bottom: 2.5rem;
-    }
+    .slider-section { margin-bottom: 2.5rem; }
 
     .slider-label {
       font-family: 'Space Mono', monospace;
@@ -618,14 +568,7 @@
       margin-bottom: 1rem;
     }
 
-    .slider-endpoints {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-bottom: 0.5rem;
-    }
-
+    .slider-endpoints { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
     .slider-endpoints span:first-child { color: var(--cerulean); }
     .slider-endpoints span:last-child  { color: var(--light-green); }
 
@@ -666,7 +609,6 @@
       letter-spacing: 0.08em;
     }
 
-    /* problems dropdown */
     .problems-section { margin-bottom: 2.5rem; }
 
     .problems-label {
@@ -696,16 +638,9 @@
       transition: border-color 0.2s;
     }
 
-    select.problems-select:focus {
-      outline: none;
-      border-color: var(--muted-teal);
-    }
+    select.problems-select:focus { outline: none; border-color: var(--muted-teal); }
+    select.problems-select option { background: var(--surface-2); }
 
-    select.problems-select option {
-      background: var(--surface-2);
-    }
-
-    /* nav buttons */
     .slide-nav {
       display: flex;
       align-items: center;
@@ -731,17 +666,8 @@
       display: inline-block;
     }
 
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 32px rgba(162,250,163,0.35);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(162,250,163,0.35); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
     .btn-ghost {
       background: transparent;
@@ -759,12 +685,27 @@
     .btn-ghost:hover { border-color: rgba(255,255,255,0.3); color: var(--text); }
     .btn-ghost:disabled { opacity: 0.3; cursor: not-allowed; }
 
-    /* ─── SPEAKER ADDED CONFIRMATION PAGE ─── */
-    .speaker-added-page {
-      display: none;
-      animation: fade-up 0.4s ease both;
+    /* ─── DANGER BUTTON ─── */
+    .btn-danger {
+      background: transparent;
+      border: 1px solid rgba(240, 100, 100, 0.35);
+      color: #f07070;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.88rem;
+      padding: 0.8rem 1.6rem;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.22s ease;
     }
 
+    .btn-danger:hover {
+      background: rgba(240, 100, 100, 0.1);
+      border-color: #f07070;
+    }
+
+    /* ─── SPEAKER ADDED CONFIRMATION ─── */
+    .speaker-added-page { display: none; animation: fade-up 0.4s ease both; }
     .speaker-added-page.active { display: block; }
 
     .added-header {
@@ -791,19 +732,9 @@
       flex-shrink: 0;
     }
 
-    .added-info h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.8rem;
-      margin-bottom: 0.4rem;
-    }
-
+    .added-info h2 { font-family: 'DM Serif Display', serif; font-size: 1.8rem; margin-bottom: 0.4rem; }
     .added-info h2 em { font-style: italic; color: var(--light-green); }
-
-    .added-info p {
-      font-size: 0.88rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
+    .added-info p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; }
 
     .added-badge {
       display: inline-flex;
@@ -821,85 +752,21 @@
       border-radius: 100px;
     }
 
-    .preferences-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
-    }
+    .preferences-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
 
-    .pref-card {
-      background: var(--surface);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 18px;
-      padding: 1.5rem;
-    }
-
-    .pref-card-label {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.75rem;
-    }
-
-    .pref-freq-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.6rem;
-    }
-
-    .pref-freq-name {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-    }
-
-    .pref-bar-wrap {
-      flex: 1;
-      height: 6px;
-      background: rgba(255,255,255,0.07);
-      border-radius: 100px;
-      margin: 0 0.75rem;
-      overflow: hidden;
-    }
-
-    .pref-bar-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--cerulean), var(--muted-teal));
-    }
-
+    .pref-card { background: var(--surface); border: 1px solid rgba(255,255,255,0.07); border-radius: 18px; padding: 1.5rem; }
+    .pref-card-label { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .pref-freq-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+    .pref-freq-name { font-size: 0.82rem; color: var(--text-muted); }
+    .pref-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.07); border-radius: 100px; margin: 0 0.75rem; overflow: hidden; }
+    .pref-bar-fill { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--cerulean), var(--muted-teal)); }
     .pref-bar-fill.highlight { background: linear-gradient(90deg, var(--grape), var(--light-green)); }
-
-    .pref-val {
-      font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      width: 28px;
-      text-align: right;
-    }
-
-    .pref-issues {
-      margin-top: 1rem;
-    }
-
-    .pref-issue-tag {
-      display: inline-block;
-      font-size: 0.72rem;
-      padding: 0.3rem 0.7rem;
-      border-radius: 100px;
-      background: rgba(93,81,121,0.2);
-      border: 1px solid rgba(93,81,121,0.3);
-      color: rgba(255,255,255,0.6);
-      margin: 0.2rem 0.2rem 0 0;
-    }
+    .pref-val { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); width: 28px; text-align: right; }
+    .pref-issues { margin-top: 1rem; }
+    .pref-issue-tag { display: inline-block; font-size: 0.72rem; padding: 0.3rem 0.7rem; border-radius: 100px; background: rgba(93,81,121,0.2); border: 1px solid rgba(93,81,121,0.3); color: rgba(255,255,255,0.6); margin: 0.2rem 0.2rem 0 0; }
 
     /* ─── MY SPEAKERS LIST ─── */
-    .speakers-list {
-      display: grid;
-      gap: 1rem;
-    }
+    .speakers-list { display: grid; gap: 1rem; }
 
     .speaker-list-card {
       background: var(--surface);
@@ -909,7 +776,6 @@
       display: flex;
       align-items: center;
       gap: 1.2rem;
-      cursor: pointer;
       transition: all 0.22s ease;
     }
 
@@ -932,11 +798,103 @@
       flex-shrink: 0;
     }
 
-    .spk-card-info { flex: 1; }
+    .spk-card-info { flex: 1; cursor: pointer; }
     .spk-card-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.2rem; }
     .spk-card-meta { font-family: 'Space Mono', monospace; font-size: 0.65rem; letter-spacing: 0.08em; color: var(--cerulean); }
 
-    .spk-card-arrow { color: var(--text-muted); font-size: 1rem; }
+    .spk-card-actions { display: flex; align-items: center; gap: 0.5rem; }
+
+    .spk-edit-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .spk-edit-btn:hover {
+      border-color: var(--muted-teal);
+      color: var(--muted-teal);
+      background: rgba(146,201,177,0.08);
+    }
+
+    .spk-delete-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid rgba(240,100,100,0.2);
+      background: transparent;
+      color: rgba(240,100,100,0.6);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .spk-delete-btn:hover {
+      border-color: #f07070;
+      color: #f07070;
+      background: rgba(240,100,100,0.08);
+    }
+
+    /* ─── EDIT SPEAKER VIEW ─── */
+    .edit-speaker-view {
+      display: none;
+      animation: fade-up 0.4s ease both;
+    }
+
+    .edit-speaker-view.active { display: block; }
+
+    .edit-back-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .edit-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: color 0.2s;
+      padding: 0;
+    }
+
+    .edit-back-btn:hover { color: var(--text); }
+
+    .edit-back-btn svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .edit-speaker-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .edit-speaker-title em { font-style: italic; color: var(--light-green); }
 
     /* ─── FOOTER ─── */
     footer {
@@ -949,31 +907,11 @@
       gap: 1.5rem;
     }
 
-    .footer-logo {
-      font-family: 'DM Serif Display', serif;
-      font-size: 1.4rem;
-      color: var(--light-green);
-      letter-spacing: -0.02em;
-    }
-
+    .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--light-green); letter-spacing: -0.02em; }
     .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
-
-    .footer-links a {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.45);
-      text-decoration: none;
-      transition: color 0.2s;
-      letter-spacing: 0.04em;
-      font-family: 'DM Sans', sans-serif;
-    }
-
+    .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; letter-spacing: 0.04em; font-family: 'DM Sans', sans-serif; }
     .footer-links a:hover { color: var(--muted-teal); }
-
-    .footer-copy {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.25);
-      font-family: 'Space Mono', monospace;
-    }
+    .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
 
     @media (max-width: 700px) {
       .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
@@ -990,8 +928,8 @@
 
 <header>
   <div class="topbar">
-    <a class="logo" href="homePage.html">Freq<span>Sync</span></a>
-    <div class="tagline-top">Speaker · Frequency · Harmony</div>
+    <a class="logo" href="homePage.html">Speak<span>Easy</span></a>
+    <div class="tagline-top">Speaker · Frequency · Balance</div>
     <nav>
       <a href="homePage.html">Home</a>
       <a href="addSpeakerPage.html" class="active">Add Speaker</a>
@@ -1003,15 +941,15 @@
   <div class="page-title-strip">
     <div class="page-eyebrow">Speaker Calibration</div>
     <h1>Add Your <em>Speaker</em></h1>
+    <p>Your speaker has it's own frequency response. Here, you can create a profile that minimizes the effect that your specific speaker has on the audio.</p>
   </div>
 </header>
 
 <main>
 
-  <!-- Main content: either the tab flow OR the speaker-added page -->
+  <!-- Main content: tab flow -->
   <div id="main-flow">
 
-    <!-- Top tab selector -->
     <div class="top-tab-bar">
       <button class="top-tab active" data-panel="learn">Learn My Speaker</button>
       <button class="top-tab" data-panel="know">I Know My Speaker</button>
@@ -1022,7 +960,6 @@
     <div class="tab-panel active" id="panel-learn">
       <div class="survey-wrapper">
 
-        <!-- Progress -->
         <div class="survey-progress">
           <span class="progress-label">Step <span id="step-current">1</span> of 6</span>
           <div class="progress-track">
@@ -1038,45 +975,27 @@
           </div>
         </div>
 
-        <!-- ── SLIDE 1: 60 Hz ── -->
+        <!-- SLIDE 1 -->
         <div class="survey-slide active" id="slide-0">
           <div class="slide-freq-tag"><div class="dot"></div> 60 Hz — Sub-bass</div>
           <h2 class="slide-title"><em>60 Hz</em></h2>
           <p class="slide-desc">60 Hz is the deep sub-bass region — kick drums, bass guitar fundamentals, and the physical pressure of low-end energy. Play both tones and listen carefully for which sounds louder or more present.</p>
-
           <div class="play-buttons">
             <button class="play-btn computer" id="play-comp-0" onclick="toggleTone(this, 60, 'computer')">
-              <div class="btn-icon">💻</div>
-              <span>Play on Computer</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
+              <div class="btn-icon">💻</div><span>Play on Computer</span>
+              <div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div>
             </button>
             <button class="play-btn speaker" id="play-spk-0" onclick="toggleTone(this, 60, 'speaker')">
-              <div class="btn-icon">🔊</div>
-              <span>Play on Speaker</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
+              <div class="btn-icon">🔊</div><span>Play on Speaker</span>
+              <div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div>
             </button>
           </div>
-
           <div class="slider-section">
             <div class="slider-label">Which device sounds louder at 60 Hz?</div>
-            <div class="slider-endpoints">
-              <span>← Computer louder</span>
-              <span>Speaker louder →</span>
-            </div>
+            <div class="slider-endpoints"><span>← Computer louder</span><span>Speaker louder →</span></div>
             <input type="range" min="0" max="100" value="50" id="slider-0" oninput="updateReadout(0)"/>
             <div class="slider-readout" id="readout-0">Even / Balanced</div>
           </div>
-
           <div class="problems-section">
             <div class="problems-label">Any issues noticed at this frequency?</div>
             <select class="problems-select" id="issues-0">
@@ -1089,52 +1008,27 @@
               <option value="other">Other issue</option>
             </select>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" disabled>← Back</button>
             <button class="btn-primary" onclick="goToSlide(1)">Next →</button>
           </div>
         </div>
 
-        <!-- ── SLIDE 2: 500 Hz ── -->
+        <!-- SLIDE 2 -->
         <div class="survey-slide" id="slide-1">
           <div class="slide-freq-tag"><div class="dot"></div> 500 Hz — Low midrange</div>
           <h2 class="slide-title"><em>500 Hz</em></h2>
           <p class="slide-desc">500 Hz sits in the low midrange — the body of vocals, the warmth of acoustic guitars, and the chest resonance of brass instruments. Excess here can feel "boxy"; a dip can make sound thin.</p>
-
           <div class="play-buttons">
-            <button class="play-btn computer" onclick="toggleTone(this, 500, 'computer')">
-              <div class="btn-icon">💻</div>
-              <span>Play on Computer</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
-            <button class="play-btn speaker" onclick="toggleTone(this, 500, 'speaker')">
-              <div class="btn-icon">🔊</div>
-              <span>Play on Speaker</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
+            <button class="play-btn computer" onclick="toggleTone(this, 500, 'computer')"><div class="btn-icon">💻</div><span>Play on Computer</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
+            <button class="play-btn speaker" onclick="toggleTone(this, 500, 'speaker')"><div class="btn-icon">🔊</div><span>Play on Speaker</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
           </div>
-
           <div class="slider-section">
             <div class="slider-label">Which device sounds louder at 500 Hz?</div>
-            <div class="slider-endpoints">
-              <span>← Computer louder</span>
-              <span>Speaker louder →</span>
-            </div>
+            <div class="slider-endpoints"><span>← Computer louder</span><span>Speaker louder →</span></div>
             <input type="range" min="0" max="100" value="50" id="slider-1" oninput="updateReadout(1)"/>
             <div class="slider-readout" id="readout-1">Even / Balanced</div>
           </div>
-
           <div class="problems-section">
             <div class="problems-label">Any issues noticed at this frequency?</div>
             <select class="problems-select" id="issues-1">
@@ -1148,52 +1042,27 @@
               <option value="other">Other issue</option>
             </select>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" onclick="goToSlide(0)">← Back</button>
             <button class="btn-primary" onclick="goToSlide(2)">Next →</button>
           </div>
         </div>
 
-        <!-- ── SLIDE 3: 1000 Hz ── -->
+        <!-- SLIDE 3 -->
         <div class="survey-slide" id="slide-2">
           <div class="slide-freq-tag"><div class="dot"></div> 1,000 Hz — Midrange</div>
           <h2 class="slide-title"><em>1 kHz</em></h2>
           <p class="slide-desc">1 kHz is the heart of the midrange — vocal clarity, guitar attack, and the fundamental pitch most ear-sensitive to. This frequency reveals speaker coloration most clearly.</p>
-
           <div class="play-buttons">
-            <button class="play-btn computer" onclick="toggleTone(this, 1000, 'computer')">
-              <div class="btn-icon">💻</div>
-              <span>Play on Computer</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
-            <button class="play-btn speaker" onclick="toggleTone(this, 1000, 'speaker')">
-              <div class="btn-icon">🔊</div>
-              <span>Play on Speaker</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
+            <button class="play-btn computer" onclick="toggleTone(this, 1000, 'computer')"><div class="btn-icon">💻</div><span>Play on Computer</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
+            <button class="play-btn speaker" onclick="toggleTone(this, 1000, 'speaker')"><div class="btn-icon">🔊</div><span>Play on Speaker</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
           </div>
-
           <div class="slider-section">
             <div class="slider-label">Which device sounds louder at 1,000 Hz?</div>
-            <div class="slider-endpoints">
-              <span>← Computer louder</span>
-              <span>Speaker louder →</span>
-            </div>
+            <div class="slider-endpoints"><span>← Computer louder</span><span>Speaker louder →</span></div>
             <input type="range" min="0" max="100" value="50" id="slider-2" oninput="updateReadout(2)"/>
             <div class="slider-readout" id="readout-2">Even / Balanced</div>
           </div>
-
           <div class="problems-section">
             <div class="problems-label">Any issues noticed at this frequency?</div>
             <select class="problems-select" id="issues-2">
@@ -1206,52 +1075,27 @@
               <option value="other">Other issue</option>
             </select>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" onclick="goToSlide(1)">← Back</button>
             <button class="btn-primary" onclick="goToSlide(3)">Next →</button>
           </div>
         </div>
 
-        <!-- ── SLIDE 4: 3500 Hz ── -->
+        <!-- SLIDE 4 -->
         <div class="survey-slide" id="slide-3">
           <div class="slide-freq-tag"><div class="dot"></div> 3,500 Hz — Upper midrange</div>
           <h2 class="slide-title"><em>3.5 kHz</em></h2>
           <p class="slide-desc">3.5 kHz is where consonants live — the "t", "s", and "k" sounds in speech, the bite of a snare, the pick attack on a guitar. Too much causes ear fatigue; too little makes music feel dull.</p>
-
           <div class="play-buttons">
-            <button class="play-btn computer" onclick="toggleTone(this, 3500, 'computer')">
-              <div class="btn-icon">💻</div>
-              <span>Play on Computer</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
-            <button class="play-btn speaker" onclick="toggleTone(this, 3500, 'speaker')">
-              <div class="btn-icon">🔊</div>
-              <span>Play on Speaker</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
+            <button class="play-btn computer" onclick="toggleTone(this, 3500, 'computer')"><div class="btn-icon">💻</div><span>Play on Computer</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
+            <button class="play-btn speaker" onclick="toggleTone(this, 3500, 'speaker')"><div class="btn-icon">🔊</div><span>Play on Speaker</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
           </div>
-
           <div class="slider-section">
             <div class="slider-label">Which device sounds louder at 3,500 Hz?</div>
-            <div class="slider-endpoints">
-              <span>← Computer louder</span>
-              <span>Speaker louder →</span>
-            </div>
+            <div class="slider-endpoints"><span>← Computer louder</span><span>Speaker louder →</span></div>
             <input type="range" min="0" max="100" value="50" id="slider-3" oninput="updateReadout(3)"/>
             <div class="slider-readout" id="readout-3">Even / Balanced</div>
           </div>
-
           <div class="problems-section">
             <div class="problems-label">Any issues noticed at this frequency?</div>
             <select class="problems-select" id="issues-3">
@@ -1264,52 +1108,27 @@
               <option value="other">Other issue</option>
             </select>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" onclick="goToSlide(2)">← Back</button>
             <button class="btn-primary" onclick="goToSlide(4)">Next →</button>
           </div>
         </div>
 
-        <!-- ── SLIDE 5: 16000 Hz ── -->
+        <!-- SLIDE 5 -->
         <div class="survey-slide" id="slide-4">
           <div class="slide-freq-tag"><div class="dot"></div> 16,000 Hz — Air / Treble</div>
           <h2 class="slide-title"><em>16 kHz</em></h2>
           <p class="slide-desc">16 kHz is the "air" of a recording — cymbal shimmer, the breath of a flute, the sparkle on a vocal. Many consumer speakers roll off here significantly, dulling the sense of space and openness.</p>
-
           <div class="play-buttons">
-            <button class="play-btn computer" onclick="toggleTone(this, 16000, 'computer')">
-              <div class="btn-icon">💻</div>
-              <span>Play on Computer</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
-            <button class="play-btn speaker" onclick="toggleTone(this, 16000, 'speaker')">
-              <div class="btn-icon">🔊</div>
-              <span>Play on Speaker</span>
-              <div class="mini-bars">
-                <div class="mini-bar" style="height:60%; --d:0.6s;"></div>
-                <div class="mini-bar" style="height:100%; --d:0.9s;"></div>
-                <div class="mini-bar" style="height:70%; --d:0.7s;"></div>
-                <div class="mini-bar" style="height:85%; --d:1.0s;"></div>
-              </div>
-            </button>
+            <button class="play-btn computer" onclick="toggleTone(this, 16000, 'computer')"><div class="btn-icon">💻</div><span>Play on Computer</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
+            <button class="play-btn speaker" onclick="toggleTone(this, 16000, 'speaker')"><div class="btn-icon">🔊</div><span>Play on Speaker</span><div class="mini-bars"><div class="mini-bar" style="height:60%; --d:0.6s;"></div><div class="mini-bar" style="height:100%; --d:0.9s;"></div><div class="mini-bar" style="height:70%; --d:0.7s;"></div><div class="mini-bar" style="height:85%; --d:1.0s;"></div></div></button>
           </div>
-
           <div class="slider-section">
             <div class="slider-label">Which device sounds louder at 16,000 Hz?</div>
-            <div class="slider-endpoints">
-              <span>← Computer louder</span>
-              <span>Speaker louder →</span>
-            </div>
+            <div class="slider-endpoints"><span>← Computer louder</span><span>Speaker louder →</span></div>
             <input type="range" min="0" max="100" value="50" id="slider-4" oninput="updateReadout(4)"/>
             <div class="slider-readout" id="readout-4">Even / Balanced</div>
           </div>
-
           <div class="problems-section">
             <div class="problems-label">Any issues noticed at this frequency?</div>
             <select class="problems-select" id="issues-4">
@@ -1322,24 +1141,21 @@
               <option value="other">Other issue</option>
             </select>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" onclick="goToSlide(3)">← Back</button>
             <button class="btn-primary" onclick="goToSlide(5)">Review →</button>
           </div>
         </div>
 
-        <!-- ── SLIDE 6: REVIEW & ADD ── -->
+        <!-- SLIDE 6: REVIEW -->
         <div class="survey-slide" id="slide-5">
           <div class="slide-freq-tag"><div class="dot"></div> Review</div>
           <h2 class="slide-title">Ready to <em>add</em> your speaker?</h2>
           <p class="slide-desc">Your frequency calibration data has been recorded across all 5 ranges. FreqSync will build a correction profile based on your responses. You can always re-run this survey later.</p>
-
           <div style="background: var(--surface-2); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
             <div style="font-family:'Space Mono',monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1.2rem;">Survey Summary</div>
             <div id="survey-summary" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
           </div>
-
           <div class="slide-nav">
             <button class="btn-ghost" onclick="goToSlide(4)">← Back</button>
             <button class="btn-primary" onclick="addSpeaker()">✓ Add Speaker</button>
@@ -1427,13 +1243,79 @@
         <button class="btn-primary" onclick="switchTab('learn')">+ Add Your First Speaker</button>
       </div>
       <div id="speakers-list-wrap" class="speakers-list" style="display:none;"></div>
+      <div id="add-another-wrap" style="display:none; margin-top:1.5rem;">
+        <button class="btn-ghost" onclick="addAnother()" style="width:100%; padding:1rem; border-radius:14px; border-style:dashed; font-size:0.9rem;">+ Add Another Speaker</button>
+      </div>
     </div>
 
   </div>
 
+  <!-- ══ EDIT SPEAKER VIEW ══ -->
+  <div class="edit-speaker-view" id="edit-speaker-view">
+    <div class="edit-back-bar">
+      <button class="edit-back-btn" onclick="closeEditView()">
+        <svg viewBox="0 0 16 16"><polyline points="10 3 5 8 10 13"/></svg>
+        Back to My Speakers
+      </button>
+      <h2 class="edit-speaker-title" id="edit-speaker-title">Edit <em>Speaker</em></h2>
+      <button class="btn-danger" onclick="deleteCurrentSpeaker()">🗑 Delete Speaker</button>
+    </div>
+
+    <div class="know-card">
+      <div class="know-section-label">Speaker Info</div>
+      <h3>Rename your <em>speaker</em></h3>
+      <div class="know-preset-form">
+        <div class="know-input-group">
+          <label>Speaker Name</label>
+          <input id="editSpeakerName" placeholder="Speaker name">
+        </div>
+        <div class="know-preset-actions">
+          <button class="btn-primary" onclick="saveEditedSpeakerName()">Save Name</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="know-card">
+      <div class="know-section-label">EQ Correction</div>
+      <h3>Speaker <em>Frequency Response</em> (Editable)</h3>
+      <p class="know-instructions" style="margin-bottom: 1rem;">Adjust each band to match your speaker's known frequency response. Positive = boost, negative = cut.</p>
+      <div id="editSpeakerSliders" class="sliderContainer"></div>
+    </div>
+
+    <div class="know-card">
+      <div class="know-section-label">Auto Correction</div>
+      <h3>Correction <em>EQ Applied</em> (Auto Generated)</h3>
+      <p class="know-instructions" style="margin-bottom: 1rem;">The inverse of your speaker response — applied automatically.</p>
+      <div id="editCorrectionSliders" class="sliderContainer"></div>
+    </div>
+
+    <div class="know-card">
+      <div class="know-section-label">Test</div>
+      <h3>Test <em>Music</em></h3>
+      <p class="know-instructions" style="margin-bottom: 1rem;">Upload a track to hear the correction EQ applied in real time.</p>
+      <div class="know-upload-zone" id="editUploadZone" onclick="document.getElementById('editFileInput').click()"
+           ondragover="editHandleDragOver(event)" ondragleave="editHandleDragLeave(event)" ondrop="editHandleDrop(event)">
+        <span class="know-upload-icon">🎵</span>
+        <div class="know-upload-title">Drop an audio file here</div>
+        <div class="know-upload-hint">or click to browse</div>
+        <div id="editUploadFilename"></div>
+      </div>
+      <input type="file" id="editFileInput" accept="audio/*" style="display:none;">
+      <div class="know-player-controls">
+        <button class="btn-primary" onclick="editPlayAudio()">Play</button>
+        <button class="btn-ghost" onclick="editPauseAudio()">Pause</button>
+        <audio id="editPlayer" controls></audio>
+      </div>
+    </div>
+
+    <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+      <button class="btn-primary" onclick="saveEditedSpeaker()">✓ Save Changes</button>
+      <button class="btn-ghost" onclick="closeEditView()">Cancel</button>
+    </div>
+  </div>
+
   <!-- ══ SPEAKER ADDED PAGE ══ -->
   <div class="speaker-added-page" id="speaker-added-page">
-
     <div class="added-header">
       <div class="added-icon">🔊</div>
       <div class="added-info">
@@ -1454,21 +1336,18 @@
       <button class="btn-primary" onclick="viewAllSpeakers()">View All Speakers</button>
       <button class="btn-ghost" onclick="addAnother()">+ Add Another Speaker</button>
     </div>
-
   </div>
 
 </main>
 
 <footer>
-  <div class="footer-logo">FreqSync</div>
+  <div class="footer-logo">SpeakEasy</div>
   <div class="footer-links">
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
     <a href="playMusic.html">Play Music</a>
-    <a href="#">Contact</a>
-    <a href="#">Privacy</a>
   </div>
-  <div class="footer-copy">© 2026 FreqSync. All rights reserved.</div>
+  <div class="footer-copy">© 2026 SpeakEasy. All rights reserved.</div>
 </footer>
 
 <script src="js/api.js"></script>
@@ -1476,56 +1355,45 @@
   // ─── STATE ───
   const freqLabels = ['60 Hz', '500 Hz', '1,000 Hz', '3,500 Hz', '16,000 Hz'];
   const freqNames  = ['Sub-bass', 'Low midrange', 'Midrange', 'Upper midrange', 'Air / Treble'];
+  const knowFrequencies = [60, 170, 350, 1000, 3500, 8000, 16000];
   const SPEAKERS_STORAGE_KEY = 'freqsync_speakers';
   let speakers = [];
   let currentTone = null;
   let audioCtx = null;
+  let editingSpkId = null;
+  let editAudioContext = null;
+  let editFilters = [];
 
+  // ─── LOAD SPEAKERS ───
+  // ─── SAFE API CALL WRAPPER ───
+  async function apiCall(fn) {
+    try { if (typeof API !== 'undefined') return await fn(); } catch (_) {}
+    return null;
+  }
+
+  // ─── LOAD SPEAKERS ───
   async function loadSpeakers() {
+    // Load from localStorage first — this is the source of truth
     try {
       const raw = localStorage.getItem(SPEAKERS_STORAGE_KEY);
       speakers = raw ? JSON.parse(raw) : [];
-      // Sync from backend when available
-      try {
-        const list = await API.speakerSystemsList();
-        if (Array.isArray(list) && list.length > 0) {
-          list.forEach(s => {
-            if (!speakers.some(sp => sp.id === s.id)) {
-              speakers.push({
-                id: s.id,
-                name: s.name,
-                addedAt: s.created_at ? new Date(s.created_at).toLocaleDateString() : new Date().toLocaleDateString(),
-                source: 'learn',
-                readings: []
-              });
-            }
-          });
-        }
-      } catch (_) {}
-      // Migrate existing eq_ presets into speakers list if not already present
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith('eq_')) {
-          const name = key.replace('eq_', '');
-          if (!speakers.some(s => s.source === 'know' && s.eqPresetKey === key)) {
-            speakers.push({
-              id: 'eq_' + name + '_' + Date.now(),
-              name,
-              addedAt: new Date().toLocaleDateString(),
-              source: 'know',
-              eqPresetKey: key
-            });
-          }
-        }
-      }
-      saveSpeakers();
     } catch (e) { speakers = []; }
+    // Best-effort API sync — never overwrites local data
+    try {
+      const list = await apiCall(() => API.speakerSystemsList());
+      if (Array.isArray(list) && list.length > 0) {
+        list.forEach(s => {
+          if (!speakers.some(sp => sp.id === s.id)) {
+            speakers.push({ id: s.id, name: s.name, addedAt: s.created_at ? new Date(s.created_at).toLocaleDateString() : new Date().toLocaleDateString(), source: 'learn', readings: [] });
+          }
+        });
+        saveSpeakers();
+      }
+    } catch (_) {}
   }
 
   function saveSpeakers() {
-    try {
-      localStorage.setItem(SPEAKERS_STORAGE_KEY, JSON.stringify(speakers));
-    } catch (e) {}
+    try { localStorage.setItem(SPEAKERS_STORAGE_KEY, JSON.stringify(speakers)); } catch (e) {}
   }
 
   // ─── TAB SWITCHING ───
@@ -1538,10 +1406,12 @@
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   }
 
-  // ─── INIT: Load speakers from storage ───
-  loadSpeakers().then(() => {});
-  updateSpeakerCount();
-  rebuildSpeakerList();
+  // Wait for speakers to load before building UI so the list is populated first
+  loadSpeakers().then(() => {
+    updateSpeakerCount();
+    rebuildSpeakerList();
+    knowPopulatePresetMenu();
+  });
 
   // ─── SLIDE NAVIGATION ───
   function goToSlide(idx) {
@@ -1553,14 +1423,14 @@
     });
     document.getElementById('step-current').textContent = idx + 1;
     document.getElementById('progress-fill').style.width = ((idx + 1) / 6 * 100) + '%';
-
     if (idx === 5) buildSummary();
   }
 
-  // ─── SLIDER READOUT ───
   function updateReadout(idx) {
-    const val = parseInt(document.getElementById('slider-' + idx).value);
+    const slider = document.getElementById('slider-' + idx);
     const el = document.getElementById('readout-' + idx);
+    if (!slider || !el) return;
+    const val = parseInt(slider.value);
     if (val < 35)      el.textContent = 'Computer sounds louder';
     else if (val > 65) el.textContent = 'Speaker sounds louder';
     else               el.textContent = 'Even / Balanced';
@@ -1568,15 +1438,10 @@
 
   // ─── TONE PLAYBACK ───
   function toggleTone(btn, freq, source) {
-    if (btn.classList.contains('playing')) {
-      stopTone();
-      btn.classList.remove('playing');
-      return;
-    }
+    if (btn.classList.contains('playing')) { stopTone(); btn.classList.remove('playing'); return; }
     stopTone();
     document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
     btn.classList.add('playing');
-
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
@@ -1587,19 +1452,12 @@
     gain.connect(audioCtx.destination);
     osc.start();
     currentTone = { osc, gain, btn };
-
-    // auto-stop after 4s
-    setTimeout(() => {
-      if (currentTone && currentTone.btn === btn) stopTone();
-    }, 4000);
+    setTimeout(() => { if (currentTone && currentTone.btn === btn) stopTone(); }, 4000);
   }
 
   function stopTone() {
     if (currentTone) {
-      try {
-        currentTone.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05);
-        currentTone.osc.stop(audioCtx.currentTime + 0.15);
-      } catch(e) {}
+      try { currentTone.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.05); currentTone.osc.stop(audioCtx.currentTime + 0.15); } catch(e) {}
       currentTone.btn.classList.remove('playing');
       currentTone = null;
     }
@@ -1608,10 +1466,14 @@
   // ─── BUILD SUMMARY ───
   function buildSummary() {
     const wrap = document.getElementById('survey-summary');
+    if (!wrap) return;
     wrap.innerHTML = '';
     freqLabels.forEach((label, i) => {
-      const val = parseInt(document.getElementById('slider-' + i).value);
-      const issue = document.getElementById('issues-' + i).value;
+      const sliderEl = document.getElementById('slider-' + i);
+      const issueEl = document.getElementById('issues-' + i);
+      if (!sliderEl || !issueEl) return;
+      const val = parseInt(sliderEl.value);
+      const issue = issueEl.value;
       let bias = val < 35 ? 'Computer louder' : val > 65 ? 'Speaker louder' : 'Balanced';
       const row = document.createElement('div');
       row.style.cssText = 'display:flex; justify-content:space-between; align-items:center; font-size:0.84rem;';
@@ -1628,25 +1490,17 @@
   async function addSpeaker() {
     stopTone();
     const readings = freqLabels.map((label, i) => ({
-      label,
-      name: freqNames[i],
-      val: parseInt(document.getElementById('slider-' + i).value),
-      issue: document.getElementById('issues-' + i).value
+      label, name: freqNames[i],
+      val: parseInt((document.getElementById('slider-' + i) || {value:'50'}).value),
+      issue: (document.getElementById('issues-' + i) || {value:'none'}).value
     }));
     let id = Date.now();
     let name = 'Speaker ' + (speakers.filter(s => s.source === 'learn').length + 1);
     try {
-      const created = await API.speakerSystemsCreate({ name });
-      id = created.id;
-      await API.speakerSystemsCalibrate(id, readings);
+      const created = await apiCall(() => API.speakerSystemsCreate({ name }));
+      if (created) { id = created.id; await apiCall(() => API.speakerSystemsCalibrate(id, readings)); }
     } catch (_) {}
-    const spk = {
-      id,
-      name,
-      addedAt: new Date().toLocaleDateString(),
-      source: 'learn',
-      readings
-    };
+    const spk = { id, name, addedAt: new Date().toLocaleDateString(), source: 'learn', readings, eqBands: {} };
     speakers.push(spk);
     saveSpeakers();
     updateSpeakerCount();
@@ -1658,18 +1512,23 @@
     document.getElementById('spk-count-badge').textContent = '(' + speakers.length + ')';
   }
 
+  // ─── REBUILD SPEAKER LIST (with edit + delete buttons) ───
   function rebuildSpeakerList() {
     const wrap = document.getElementById('speakers-list-wrap');
     const empty = document.getElementById('empty-speakers');
     wrap.innerHTML = '';
+    const addWrap = document.getElementById('add-another-wrap');
     if (speakers.length === 0) {
       wrap.style.display = 'none';
       empty.style.display = 'block';
+      if (addWrap) addWrap.style.display = 'none';
       return;
     }
     empty.style.display = 'none';
     wrap.style.display = 'grid';
+    if (addWrap) addWrap.style.display = 'block';
     speakers.forEach(spk => {
+      const id = spk.id;
       const bands = spk.source === 'know' ? '7 frequency bands' : '5 frequency bands';
       const method = spk.source === 'know' ? 'Manual' : 'Learn';
       const card = document.createElement('div');
@@ -1678,12 +1537,264 @@
         <div class="spk-card-icon">🔊</div>
         <div class="spk-card-info">
           <div class="spk-card-name">${spk.name}</div>
-          <div class="spk-card-meta">Added ${spk.addedAt} · ${bands} · ${method}</div>
+          <div class="spk-card-meta">Added ${spk.addedAt} · ${bands} · ${method} — click to edit</div>
         </div>
-        <div class="spk-card-arrow">›</div>
+        <div class="spk-card-actions">
+          <button class="spk-edit-btn" title="Edit speaker">✏️</button>
+          <button class="spk-delete-btn" title="Delete speaker">🗑</button>
+        </div>
       `;
+      card.querySelector('.spk-card-info').addEventListener('click', () => openEditView(id));
+      card.querySelector('.spk-edit-btn').addEventListener('click', (e) => { e.stopPropagation(); openEditView(id); });
+      card.querySelector('.spk-delete-btn').addEventListener('click', (e) => { e.stopPropagation(); deleteSpeaker(id); });
       wrap.appendChild(card);
     });
+  }
+
+  // ─── DELETE SPEAKER (from list) ───
+  function deleteSpeaker(id) {
+    const idStr = String(id);
+    const spkIndex = speakers.findIndex(s => String(s.id) === idStr);
+    if (spkIndex === -1) {
+      console.error("Speaker not found with ID:", id);
+      return;
+    }
+    const spk = speakers[spkIndex];
+    if (!confirm(`Delete "${spk.name}"? This cannot be undone.`)) return;
+    if (spk.eqPresetKey) {
+      try { localStorage.removeItem(spk.eqPresetKey); } catch (_) {}
+    }
+    speakers.splice(spkIndex, 1);
+    saveSpeakers();
+    updateSpeakerCount();
+    rebuildSpeakerList();
+    if (typeof knowPopulatePresetMenu === 'function') knowPopulatePresetMenu();
+    apiCall(() => API.speakerSystemsDelete(idStr));
+    if (spk.eqPresetKey) { apiCall(() => API.eqPresetsDelete(spk.eqPresetKey)); }
+  }
+
+  // ─── DELETE SPEAKER (from edit view) ───
+  function deleteCurrentSpeaker() {
+    if (!editingSpkId) {
+      console.warn("No speaker is currently being edited.");
+      return;
+    }
+    const idToDelete = String(editingSpkId);
+    const spk = speakers.find(s => String(s.id) === idToDelete);
+    if (!spk) return;
+    if (!confirm(`Delete "${spk.name}"? This cannot be undone.`)) return;
+    if (spk.eqPresetKey) {
+      try { localStorage.removeItem(spk.eqPresetKey); } catch (_) {}
+    }
+    speakers = speakers.filter(s => String(s.id) !== idToDelete);
+    saveSpeakers();
+    updateSpeakerCount();
+    rebuildSpeakerList();
+    if (typeof knowPopulatePresetMenu === 'function') knowPopulatePresetMenu();
+    closeEditView();
+    apiCall(() => API.speakerSystemsDelete(idToDelete));
+    if (spk.eqPresetKey) { apiCall(() => API.eqPresetsDelete(spk.eqPresetKey)); }
+  }
+
+  // ─── OPEN EDIT VIEW ───
+  function openEditView(id) {
+    const spk = speakers.find(s => String(s.id) === String(id));
+    if (!spk) return;
+    editingSpkId = id;
+
+    // Hide main flow, show edit view
+    document.getElementById('main-flow').style.display = 'none';
+    document.getElementById('speaker-added-page').classList.remove('active');
+    const editView = document.getElementById('edit-speaker-view');
+    editView.classList.add('active');
+
+    // Set title & name input
+    document.getElementById('edit-speaker-title').innerHTML = `Edit <em>${spk.name}</em>`;
+    document.getElementById('editSpeakerName').value = spk.name;
+
+    // Build EQ sliders
+    buildEditSliders(spk);
+
+    // Reset audio player
+    const player = document.getElementById('editPlayer');
+    player.src = '';
+    document.getElementById('editUploadFilename').textContent = '';
+    document.getElementById('editUploadZone').classList.remove('has-file');
+    editAudioContext = null;
+    editFilters = [];
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function buildEditSliders(spk) {
+    const speakerDiv = document.getElementById('editSpeakerSliders');
+    const corrDiv = document.getElementById('editCorrectionSliders');
+    speakerDiv.innerHTML = '';
+    corrDiv.innerHTML = '';
+
+    // Load existing EQ bands if available
+    let bands = {};
+    if (spk.eqBands) {
+      bands = spk.eqBands;
+    } else if (spk.eqPresetKey) {
+      try { bands = JSON.parse(localStorage.getItem(spk.eqPresetKey) || '{}'); } catch (_) {}
+    }
+
+    knowFrequencies.forEach(freq => {
+      // For learn-type speakers, derive approximate band value from readings
+      let initialVal = 0;
+      if (bands[freq] !== undefined) {
+        initialVal = -bands[freq]; // stored as correction, display as speaker response
+      } else if (spk.source === 'learn' && spk.readings) {
+        // Map the 5 survey bands to the 7 EQ bands approximately
+        const nearestReading = spk.readings.find(r => {
+          const hz = parseFloat(r.label.replace(/[^0-9.]/g, '').replace(',', ''));
+          return Math.abs(hz - freq) < freq * 0.8;
+        });
+        if (nearestReading) {
+          const bias = nearestReading.val - 50; // -50 to +50
+          initialVal = -(bias / 50) * 6; // scale to ±6 dB
+        }
+      }
+
+      // Speaker response slider (editable)
+      const block = document.createElement('div');
+      block.className = 'sliderBlock';
+      block.innerHTML = `
+        <div class="know-boost">Boost</div>
+        <input type="range" min="-12" max="12" step="0.1" value="${initialVal.toFixed(1)}" id="editSpk${freq}">
+        <div class="know-cut">Cut</div>
+        <div class="know-sliderLabel">${freq >= 1000 ? (freq/1000) + 'k' : freq} Hz</div>
+        <div class="know-value" id="editSpkVal${freq}">${initialVal >= 0 ? '+' : ''}${initialVal.toFixed(1)} dB</div>
+      `;
+      speakerDiv.appendChild(block);
+
+      // Correction slider (read-only, auto-generated)
+      const block2 = document.createElement('div');
+      block2.className = 'sliderBlock locked';
+      const corrVal = -initialVal;
+      block2.innerHTML = `
+        <div class="know-boost">Boost</div>
+        <input type="range" min="-12" max="12" step="0.1" value="${corrVal.toFixed(1)}" id="editCorr${freq}" disabled>
+        <div class="know-cut">Cut</div>
+        <div class="know-sliderLabel">${freq >= 1000 ? (freq/1000) + 'k' : freq} Hz</div>
+        <div class="know-value" id="editCorrVal${freq}">${corrVal >= 0 ? '+' : ''}${corrVal.toFixed(1)} dB</div>
+      `;
+      corrDiv.appendChild(block2);
+
+      document.getElementById('editSpk' + freq).addEventListener('input', updateEditEQ);
+    });
+  }
+
+  function updateEditEQ() {
+    knowFrequencies.forEach((freq, i) => {
+      const spkVal = parseFloat(document.getElementById('editSpk' + freq).value);
+      const corrVal = -spkVal;
+      document.getElementById('editSpkVal' + freq).textContent = (spkVal >= 0 ? '+' : '') + spkVal.toFixed(1) + ' dB';
+      document.getElementById('editCorr' + freq).value = corrVal.toFixed(1);
+      document.getElementById('editCorrVal' + freq).textContent = (corrVal >= 0 ? '+' : '') + corrVal.toFixed(1) + ' dB';
+      if (editFilters[i]) editFilters[i].gain.value = corrVal;
+    });
+  }
+
+  function saveEditedSpeakerName() {
+    const newName = document.getElementById('editSpeakerName').value.trim();
+    if (!newName) { alert('Enter a speaker name'); return; }
+    const spk = speakers.find(s => String(s.id) === String(editingSpkId));
+    if (!spk) return;
+    spk.name = newName;
+    document.getElementById('edit-speaker-title').innerHTML = `Edit <em>${newName}</em>`;
+    saveSpeakers();
+    rebuildSpeakerList();
+  }
+
+  async function saveEditedSpeaker() {
+    const newName = document.getElementById('editSpeakerName').value.trim();
+    if (!newName) { alert('Enter a speaker name'); return; }
+    const spk = speakers.find(s => String(s.id) === String(editingSpkId));
+    if (!spk) return;
+
+    // Collect EQ bands
+    const eqBands = {};
+    knowFrequencies.forEach(freq => {
+      const spkVal = parseFloat(document.getElementById('editSpk' + freq).value);
+      eqBands[freq] = -spkVal; // store as correction value
+    });
+
+    spk.name = newName;
+    spk.eqBands = eqBands;
+
+    // Persist EQ preset for know-type speakers
+    if (spk.eqPresetKey) {
+      localStorage.setItem(spk.eqPresetKey, JSON.stringify(eqBands));
+      await apiCall(() => API.eqPresetsSave({ id: spk.eqPresetKey, name: newName, speaker_system_id: '', bands: eqBands }));
+    }
+
+    saveSpeakers();
+    updateSpeakerCount();
+    rebuildSpeakerList();
+    knowPopulatePresetMenu();
+    closeEditView();
+  }
+
+  function closeEditView() {
+    document.getElementById('edit-speaker-view').classList.remove('active');
+    document.getElementById('main-flow').style.display = 'block';
+    // Pause edit audio if playing
+    try { document.getElementById('editPlayer').pause(); } catch (_) {}
+    editingSpkId = null;
+    switchTab('my-speakers');
+  }
+
+  // ─── EDIT AUDIO PLAYER ───
+  function editSetupAudio() {
+    const audioElement = document.getElementById('editPlayer');
+    editAudioContext = new AudioContext();
+    const track = editAudioContext.createMediaElementSource(audioElement);
+    editFilters = knowFrequencies.map(freq => {
+      const filter = editAudioContext.createBiquadFilter();
+      filter.type = 'peaking';
+      filter.frequency.value = freq;
+      filter.Q.value = 1;
+      filter.gain.value = 0;
+      return filter;
+    });
+    const chain = [track, ...editFilters, editAudioContext.destination];
+    for (let i = 0; i < chain.length - 1; i++) chain[i].connect(chain[i + 1]);
+    updateEditEQ();
+  }
+
+  document.getElementById('editFileInput').addEventListener('change', function() {
+    const file = this.files[0];
+    if (file) {
+      const audio = document.getElementById('editPlayer');
+      audio.src = URL.createObjectURL(file);
+      document.getElementById('editUploadFilename').textContent = file.name;
+      document.getElementById('editUploadZone').classList.add('has-file');
+      if (!editAudioContext) editSetupAudio();
+    }
+  });
+
+  function editPlayAudio() {
+    if (!editAudioContext) editSetupAudio();
+    document.getElementById('editPlayer').play();
+  }
+
+  function editPauseAudio() { document.getElementById('editPlayer').pause(); }
+
+  function editHandleDragOver(e) { e.preventDefault(); document.getElementById('editUploadZone').classList.add('drag-over'); }
+  function editHandleDragLeave() { document.getElementById('editUploadZone').classList.remove('drag-over'); }
+  function editHandleDrop(e) {
+    e.preventDefault();
+    document.getElementById('editUploadZone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const audio = document.getElementById('editPlayer');
+      audio.src = URL.createObjectURL(file);
+      document.getElementById('editUploadFilename').textContent = file.name;
+      document.getElementById('editUploadZone').classList.add('has-file');
+      if (!editAudioContext) editSetupAudio();
+    }
   }
 
   // ─── SHOW ADDED PAGE ───
@@ -1691,64 +1802,35 @@
     document.getElementById('main-flow').style.display = 'none';
     const page = document.getElementById('speaker-added-page');
     page.classList.add('active');
-
-    // Build prefs grid (Learn speakers have readings; Know speakers don't)
     const grid = document.getElementById('prefs-grid');
     grid.innerHTML = '';
 
     if (spk.source === 'know') {
-      // Know speaker: show EQ preset summary
       const preset = spk.eqPresetKey ? JSON.parse(localStorage.getItem(spk.eqPresetKey) || '{}') : {};
       const card1 = document.createElement('div');
       card1.className = 'pref-card';
       card1.innerHTML = `<div class="pref-card-label">Manual Calibration</div>`;
       Object.entries(preset).forEach(([freq, val]) => {
-        card1.innerHTML += `
-          <div class="pref-freq-row">
-            <span class="pref-freq-name">${freq} Hz</span>
-            <div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div>
-            <span class="pref-val">${val > 0 ? '+' : ''}${val} dB</span>
-          </div>
-        `;
+        card1.innerHTML += `<div class="pref-freq-row"><span class="pref-freq-name">${freq} Hz</span><div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div><span class="pref-val">${val > 0 ? '+' : ''}${val} dB</span></div>`;
       });
       grid.appendChild(card1);
       const card3 = document.createElement('div');
       card3.className = 'pref-card';
-      card3.innerHTML = `
-        <div class="pref-card-label">Calibration Status</div>
-        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
-          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-            <span style="color:var(--text-muted);">Bands calibrated</span>
-            <span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">7 / 7</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-            <span style="color:var(--text-muted);">Method</span>
-            <span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Manual</span>
-          </div>
-        </div>
-      `;
+      card3.innerHTML = `<div class="pref-card-label">Calibration Status</div><div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:var(--text-muted);">Bands calibrated</span><span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">7 / 7</span></div><div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:var(--text-muted);">Method</span><span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Manual</span></div></div>`;
       grid.appendChild(card3);
       return;
     }
 
-    // Card 1: Frequency balance (Learn only)
     const card1 = document.createElement('div');
     card1.className = 'pref-card';
     card1.innerHTML = `<div class="pref-card-label">Frequency Balance</div>`;
     spk.readings.forEach(r => {
       const pct = r.val;
       const highlight = pct < 30 || pct > 70;
-      card1.innerHTML += `
-        <div class="pref-freq-row">
-          <span class="pref-freq-name">${r.label}</span>
-          <div class="pref-bar-wrap"><div class="pref-bar-fill${highlight ? ' highlight' : ''}" style="width:${pct}%;"></div></div>
-          <span class="pref-val">${pct < 35 ? 'Comp' : pct > 65 ? 'Spk' : 'Even'}</span>
-        </div>
-      `;
+      card1.innerHTML += `<div class="pref-freq-row"><span class="pref-freq-name">${r.label}</span><div class="pref-bar-wrap"><div class="pref-bar-fill${highlight ? ' highlight' : ''}" style="width:${pct}%;"></div></div><span class="pref-val">${pct < 35 ? 'Comp' : pct > 65 ? 'Spk' : 'Even'}</span></div>`;
     });
     grid.appendChild(card1);
 
-    // Card 2: Noted Issues
     const card2 = document.createElement('div');
     card2.className = 'pref-card';
     const issues = spk.readings.filter(r => r.issue !== 'none');
@@ -1756,34 +1838,13 @@
     if (issues.length === 0) {
       card2.innerHTML += `<p style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">No issues detected — speaker performed cleanly across all frequency bands.</p>`;
     } else {
-      card2.innerHTML += `<div class="pref-issues">`;
-      issues.forEach(r => {
-        card2.innerHTML += `<span class="pref-issue-tag">⚠ ${r.label}</span>`;
-      });
-      card2.innerHTML += `</div>`;
+      card2.innerHTML += `<div class="pref-issues">` + issues.map(r => `<span class="pref-issue-tag">⚠ ${r.label}</span>`).join('') + `</div>`;
     }
     grid.appendChild(card2);
 
-    // Card 3: Profile status
     const card3 = document.createElement('div');
     card3.className = 'pref-card';
-    card3.innerHTML = `
-      <div class="pref-card-label">Calibration Status</div>
-      <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
-        <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-          <span style="color:var(--text-muted);">Bands calibrated</span>
-          <span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">5 / 5</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-          <span style="color:var(--text-muted);">Method</span>
-          <span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Learn Mode</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
-          <span style="color:var(--text-muted);">Correction active</span>
-          <span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">Yes</span>
-        </div>
-      </div>
-    `;
+    card3.innerHTML = `<div class="pref-card-label">Calibration Status</div><div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;"><div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:var(--text-muted);">Bands calibrated</span><span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">5 / 5</span></div><div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:var(--text-muted);">Method</span><span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Learn Mode</span></div><div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:var(--text-muted);">Correction active</span><span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">Yes</span></div></div>`;
     grid.appendChild(card3);
   }
 
@@ -1796,15 +1857,13 @@
   function addAnother() {
     document.getElementById('speaker-added-page').classList.remove('active');
     document.getElementById('main-flow').style.display = 'block';
-    // reset survey
     goToSlide(0);
     document.querySelectorAll('.problems-select').forEach(s => s.selectedIndex = 0);
-    document.querySelectorAll('input[type="range"]').forEach((r, i) => { r.value = 50; updateReadout(i); });
+    [0,1,2,3,4].forEach(i => { const r = document.getElementById('slider-' + i); if (r) { r.value = 50; updateReadout(i); } });
     switchTab('learn');
   }
 
   // ─── I KNOW MY SPEAKER PANEL ───
-  const knowFrequencies = [60, 170, 350, 1000, 3500, 8000, 16000];
   let knowAudioContext = null;
   let knowFilters = [];
 
@@ -1815,26 +1874,15 @@
     if (!speakerDiv || !correctionDiv) return;
 
     knowFrequencies.forEach(freq => {
+      const label = freq >= 1000 ? (freq/1000) + 'k' : freq;
       const block = document.createElement('div');
       block.className = 'sliderBlock';
-      block.innerHTML = `
-        <div class="know-boost">Boost</div>
-        <input type="range" min="-12" max="12" step="0.1" value="0" id="knowSpeaker${freq}">
-        <div class="know-cut">Cut</div>
-        <div class="know-sliderLabel">${freq} Hz</div>
-        <div class="know-value" id="knowSpeakerVal${freq}">0 dB</div>
-      `;
+      block.innerHTML = `<div class="know-boost">Boost</div><input type="range" min="-12" max="12" step="0.1" value="0" id="knowSpeaker${freq}"><div class="know-cut">Cut</div><div class="know-sliderLabel">${label} Hz</div><div class="know-value" id="knowSpeakerVal${freq}">0 dB</div>`;
       speakerDiv.appendChild(block);
 
       const block2 = document.createElement('div');
       block2.className = 'sliderBlock locked';
-      block2.innerHTML = `
-        <div class="know-boost">Boost</div>
-        <input type="range" min="-12" max="12" step="0.1" value="0" id="knowCorr${freq}" disabled>
-        <div class="know-cut">Cut</div>
-        <div class="know-sliderLabel">${freq} Hz</div>
-        <div class="know-value" id="knowCorrVal${freq}">0 dB</div>
-      `;
+      block2.innerHTML = `<div class="know-boost">Boost</div><input type="range" min="-12" max="12" step="0.1" value="0" id="knowCorr${freq}" disabled><div class="know-cut">Cut</div><div class="know-sliderLabel">${label} Hz</div><div class="know-value" id="knowCorrVal${freq}">0 dB</div>`;
       correctionDiv.appendChild(block2);
 
       document.getElementById('knowSpeaker' + freq).addEventListener('input', knowUpdateEQ);
@@ -1881,13 +1929,8 @@
     });
   }
 
-  function knowHandleDragOver(e) {
-    e.preventDefault();
-    document.getElementById('knowUploadZone').classList.add('drag-over');
-  }
-  function knowHandleDragLeave() {
-    document.getElementById('knowUploadZone').classList.remove('drag-over');
-  }
+  function knowHandleDragOver(e) { e.preventDefault(); document.getElementById('knowUploadZone').classList.add('drag-over'); }
+  function knowHandleDragLeave() { document.getElementById('knowUploadZone').classList.remove('drag-over'); }
   function knowHandleDrop(e) {
     e.preventDefault();
     document.getElementById('knowUploadZone').classList.remove('drag-over');
@@ -1901,36 +1944,21 @@
     }
   }
 
-  function knowPlayAudio() {
-    if (!knowAudioContext) knowSetupAudio();
-    document.getElementById('knowPlayer').play();
-  }
-  function knowPauseAudio() {
-    document.getElementById('knowPlayer').pause();
-  }
+  function knowPlayAudio() { if (!knowAudioContext) knowSetupAudio(); document.getElementById('knowPlayer').play(); }
+  function knowPauseAudio() { document.getElementById('knowPlayer').pause(); }
 
   async function knowSavePreset() {
     const name = document.getElementById('knowSpeakerName').value;
     if (!name) { alert('Enter a speaker name'); return; }
     const preset = {};
-    knowFrequencies.forEach(freq => {
-      preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value);
-    });
+    knowFrequencies.forEach(freq => { preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value); });
     const key = 'eq_' + name;
-    try {
-      await API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: preset });
-    } catch (_) {}
     localStorage.setItem(key, JSON.stringify(preset));
+    await apiCall(() => API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: preset }));
     knowPopulatePresetMenu();
     const existing = speakers.find(s => s.source === 'know' && s.eqPresetKey === key);
     if (!existing) {
-      const spk = {
-        id: key + '_' + Date.now(),
-        name,
-        addedAt: new Date().toLocaleDateString(),
-        source: 'know',
-        eqPresetKey: key
-      };
+      const spk = { id: key + '_' + Date.now(), name, addedAt: new Date().toLocaleDateString(), source: 'know', eqPresetKey: key, eqBands: preset };
       speakers.push(spk);
       saveSpeakers();
       updateSpeakerCount();
@@ -1945,9 +1973,7 @@
     const key = document.getElementById('knowPresetMenu').value;
     if (!key) return;
     const preset = JSON.parse(localStorage.getItem(key));
-    knowFrequencies.forEach(freq => {
-      document.getElementById('knowSpeaker' + freq).value = -preset[freq];
-    });
+    knowFrequencies.forEach(freq => { document.getElementById('knowSpeaker' + freq).value = -preset[freq]; });
     knowUpdateEQ();
   }
 
@@ -1955,8 +1981,8 @@
     const key = document.getElementById('knowPresetMenu').value;
     if (!key) { alert('Select a preset'); return; }
     if (!confirm('Delete this preset?')) return;
-    try { await API.eqPresetsDelete(key); } catch (_) {}
     localStorage.removeItem(key);
+    await apiCall(() => API.eqPresetsDelete(key));
     speakers = speakers.filter(s => !(s.source === 'know' && s.eqPresetKey === key));
     saveSpeakers();
     updateSpeakerCount();
@@ -1967,16 +1993,9 @@
   async function knowPopulatePresetMenu() {
     const menu = document.getElementById('knowPresetMenu');
     menu.innerHTML = '<option value="">Select preset...</option>';
-    const keys = new Set();
-    try {
-      const list = await API.eqPresetsList();
-      if (Array.isArray(list)) list.forEach(p => keys.add(p.id));
-    } catch (_) {}
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith('eq_')) keys.add(key);
-    }
-    [...keys].sort().forEach(key => {
+    // Build preset list from saved speakers only (not raw localStorage scan)
+    const keys = speakers.filter(s => s.eqPresetKey).map(s => s.eqPresetKey);
+    [...new Set(keys)].sort().forEach(key => {
       const opt = document.createElement('option');
       opt.value = key;
       opt.textContent = key.replace('eq_', '');
