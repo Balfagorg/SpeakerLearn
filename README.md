@@ -7,14 +7,17 @@
 ## Quick Start
 
 ```bash
-python run_local.py
-# or: run.bat (Windows)
+# macOS / Linux
+./run.sh
+
+# Windows
+run.bat
 ```
 
 - **Frontend:** http://localhost:8080  
 - **Backend:** http://localhost:8001  
 
-Requires: Python 3, CMake 3.20+, C++20 compiler. Builds backend automatically.
+Requires: **Node.js**, CMake 3.20+, C++20 compiler. Builds backend automatically. (Python no longer required.)
 
 ### Backend Only
 
