@@ -57,6 +57,23 @@ function migrateLearnTo7Band(readings) {
   return learn5To7Band(readings);
 }
 
+/** Get master EQ value at a given frequency (interpolate from 10-band format) */
+function getMasterEQValueAt(eq, hz) {
+  if (!eq || typeof eq !== 'object') return 0;
+  const freqs = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+  const val = (f) => parseFloat(eq[f] ?? eq[String(f)] ?? 0) || 0;
+  let lo = null, hi = null;
+  for (const f of freqs) {
+    if (f <= hz) lo = f;
+    if (f >= hz && hi === null) { hi = f; break; }
+  }
+  if (lo === null) return val(hi ?? freqs[0]);
+  if (hi === null) return val(lo);
+  if (lo === hi) return val(lo);
+  const vLo = val(lo), vHi = val(hi);
+  return vLo + (vHi - vLo) * (hz - lo) / (hi - lo);
+}
+
 /** Platform options for source selector */
 const PLATFORM_OPTIONS = [
   { value: 'spotify', label: 'Spotify' },

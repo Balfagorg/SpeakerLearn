@@ -558,28 +558,11 @@ header::after {
     .footer-links a:hover { color: var(--muted-teal); }
     .footer-copy { font-size: 0.68rem; color: rgba(255,255,255,0.2); font-family: 'Space Mono', monospace; }
 
-    @media (max-width: 768px) {
-      .pref-layout { padding: 2rem 4vw 4rem; gap: 1.5rem; }
-      .player-card { position: static; }
-    }
     @media (max-width: 600px) {
       .topbar { flex-wrap: wrap; gap: 1rem; padding: 1.2rem 4vw; }
       nav { flex-wrap: wrap; border-radius: 14px; }
-      nav a { padding: 0.6rem 1rem; min-height: 44px; }
-      .eq-band { grid-template-columns: 72px 1fr 54px; gap: 0.75rem; }
-      .card { padding: 1.5rem 1.2rem; }
-      .preset-row { flex-direction: column; align-items: stretch; }
-      .preset-name-input { min-width: 100%; }
-      .btn { min-height: 44px; }
-      .play-btn, .stop-btn { width: 48px; height: 48px; }
-      footer { flex-direction: column; text-align: center; padding: 2rem 4vw; }
-      .footer-links { justify-content: center; }
-    }
-    @media (max-width: 480px) {
-      .eq-band { grid-template-columns: 60px 1fr 48px; }
-      .band-value { min-width: 44px; font-size: 0.72rem; }
-      .styled-select { min-width: 100%; }
-      .upload-zone { padding: 1.5rem 1rem; }
+      .eq-band { grid-template-columns: 72px 1fr 54px; }
+      footer { flex-direction: column; text-align: center; }
     }
   </style>
 </head>
@@ -721,7 +704,7 @@ header::after {
     <a href="homePage.html">Home</a>
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
-    <a href="playMusic.html">Play Music</a>
+    <a href="playMusic.html">Play Musicccccc</a>
   </div>
   <div class="footer-copy">© 2026 SpeakEasy. All rights reserved.</div>
 </footer>
@@ -730,21 +713,19 @@ header::after {
 <div class="toast" id="toast"></div>
 
 <script src="js/api.js"></script>
-<script src="js/bands.js"></script>
 <script>
 // ── BAND CONFIG ──
 const BANDS = [
-  { hz: 60,    label: '60 Hz',         desc: 'Sub-bass' },
-  { hz: 500,   label: '500 Hz',        desc: 'Low-mid' },
-  { hz: 1000,  label: '1 kHz',         desc: 'Midrange' },
-  { hz: 3500,  label: '3.5 kHz',       desc: 'Presence' },
-  { hz: 8000,  label: '3.5k+500 mix',  desc: 'Mix' },
+  { hz: 60,    label: '60 Hz',    desc: 'Sub-bass' },
+  { hz: 500,   label: '500 Hz',   desc: 'Low-mid' },
+  { hz: 1000,  label: '1 kHz',    desc: 'Midrange' },
+  { hz: 3500,  label: '3.5 kHz',  desc: 'Presence' },
+  { hz: 16000, label: '16 kHz',   desc: 'Air' },
 ];
 
 // ── STATE ──
 let eqValues = {};
-let calibrationValues = {};
-BANDS.forEach(b => { eqValues[b.hz] = 0; calibrationValues[b.hz] = 0; });
+BANDS.forEach(b => eqValues[b.hz] = 0);
 let activePresetKey = null;
 
 // ── BUILD EQ SLIDERS ──
@@ -763,7 +744,7 @@ function buildEQ() {
       </div>
       <div class="slider-wrap">
         <div class="slider-zero"></div>
-        <input type="range" min="-16" max="16" step="0.5" value="${val}"
+        <input type="range" min="-12" max="12" step="0.5" value="${val}"
                id="slider_${band.hz}" oninput="onSliderChange(${band.hz}, this.value)"/>
       </div>
       <div class="band-value" id="val_${band.hz}">${formatDb(val)}</div>
@@ -791,7 +772,7 @@ function onSliderChange(hz, raw) {
 function updateSliderTrack(hz, v) {
   const slider = document.getElementById('slider_' + hz);
   if (!slider) return;
-  const pct = ((v + 16) / 32) * 100;
+  const pct = ((v + 12) / 24) * 100;
   // Color fill from center to thumb
   const center = 50;
   const left  = Math.min(center, pct);
@@ -850,9 +831,7 @@ function getCtx() {
 
 function applyEQ() {
   if (!filters.length) return;
-  BANDS.forEach((band, i) => {
-    filters[i].gain.value = (calibrationValues[band.hz] ?? 0) + (eqValues[band.hz] ?? 0);
-  });
+  BANDS.forEach((band, i) => { filters[i].gain.value = eqValues[band.hz]; });
 }
 
 function chainAndPlay(offset) {
@@ -1047,13 +1026,17 @@ function updateVizBars(active) {
 // ── SPEAKER SELECTOR ──
 async function populateSpeakerSelect() {
   const sel = document.getElementById('speakerSelect');
+  const firstOpt = sel.querySelector('option[value=""]') || (() => {
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = '— No speaker selected —';
+    sel.appendChild(o);
+    return o;
+  })();
   sel.innerHTML = '';
-  const none = document.createElement('option');
-  none.value = '';
-  none.textContent = '— No speaker selected —';
-  sel.appendChild(none);
+  sel.appendChild(firstOpt);
   try {
-    const list = await API.getAllSpeakers();
+    const list = await API.speakerSystemsList();
     if (Array.isArray(list)) {
       list.forEach(s => {
         const opt = document.createElement('option');
@@ -1063,88 +1046,15 @@ async function populateSpeakerSelect() {
       });
     }
   } catch (_) {}
-
-  let activeId = '';
-  try { activeId = await API.getActiveSpeakerFromBackend(); } catch (_) {}
-  if (!activeId) activeId = API.getActiveSpeaker();
-  if (activeId && sel.querySelector('option[value="' + CSS.escape(activeId) + '"]')) {
-    sel.value = activeId;
-  }
-  await onSpeakerChange(true);
 }
 
-async function loadSpeakerCalibration(speakerId, silent) {
-  BANDS.forEach(b => calibrationValues[b.hz] = 0);
-  if (!speakerId) { applyEQ(); return; }
-
-  try {
-    const speakers = await API.getAllSpeakers();
-    const spk = speakers.find(s => s.id === speakerId);
-    if (!spk) { applyEQ(); return; }
-
-    let calBands = null;
-
-    if (spk.source === 'know' && spk.eqPresetKey) {
-      // Prefer speaker object's eqBands (updated when editing) — ensures edited calibrations load correctly
-      if (spk.eqBands && Object.keys(spk.eqBands).length > 0) {
-        calBands = spk.eqBands;
-      } else {
-        const raw = localStorage.getItem(spk.eqPresetKey);
-        if (raw) {
-          try {
-            const parsed = JSON.parse(raw);
-            calBands = parsed.bands || parsed;
-          } catch (_) {}
-        }
-        if (!calBands) {
-          try {
-            const list = await API.eqPresetsList();
-            const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
-            if (p && p.bands) calBands = p.bands;
-          } catch (_) {}
-        }
-      }
-    } else if (spk.bands_7) {
-      calBands = spk.bands_7;
-    } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
-      const converted = learn5To7Band(spk.readings);
-      calBands = converted.bands;
-    } else {
-      try {
-        const cal = await API.speakerSystemsCalibration(speakerId);
-        if (Array.isArray(cal) && cal.length >= 5) {
-          const converted = learn5To7Band(cal);
-          calBands = converted.bands;
-        }
-      } catch (_) {}
-    }
-
-    if (calBands) {
-      BANDS.forEach(b => {
-        if (calBands[b.hz] !== undefined) {
-          calibrationValues[b.hz] = calBands[b.hz];
-        } else if (b.hz === 8000) {
-          calibrationValues[8000] = calBands[16000] ?? calBands[8000] ?? 0;
-        }
-      });
-    }
-  } catch (e) {
-    if (!silent) showToast('Could not load speaker calibration', true);
-  }
-  applyEQ();
-}
-
-async function onSpeakerChange(silent = false) {
+async function onSpeakerChange() {
   const sel = document.getElementById('speakerSelect');
   const badge = document.getElementById('speakerBadge');
   const val = sel.value;
   const label = val ? sel.options[sel.selectedIndex].text : 'No speaker';
   badge.textContent = label;
-  API.setActiveSpeaker(val);
-  try { await API.speakerSystemsSwitch(val); } catch (_) {
-    if (!silent) showToast('Could not switch speaker', true);
-  }
-  await loadSpeakerCalibration(val, silent);
+  try { await API.speakerSystemsSwitch(val); } catch (_) {}
 }
 
 // ── PRESETS ──
@@ -1156,7 +1066,7 @@ async function savePreset() {
   const data = { name, speaker, bands: { ...eqValues } };
   try {
     await API.eqPresetsSave({ id: key, name, speaker_system_id: speaker, bands: data.bands });
-  } catch (_) { showToast('Could not save preset to server', true); }
+  } catch (_) {}
   localStorage.setItem(key, JSON.stringify(data));
   activePresetKey = key;
   document.getElementById('presetNameInput').value = '';
@@ -1203,7 +1113,7 @@ async function loadPreset(key) {
 
 async function deletePreset(key, e) {
   e.stopPropagation();
-  try { await API.eqPresetsDelete(key); } catch (_) { showToast('Could not delete preset from server', true); }
+  try { await API.eqPresetsDelete(key); } catch (_) {}
   localStorage.removeItem(key);
   if (activePresetKey === key) activePresetKey = null;
   renderPresets();
@@ -1263,27 +1173,10 @@ function showToast(msg, error = false) {
   toastTimer = setTimeout(() => { t.className = 'toast' + (error ? ' error' : ''); }, 2800);
 }
 
-// ── CROSS-TAB ACTIVE SPEAKER SYNC ──
-window.addEventListener('storage', (e) => {
-  if (e.key !== 'freqsync_active_speaker') return;
-  const newId = e.newValue || '';
-  const sel = document.getElementById('speakerSelect');
-  if (sel && sel.value !== newId) {
-    if (sel.querySelector('option[value="' + CSS.escape(newId) + '"]')) {
-      sel.value = newId;
-    }
-    loadSpeakerCalibration(newId, true);
-    const badge = document.getElementById('speakerBadge');
-    if (badge) {
-      badge.textContent = newId && sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : 'No speaker';
-    }
-  }
-});
-
 // ── INIT ──
 buildEQ();
 buildVizBars();
-populateSpeakerSelect();
+populateSpeakerSelect().then(() => onSpeakerChange());
 renderPresets();
 </script>
 </body>

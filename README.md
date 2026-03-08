@@ -7,6 +7,9 @@
 ## Quick Start
 
 ```bash
+# Install dependencies (required for SpeakEasy Bridge)
+npm install
+
 # macOS / Linux
 ./run.sh
 
@@ -18,6 +21,18 @@ run.bat
 - **Backend:** http://localhost:8001  
 
 Requires: **Node.js**, CMake 3.20+, C++20 compiler. Builds backend automatically. (Python no longer required.)
+
+### SpeakEasy Bridge — Use as system output device
+
+To route **all system audio** (Spotify, YouTube, games) through SpeakEasy's EQ:
+
+1. Install [VB-Audio Virtual Cable](https://vb-audio.com/Cable/) (free)
+2. In Windows Sound settings, set **Output** to *CABLE Input*
+3. Open Play Music → **SpeakEasy Bridge** tab
+4. Select **Input** (CABLE Output) and **Output** (your speakers)
+5. Choose a speaker/preset/genre for EQ, then click **Start Bridge**
+
+Audio from any app will flow: app → CABLE Input → SpeakEasy (EQ) → your speakers.
 
 ### Backend Only
 
@@ -40,7 +55,11 @@ Backend/
 ├── playMusic.html          # Playback with EQ correction
 ├── js/
 │   ├── api.js              # Backend API + localStorage fallback
-│   └── bands.js            # 7-band EQ constants, Learn↔7 conversion
+│   ├── bands.js            # 7-band EQ constants, Learn↔7 conversion
+│   └── eqExport.js         # EqualizerAPO config export
+├── bridge/
+│   ├── audioBridge.js      # Virtual cable capture → EQ → output
+│   └── biquadEq.js         # Real-time biquad EQ for bridge
 ├── backend/                # C++20 HTTP API
 │   ├── src/                # api, db, core (pipeline, stages)
 │   ├── dsp_engine/         # DSP library (C API)
@@ -59,6 +78,11 @@ Backend/
 | 2 | addSpeakerPage | **Learn** (5 test tones) or **Know** (manual 7-band EQ) |
 | 3 | preferencesPage | Select speaker, tweak EQ (±16 dB), save presets |
 | 4 | playMusic | Choose speaker + preset, output device, play with correction |
+| 5 | SpeakEasy Bridge | Route system audio through EQ (requires VB-Audio Virtual Cable) |
+
+**SpeakEasy Bridge:** Set system output to a virtual cable; SpeakEasy captures it, applies EQ, and forwards to your speakers. See the Bridge tab in Play Music.
+
+**EqualizerAPO export:** For system-wide EQ without the bridge, export config and use [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/).
 
 ---
 

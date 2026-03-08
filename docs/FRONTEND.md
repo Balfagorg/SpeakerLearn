@@ -190,6 +190,10 @@ Sidebar lists saved presets from Preferences (localStorage + API). Optional spea
 
 Predefined EQ curves: Pop, Rock, R&B, Jazz, Electronic. Each has a 10-band definition (32–16 kHz). `bandsTo10Band()` interpolates 7-band data to 10-band for playback. Genre cards show emoji, name, description; active state uses light-green border and background tint.
 
+### Tab Capture
+
+**Capture tab audio** applies the active EQ to audio from other browser tabs (Spotify Web Player, YouTube, etc.). Uses `getDisplayMedia({ video: true, audio: true })`; the user selects which tab to share. The captured stream is routed through `MediaStreamAudioSourceNode` → BiquadFilter chain → output. Video tracks are stopped immediately; only audio is processed. Capture stops when the user clicks Stop, switches panels, or ends sharing in the browser.
+
 ### Audio Pipeline
 
 1. Decode audio file with `AudioContext.decodeAudioData()`
@@ -199,6 +203,21 @@ Predefined EQ curves: Pop, Rock, R&B, Jazz, Electronic. Each has a 10-band defin
 5. Connect to `AudioContext.destination` (or selected sink via `setSinkId`)
 
 Seek: stop playback, update `pauseOffset`, restart from new position. Per-panel state tracks `audioCtx`, `sourceNode`, `gainNode`, `filters`, `decodedBuffer`, `isPlaying`, `startTime`, `pauseOffset`, `durationSec`, `volume`, and `activeEQ`.
+
+### System-Wide EQ (EqualizerAPO Export)
+
+**Why in-browser EQ only affects Brennan playback:** The Web Audio API processes only audio that flows through the browser tab. Spotify, YouTube, and other apps output directly to the system audio device and bypass the browser entirely. This is a fundamental browser sandbox constraint.
+
+**Solution — EqualizerAPO export:** To apply the same EQ curve to Spotify, games, and all system audio on Windows, use the **Download config** or **Copy** buttons on Play Music or Preferences. This generates an EqualizerAPO config file.
+
+**Setup:**
+1. Install [EqualizerAPO](https://sourceforge.net/projects/equalizerapo/) (free, open-source, Windows only)
+2. During setup, select your audio device
+3. Export your EQ from SpeakEasy (Play Music or Preferences)
+4. Save the downloaded `config.txt` to `C:\Program Files\EqualizerAPO\config\`
+5. Restart EqualizerAPO or switch audio device to apply
+
+**Caveats:** Works best with built-in sound cards; some USB/Bluetooth devices may not support APOs. Apps using ASIO or WASAPI exclusive mode bypass system effects.
 
 ---
 
@@ -313,6 +332,7 @@ flowchart TB
 | `playMusic.html` | Playback | My Speakers, My Presets, Genre Presets tabs; device routing; BiquadFilterNode EQ |
 | `js/api.js` | Backend + storage | CRUD, merge logic, device enumeration, audioOptimize |
 | `js/bands.js` | EQ math | 5↔7 conversion, BANDS_7, LEARN_5 constants, PLATFORM_OPTIONS |
+| `js/eqExport.js` | System-wide EQ | EqualizerAPO config export, download, clipboard copy |
 
 ---
 

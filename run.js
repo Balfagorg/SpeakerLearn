@@ -95,11 +95,72 @@ function serveFile(filePath) {
   };
 }
 
-const server = http.createServer((req, res) => {
-  let urlPath = req.url === '/' ? '/homePage.html' : req.url;
-  urlPath = urlPath.split('?')[0];
-  const filePath = path.join(ROOT, urlPath);
+let bridge;
+try {
+  bridge = require('./bridge/audioBridge');
+} catch (e) {
+  bridge = null;
+}
 
+function sendJson(res, status, obj) {
+  res.writeHead(status, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify(obj));
+}
+
+function parseBody(req) {
+  return new Promise((resolve) => {
+    let body = '';
+    req.on('data', (c) => { body += c; });
+    req.on('end', () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch {
+        resolve({});
+      }
+    });
+  });
+}
+
+const server = http.createServer(async (req, res) => {
+  const urlPath = (req.url || '/').split('?')[0];
+
+  if (bridge && urlPath.startsWith('/bridge/')) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204);
+      res.end();
+      return;
+    }
+    try {
+      if (urlPath === '/bridge/devices' && req.method === 'GET') {
+        const { inputs, outputs } = bridge.getDevices();
+        return sendJson(res, 200, { inputs, outputs });
+      }
+      if (urlPath === '/bridge/status' && req.method === 'GET') {
+        return sendJson(res, 200, bridge.getStatus());
+      }
+      if (urlPath === '/bridge/start' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const result = bridge.startBridge(body);
+        return sendJson(res, 200, result);
+      }
+      if (urlPath === '/bridge/stop' && req.method === 'POST') {
+        const result = bridge.stopBridge();
+        return sendJson(res, 200, result);
+      }
+      if (urlPath === '/bridge/eq' && req.method === 'POST') {
+        const body = await parseBody(req);
+        const result = bridge.updateEq(body.eqGains);
+        return sendJson(res, 200, result);
+      }
+      sendJson(res, 404, { error: 'Not found' });
+    } catch (err) {
+      sendJson(res, 500, { error: err.message || String(err) });
+    }
+    return;
+  }
+
+  const filePath = path.join(ROOT, urlPath === '/' ? 'homePage.html' : urlPath);
   if (!filePath.startsWith(ROOT)) {
     res.writeHead(403);
     res.end();
