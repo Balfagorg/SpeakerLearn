@@ -2,10 +2,10 @@
   "name": "speakeasy-brennan",
   "version": "0.1.0",
   "description": "SpeakEasy adaptive audio — bridge mode for system-wide EQ",
-  "main": "run.js",
+  "main": "server/run.js",
   "scripts": {
-    "start": "node run.js",
-    "bridge": "node bridge/audioBridge.js"
+    "start": "node server/run.js",
+    "bridge": "node server/bridge/audioBridge.js"
   },
   "dependencies": {
     "naudiodon": "^2.3.6"

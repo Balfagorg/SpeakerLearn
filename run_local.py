@@ -88,7 +88,7 @@ def main():
         print(f"[run] Backend failed to start:\n{out.decode(errors='replace')}")
         sys.exit(1)
 
-    # 3. Start frontend (Python HTTP server) — serve from project root
+    # 3. Start frontend (Python HTTP server) — serve from frontend/
     import http.server
     import socketserver
 
@@ -98,6 +98,9 @@ def main():
 
     handler = QuietHandler
     handler.extensions_map[".js"] = "application/javascript"
+
+    frontend_dir = ROOT / "frontend"
+    os.chdir(frontend_dir)
 
     try:
         with socketserver.TCPServer(("", FRONTEND_PORT), handler) as httpd:

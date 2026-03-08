@@ -11,5 +11,5 @@ if errorlevel 1 (
   exit /b 1
 )
 
-node run.js
+node server/run.js
 if errorlevel 1 pause

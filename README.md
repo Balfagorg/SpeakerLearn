@@ -22,6 +22,8 @@ run.bat
 
 Requires: **Node.js**, CMake 3.20+, C++20 compiler. Builds backend automatically. (Python no longer required.)
 
+**Installation:** See [docs/INSTALL.md](docs/INSTALL.md) for detailed setup of CMake, npm, and dependencies on **Windows** and **macOS**.
+
 ### SpeakEasy Bridge — Use as system output device
 
 To route **all system audio** (Spotify, YouTube, games) through SpeakEasy's EQ:
@@ -48,24 +50,33 @@ cmake .. && cmake --build . --config Release
 
 ```
 Backend/
-├── index.html              # Entry → redirects to homePage
-├── homePage.html           # Landing (hero, mission, 3D speaker)
-├── addSpeakerPage.html     # Add/calibrate (Learn or Know flow)
-├── preferencesPage.html    # EQ preferences, active speaker, presets
-├── playMusic.html          # Playback with EQ correction
-├── js/
-│   ├── api.js              # Backend API + localStorage fallback
-│   ├── bands.js            # 7-band EQ constants, Learn↔7 conversion
-│   └── eqExport.js         # EqualizerAPO config export
-├── bridge/
-│   ├── audioBridge.js      # Virtual cable capture → EQ → output
-│   └── biquadEq.js         # Real-time biquad EQ for bridge
-├── backend/                # C++20 HTTP API
-│   ├── src/                # api, db, core (pipeline, stages)
-│   ├── dsp_engine/         # DSP library (C API)
-│   └── docs/               # API.md, ARCHITECTURE.md
-└── docs/
-    └── FRONTEND.md         # Design system, components, responsive
+├── frontend/               # UI (HTML, JS, assets)
+│   ├── index.html         # Entry → redirects to homePage
+│   ├── homePage.html      # Landing (hero, mission, 3D speaker)
+│   ├── addSpeakerPage.html
+│   ├── preferencesPage.html
+│   ├── playMusic.html
+│   └── js/
+│       ├── api.js         # Backend API + localStorage fallback
+│       ├── bands.js       # 7-band EQ constants, Learn↔7 conversion
+│       └── eqExport.js    # EqualizerAPO config export
+├── server/                # Node.js server + bridge
+│   ├── run.js             # Main runner (builds backend, serves frontend)
+│   └── bridge/
+│       ├── audioBridge.js # Virtual cable capture → EQ → output
+│       └── biquadEq.js    # Real-time biquad EQ for bridge
+├── backend/               # C++20 HTTP API
+│   ├── src/               # api, db, core (pipeline, stages)
+│   ├── Mac OS/            # macOS build script (build-macos.sh)
+│   ├── dsp_engine/        # DSP library (C API)
+│   └── docs/              # API.md, ARCHITECTURE.md
+├── docs/
+│   ├── INSTALL.md
+│   ├── BRIDGE.md
+│   └── FRONTEND.md
+├── run.bat                # Windows launcher
+├── run.sh                 # macOS/Linux launcher
+└── run_local.py           # Python launcher (alternative)
 ```
 
 ---
@@ -90,8 +101,11 @@ Backend/
 
 | Doc | Description |
 |-----|-------------|
+| [docs/OVERVIEW.md](docs/OVERVIEW.md) | **System overview** — How SpeakEasy works end-to-end |
+| [docs/INSTALL.md](docs/INSTALL.md) | **Install guide** — CMake, npm, dependencies (Windows & macOS) |
 | [docs/FRONTEND.md](docs/FRONTEND.md) | Design system, CSS, components, responsive, API usage |
 | [backend/README.md](backend/README.md) | Backend build, pipeline, schema |
+| [backend/Mac OS/README.md](backend/Mac%20OS/README.md) | macOS-specific build instructions |
 | [backend/docs/API.md](backend/docs/API.md) | Full API reference |
 | [backend/docs/ARCHITECTURE.md](backend/docs/ARCHITECTURE.md) | Component diagram, data flow |
 

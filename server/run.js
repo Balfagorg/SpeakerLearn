@@ -13,7 +13,8 @@ const path = require('path');
 const { spawn, execSync } = require('child_process');
 const os = require('os');
 
-const ROOT = path.resolve(__dirname);
+const ROOT = path.resolve(__dirname, '..');
+const FRONTEND_DIR = path.join(ROOT, 'frontend');
 const BACKEND_DIR = path.join(ROOT, 'backend');
 const BUILD_DIR = path.join(BACKEND_DIR, 'build');
 const FRONTEND_PORT = 8080;
@@ -22,6 +23,7 @@ const BACKEND_PORT = 8001;
 const isWindows = os.platform() === 'win32';
 
 function findBackendExe() {
+  const macOsBuildDir = path.join(BACKEND_DIR, 'Mac OS', 'build');
   const candidates = isWindows
     ? [
         path.join(BUILD_DIR, 'Release', 'speakerlearn_serverd.exe'),
@@ -29,6 +31,7 @@ function findBackendExe() {
         path.join(BUILD_DIR, 'speakerlearn_serverd.exe'),
       ]
     : [
+        path.join(macOsBuildDir, 'speakerlearn_serverd'),
         path.join(BUILD_DIR, 'speakerlearn_serverd'),
         path.join(BUILD_DIR, 'Release', 'speakerlearn_serverd'),
       ];
@@ -152,7 +155,7 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, result);
       }
       if (urlPath === '/bridge/stop' && req.method === 'POST') {
-        const result = bridge.stopBridge();
+        const result = await bridge.stopBridge();
         return sendJson(res, 200, result);
       }
       if (urlPath === '/bridge/eq' && req.method === 'POST') {
@@ -167,8 +170,8 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  const filePath = path.join(ROOT, urlPath === '/' ? 'homePage.html' : urlPath);
-  if (!filePath.startsWith(ROOT)) {
+  const filePath = path.join(FRONTEND_DIR, urlPath === '/' ? 'homePage.html' : urlPath);
+  if (!filePath.startsWith(FRONTEND_DIR)) {
     res.writeHead(403);
     res.end();
     return;

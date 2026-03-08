@@ -325,14 +325,14 @@ flowchart TB
 
 | File | Primary Purpose | Key Features |
 |------|-----------------|--------------|
-| `index.html` | Entry redirect | Meta + JS redirect to homePage.html |
-| `homePage.html` | Landing, 3D scene | Three.js speaker model, scroll-driven wave rings, mission, team |
-| `addSpeakerPage.html` | Calibration | Learn 5-tone survey, Know 7-band sliders, My Speakers CRUD |
-| `preferencesPage.html` | Personal EQ | 7-band sliders, presets save/load, test player |
-| `playMusic.html` | Playback | My Speakers, My Presets, Genre Presets tabs; device routing; BiquadFilterNode EQ |
-| `js/api.js` | Backend + storage | CRUD, merge logic, device enumeration, audioOptimize |
-| `js/bands.js` | EQ math | 5↔7 conversion, BANDS_7, LEARN_5 constants, PLATFORM_OPTIONS |
-| `js/eqExport.js` | System-wide EQ | EqualizerAPO config export, download, clipboard copy |
+| `frontend/index.html` | Entry redirect | Meta + JS redirect to homePage.html |
+| `frontend/homePage.html` | Landing, 3D scene | Three.js speaker model, scroll-driven wave rings, mission, team |
+| `frontend/addSpeakerPage.html` | Calibration | Learn 5-tone survey, Know 7-band sliders, My Speakers CRUD |
+| `frontend/preferencesPage.html` | Personal EQ | 7-band sliders, presets save/load, test player |
+| `frontend/playMusic.html` | Playback | My Speakers, My Presets, Genre Presets tabs; device routing; BiquadFilterNode EQ |
+| `frontend/js/api.js` | Backend + storage | CRUD, merge logic, device enumeration, audioOptimize |
+| `frontend/js/bands.js` | EQ math | 5↔7 conversion, BANDS_7, LEARN_5 constants, PLATFORM_OPTIONS |
+| `frontend/js/eqExport.js` | System-wide EQ | EqualizerAPO config export, download, clipboard copy |
 
 ---
 

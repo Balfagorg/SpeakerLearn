@@ -776,9 +776,12 @@
     .bridge-eq-hint { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
     .bridge-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
     .bridge-start-btn, .bridge-stop-btn { min-height: 44px; }
+    .bridge-start-btn:disabled, .bridge-stop-btn:disabled { opacity: 0.7; pointer-events: none; }
     .bridge-status { font-size: 0.82rem; color: var(--muted-teal); }
     .bridge-status.running { color: var(--light-green); }
     .bridge-status.error { color: #f08080; }
+    .bridge-status.loading { color: var(--muted-teal); opacity: 0.8; }
+    #bridgeRefreshBtn.loading { opacity: 0.7; pointer-events: none; }
 
     /* My Presets: compact speaker selector (output only, no calibration) */
     .speaker-selector-compact {
@@ -2035,6 +2038,43 @@ function showToast(msg) {
 // SPEAKEASY BRIDGE (virtual cable → EQ → speakers)
 // ═══════════════════════════════════════════
 const BRIDGE_API = window.location.origin;
+const BRIDGE_TIMEOUT_MS = 8000;
+
+/**
+ * Fetch with timeout. Returns { ok, data, error } — never throws.
+ * Prevents page freeze when server is unreachable.
+ */
+async function bridgeFetch(path, options = {}) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), BRIDGE_TIMEOUT_MS);
+  try {
+    const r = await fetch(BRIDGE_API + path, {
+      ...options,
+      signal: controller.signal,
+      headers: { ...(options.headers || {}), 'Content-Type': 'application/json' }
+    });
+    clearTimeout(timeoutId);
+    let data = null;
+    const ct = r.headers.get('content-type');
+    if (ct && ct.includes('application/json')) {
+      try { data = await r.json(); } catch (_) {}
+    }
+    if (!r.ok) {
+      const msg = data?.error || `HTTP ${r.status}`;
+      return { ok: false, data: null, error: msg };
+    }
+    return { ok: true, data, error: null };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') return { ok: false, data: null, error: 'Connection timed out' };
+    return { ok: false, data: null, error: err.message || 'Network error' };
+  }
+}
+
+function setBridgeStatus(text, className = '') {
+  const el = document.getElementById('bridgeStatus');
+  if (el) { el.textContent = text; el.className = 'bridge-status' + (className ? ' ' + className : ''); }
+}
 
 function truncateDeviceName(name, maxLen) {
   if (!name || name.length <= maxLen) return name || '';
@@ -2118,81 +2158,80 @@ async function populateBridgeEQSelectors() {
 async function onBridgeEQSourceChange() {
   const eqGains = await getBridgeEQFromSource();
   renderEQDisplay('bridge-eq-display', eqGains);
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/status');
-    if (!r.ok) return;
-    const st = await r.json();
-      if (st.running) {
-      const res = await fetch(BRIDGE_API + '/bridge/eq', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ eqGains })
-      });
-      const data = await res.json();
-      if (data?.ok) showToast('EQ updated');
-    }
-  } catch (_) {}
+  const st = await bridgeFetch('/bridge/status');
+  if (!st.ok || !st.data?.running) return;
+  const res = await bridgeFetch('/bridge/eq', { method: 'POST', body: JSON.stringify({ eqGains }) });
+  if (res.ok && res.data?.ok) showToast('EQ updated');
 }
 
-async function refreshBridgeDevices() {
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/devices');
-    if (!r.ok) throw new Error('Bridge API unavailable');
-    const data = await r.json();
-    const { inputs, outputs } = sortAndFilterBridgeDevices(data.inputs, data.outputs);
-    const inSel = document.getElementById('bridgeInputSelect');
-    const outSel = document.getElementById('bridgeOutputSelect');
-    if (!inSel || !outSel) return;
-    const prevIn = inSel.value, prevOut = outSel.value;
-    inSel.innerHTML = '<option value="-1">— Default —</option>';
-    inputs.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = d.name || 'Device ' + d.id;
-      inSel.appendChild(opt);
-    });
-    outSel.innerHTML = '<option value="-1">— Default —</option>';
-    outputs.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = d.name || 'Device ' + d.id;
-      outSel.appendChild(opt);
-    });
-    if (prevIn && [...inSel.options].some(o => o.value === prevIn)) inSel.value = prevIn;
-    if (prevOut && [...outSel.options].some(o => o.value === prevOut)) outSel.value = prevOut;
-    showToast('Devices refreshed');
-  } catch (err) {
-    showToast('Bridge unavailable — run "npm install" and restart the app');
-    const st = document.getElementById('bridgeStatus');
-    if (st) { st.textContent = 'Bridge unavailable. Run npm install in the project folder, then restart.'; st.className = 'bridge-status error'; }
+async function refreshBridgeDevices(fromUI = false) {
+  const btn = document.getElementById('bridgeRefreshBtn');
+  if (btn?.classList.contains('loading')) return;
+  btn?.classList.add('loading');
+  if (!fromUI) setBridgeStatus('Refreshing…', 'loading');
+
+  const result = await bridgeFetch('/bridge/devices');
+  btn?.classList.remove('loading');
+
+  if (!result.ok) {
+    setBridgeStatus('Bridge unavailable. Run npm install, then restart.', 'error');
+    if (!fromUI) showToast('Bridge unavailable — run "npm install" and restart the app');
+    return;
   }
+
+  const data = result.data;
+  const { inputs, outputs } = sortAndFilterBridgeDevices(data?.inputs, data?.outputs);
+  const inSel = document.getElementById('bridgeInputSelect');
+  const outSel = document.getElementById('bridgeOutputSelect');
+  if (!inSel || !outSel) { if (!fromUI) setBridgeStatus('', ''); return; }
+
+  const prevIn = inSel.value, prevOut = outSel.value;
+  inSel.innerHTML = '<option value="-1">— Default —</option>';
+  (inputs || []).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.name || 'Device ' + d.id;
+    inSel.appendChild(opt);
+  });
+  outSel.innerHTML = '<option value="-1">— Default —</option>';
+  (outputs || []).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d.id;
+    opt.textContent = d.name || 'Device ' + d.id;
+    outSel.appendChild(opt);
+  });
+  if (prevIn && [...inSel.options].some(o => o.value === prevIn)) inSel.value = prevIn;
+  if (prevOut && [...outSel.options].some(o => o.value === prevOut)) outSel.value = prevOut;
+
+  if (!fromUI) { setBridgeStatus(''); showToast('Devices refreshed'); }
 }
 
 async function refreshBridgeUI() {
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/status');
-    if (!r.ok) return;
-    const st = await r.json();
-    const startBtn = document.getElementById('bridgeStartBtn');
-    const stopBtn = document.getElementById('bridgeStopBtn');
-    const statusEl = document.getElementById('bridgeStatus');
-    if (startBtn && stopBtn && statusEl) {
-      if (st.running) {
-        startBtn.style.display = 'none';
-        stopBtn.style.display = 'inline-block';
-        statusEl.textContent = 'Bridge running';
-        statusEl.className = 'bridge-status running';
-      } else {
-        startBtn.style.display = 'inline-block';
-        stopBtn.style.display = 'none';
-        statusEl.textContent = '';
-        statusEl.className = 'bridge-status';
-      }
-      renderEQDisplay('bridge-eq-display', st.eqGains || {});
+  const startBtn = document.getElementById('bridgeStartBtn');
+  const stopBtn = document.getElementById('bridgeStopBtn');
+  const statusEl = document.getElementById('bridgeStatus');
+
+  const statusResult = await bridgeFetch('/bridge/status');
+  if (statusResult.ok && statusEl) {
+    const st = statusResult.data;
+    if (st.running) {
+      if (startBtn) startBtn.style.display = 'none';
+      if (stopBtn) stopBtn.style.display = 'inline-block';
+      setBridgeStatus('Bridge running', 'running');
+    } else {
+      if (startBtn) startBtn.style.display = 'inline-block';
+      if (stopBtn) stopBtn.style.display = 'none';
+      setBridgeStatus('', '');
     }
-    await refreshBridgeDevices();
-    await populateBridgeEQSelectors();
-  } catch (_) {}
+    renderEQDisplay('bridge-eq-display', st?.eqGains || {});
+  } else if (statusEl) {
+    setBridgeStatus('Bridge unavailable. Run npm install, then restart.', 'error');
+    if (startBtn) startBtn.style.display = 'inline-block';
+    if (stopBtn) stopBtn.style.display = 'none';
+  }
+
+  await refreshBridgeDevices(true);
+  try { await populateBridgeEQSelectors(); } catch (_) {}
 }
 
 async function getBridgeEQFromSource() {
@@ -2252,51 +2291,53 @@ function getActiveEQForBridge() {
 }
 
 async function startBridge() {
+  const startBtn = document.getElementById('bridgeStartBtn');
+  if (startBtn?.disabled) return;
+  startBtn.disabled = true;
+  setBridgeStatus('Starting…', 'loading');
+
   const inputId = parseInt(document.getElementById('bridgeInputSelect')?.value || -1, 10);
   const outputId = parseInt(document.getElementById('bridgeOutputSelect')?.value || -1, 10);
   const spkSel = document.getElementById('bridgeSpeakerSelect')?.value || '';
   const presetSel = document.getElementById('bridgePresetSelect')?.value || '';
   const eqGains = (spkSel || presetSel) ? await getBridgeEQFromSource() : getActiveEQForBridge();
-  const statusEl = document.getElementById('bridgeStatus');
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inputDeviceId: inputId, outputDeviceId: outputId, eqGains })
-    });
-    let result;
-    try {
-      result = await r.json();
-    } catch (_) {
-      const msg = r.status === 503 ? 'Bridge not available. Run "npm install" and restart the app.' : 'Server error. Try restarting the app.';
-      showToast(msg);
-      if (statusEl) { statusEl.textContent = msg; statusEl.className = 'bridge-status error'; }
-      return;
-    }
-    if (result.ok) {
-      showToast('Bridge started — set system output to CABLE Input');
-      refreshBridgeUI();
-    } else {
-      const errMsg = result.error || 'Unknown error';
-      showToast('Bridge error: ' + errMsg);
-      if (statusEl) { statusEl.textContent = errMsg; statusEl.className = 'bridge-status error'; }
-    }
-  } catch (err) {
-    const msg = err.message || 'Network error';
+
+  const result = await bridgeFetch('/bridge/start', {
+    method: 'POST',
+    body: JSON.stringify({ inputDeviceId: inputId, outputDeviceId: outputId, eqGains })
+  });
+  startBtn.disabled = false;
+
+  if (!result.ok) {
+    const msg = result.error || 'Unknown error';
+    setBridgeStatus(msg, 'error');
     showToast('Bridge failed — ' + msg);
-    if (statusEl) { statusEl.textContent = msg; statusEl.className = 'bridge-status error'; }
+    return;
+  }
+  if (result.data?.ok) {
+    showToast('Bridge started — set system output to CABLE Input');
+    refreshBridgeUI();
+  } else {
+    const errMsg = result.data?.error || 'Unknown error';
+    setBridgeStatus(errMsg, 'error');
+    showToast('Bridge error: ' + errMsg);
   }
 }
 
 async function stopBridge() {
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/stop', { method: 'POST' });
-    const result = await r.json();
-    if (result.ok) {
-      showToast('Bridge stopped');
-      refreshBridgeUI();
-    }
-  } catch (err) {
+  const stopBtn = document.getElementById('bridgeStopBtn');
+  if (stopBtn?.disabled) return;
+  stopBtn.disabled = true;
+  setBridgeStatus('Stopping…', 'loading');
+
+  const result = await bridgeFetch('/bridge/stop', { method: 'POST' });
+  stopBtn.disabled = false;
+
+  if (result.ok && result.data?.ok) {
+    showToast('Bridge stopped');
+    refreshBridgeUI();
+  } else {
+    setBridgeStatus(result.error || 'Stop failed', 'error');
     showToast('Stop failed');
   }
 }

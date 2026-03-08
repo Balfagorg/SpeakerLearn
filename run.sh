@@ -9,5 +9,5 @@ if ! command -v node &> /dev/null; then
   exit 1
 fi
 
-node run.js
+node server/run.js
 exit $?

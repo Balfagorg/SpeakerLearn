@@ -83,7 +83,8 @@ function startBridge(options = {}) {
       channelCount: CHANNELS,
       sampleFormat: portAudio.SampleFormatFloat32,
       sampleRate: SAMPLE_RATE,
-      closeOnError: true
+      closeOnError: false,
+      framesPerBuffer: FRAMES_PER_BUFFER
     };
     if (inputId >= 0) inOpts.deviceId = inputId;
 
@@ -91,7 +92,8 @@ function startBridge(options = {}) {
       channelCount: CHANNELS,
       sampleFormat: portAudio.SampleFormatFloat32,
       sampleRate: SAMPLE_RATE,
-      closeOnError: true
+      closeOnError: false,
+      framesPerBuffer: FRAMES_PER_BUFFER
     };
     if (outputId >= 0) outOpts.deviceId = outputId;
 
@@ -101,8 +103,9 @@ function startBridge(options = {}) {
     const eqTransform = createEqTransform(eqGains);
     inputStream.pipe(eqTransform).pipe(outputStream);
 
+    // Start output when first data arrives (avoids race; matches naudiodon restartTest pattern)
+    inputStream.once('data', () => outputStream.start());
     inputStream.start();
-    outputStream.start();
 
     bridgeState.inputStream = inputStream;
     bridgeState.outputStream = outputStream;
@@ -114,26 +117,44 @@ function startBridge(options = {}) {
   }
 }
 
+/**
+ * Stop the bridge. Returns a Promise that resolves when streams are fully closed.
+ * Per naudiodon/PortAudio best practice: only quit the input stream (pipe propagates
+ * to output). Quitting both causes double-quit and SIGSEGV in PaWasapi_ThreadPriorityRevert.
+ */
 function stopBridge() {
   if (!bridgeState.running) {
-    return { ok: true, message: 'Bridge not running' };
+    return Promise.resolve({ ok: true, message: 'Bridge not running' });
   }
-  try {
-    bridgeState._stereoEq = null;
-    if (bridgeState.inputStream) {
-      bridgeState.inputStream.quit();
-      bridgeState.inputStream = null;
-    }
-    if (bridgeState.outputStream) {
-      bridgeState.outputStream.quit();
-      bridgeState.outputStream = null;
-    }
-    bridgeState.running = false;
-    return { ok: true, message: 'Bridge stopped' };
-  } catch (err) {
-    bridgeState.running = false;
-    return { ok: false, error: err.message || String(err) };
+  const inputStream = bridgeState.inputStream;
+  const outputStream = bridgeState.outputStream;
+  bridgeState.inputStream = null;
+  bridgeState.outputStream = null;
+  bridgeState._stereoEq = null;
+  bridgeState.running = false;
+
+  if (!inputStream || !outputStream) {
+    return Promise.resolve({ ok: true, message: 'Bridge stopped' });
   }
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const done = (err) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      if (err) resolve({ ok: false, error: err.message || String(err) });
+      else resolve({ ok: true, message: 'Bridge stopped' });
+    };
+    const timer = setTimeout(() => done(), 5000);
+    outputStream.once('finished', () => done());
+    outputStream.once('error', (err) => done(err));
+    try {
+      inputStream.quit(() => {});
+    } catch (err) {
+      done(err);
+    }
+  });
 }
 
 function updateEq(eqGains) {
@@ -171,8 +192,7 @@ if (require.main === module) {
     console.log(result.ok ? 'Bridge started' : 'Error: ' + result.error);
     if (result.ok) {
       process.on('SIGINT', () => {
-        stopBridge();
-        process.exit(0);
+        stopBridge().then(() => process.exit(0));
       });
     } else {
       process.exit(1);
