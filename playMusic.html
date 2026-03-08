@@ -750,6 +750,29 @@
     }
     .output-device-refresh:hover { border-color: var(--muted-teal); color: var(--text); }
 
+    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted); }
+    .btn-ghost:hover { border-color: var(--muted-teal); color: var(--text); }
+
+    /* Bridge panel */
+    .bridge-layout { max-width: 560px; margin: 0 auto; padding: 2rem 1rem 4rem; display: flex; flex-direction: column; gap: 1.2rem; }
+    .bridge-card { background: var(--surface); border: 1px solid rgba(146,201,177,0.15); border-radius: 16px; padding: 1.4rem 1.6rem; }
+    .bridge-hero { border-color: rgba(162,250,163,0.25); background: linear-gradient(135deg, rgba(162,250,163,0.06), transparent); }
+    .bridge-hero-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--light-green); margin-bottom: 0.5rem; }
+    .bridge-hero-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+    .bridge-card-title { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-teal); margin-bottom: 0.8rem; }
+    .bridge-steps { margin: 0; padding-left: 1.2rem; color: var(--text); font-size: 0.9rem; line-height: 1.9; }
+    .bridge-steps a { color: var(--light-green); text-decoration: none; }
+    .bridge-steps a:hover { text-decoration: underline; }
+    .bridge-device-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+    .bridge-device-row label { min-width: 140px; font-size: 0.85rem; color: var(--text-muted); }
+    .bridge-device-row select { flex: 1; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.88rem; }
+    .bridge-eq-hint { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .bridge-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .bridge-start-btn, .bridge-stop-btn { min-height: 44px; }
+    .bridge-status { font-size: 0.82rem; color: var(--muted-teal); }
+    .bridge-status.running { color: var(--light-green); }
+    .bridge-status.error { color: #f08080; }
+
     /* My Presets: compact speaker selector (output only, no calibration) */
     .speaker-selector-compact {
       margin-top: 0.75rem;
@@ -899,6 +922,7 @@
     <button class="top-tab active" data-panel="my-speakers">My Speakers</button>
     <button class="top-tab" data-panel="my-presets">My Presets</button>
     <button class="top-tab" data-panel="genre-presets">Genre Presets</button>
+    <button class="top-tab" data-panel="bridge">SpeakEasy Bridge</button>
   </div>
 
   <!-- ══ MY SPEAKERS PANEL ══ -->
@@ -1094,6 +1118,50 @@
     </div>
   </div>
 
+  <!-- ══ SPEAKEASY BRIDGE PANEL ══ -->
+  <div class="tab-panel" id="panel-bridge">
+    <div class="bridge-layout">
+      <div class="bridge-card bridge-hero">
+        <div class="bridge-hero-title">Use SpeakEasy as your output device</div>
+        <div class="bridge-hero-desc">Set your system (or app) output to a virtual cable. SpeakEasy captures that audio, applies your EQ, and forwards it to your speakers. Spotify, YouTube, games — everything gets the same correction.</div>
+      </div>
+      <div class="bridge-card">
+        <div class="bridge-card-title">Setup</div>
+        <ol class="bridge-steps">
+          <li>Install <a href="https://vb-audio.com/Cable/" target="_blank" rel="noopener">VB-Audio Virtual Cable</a> (free)</li>
+          <li>In Windows Sound settings, set <strong>Output</strong> to <em>CABLE Input</em></li>
+          <li>Select devices below and click <strong>Start Bridge</strong></li>
+        </ol>
+      </div>
+      <div class="bridge-card">
+        <div class="bridge-card-title">Devices</div>
+        <div class="bridge-device-row">
+          <label>Input (capture from):</label>
+          <select id="bridgeInputSelect">
+            <option value="-1">— Default —</option>
+          </select>
+        </div>
+        <div class="bridge-device-row">
+          <label>Output (play to):</label>
+          <select id="bridgeOutputSelect">
+            <option value="-1">— Default —</option>
+          </select>
+        </div>
+        <button class="btn-primary" id="bridgeRefreshBtn" onclick="refreshBridgeDevices()">Refresh devices</button>
+      </div>
+      <div class="bridge-card">
+        <div class="bridge-card-title">EQ</div>
+        <div class="bridge-eq-hint">Uses the active EQ from My Speakers, My Presets, or Genre. Select one there first, then start the bridge.</div>
+        <div class="eq-display" id="bridge-eq-display"></div>
+      </div>
+      <div class="bridge-card bridge-actions">
+        <button class="btn-primary bridge-start-btn" id="bridgeStartBtn" onclick="startBridge()">Start Bridge</button>
+        <button class="btn-ghost bridge-stop-btn" id="bridgeStopBtn" onclick="stopBridge()" style="display:none">Stop Bridge</button>
+        <span class="bridge-status" id="bridgeStatus"></span>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <footer>
@@ -1225,12 +1293,17 @@ document.querySelectorAll('.top-tab').forEach(btn => {
     document.querySelectorAll('.top-tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
     // stop all other panels
-    panels.forEach(p => { if (p !== panelFromTabName(name) && state[p].isPlaying) stopAudio(p); });
+    const active = panelFromTabName(name);
+    if (active !== 'bridge') {
+      panels.forEach(p => { if (p !== active) stopAudio(p); });
+    } else {
+      refreshBridgeUI();
+    }
   });
 });
 
 function panelFromTabName(name) {
-  const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre' };
+  const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre', 'bridge': 'bridge' };
   return map[name] || name;
 }
 
@@ -1612,6 +1685,7 @@ function activateGenre(g) {
 // ═══════════════════════════════════════════
 function renderEQDisplay(containerId, eqGains) {
   const el = document.getElementById(containerId);
+  if (!el) return;
   el.innerHTML = '';
   const trackH = 120; // px, must match CSS
   const thumbH = 22;  // px
@@ -1934,6 +2008,117 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// SPEAKEASY BRIDGE (virtual cable → EQ → speakers)
+// ═══════════════════════════════════════════
+const BRIDGE_API = window.location.origin;
+
+async function refreshBridgeDevices() {
+  try {
+    const r = await fetch(BRIDGE_API + '/bridge/devices');
+    if (!r.ok) throw new Error('Bridge API unavailable');
+    const { inputs, outputs } = await r.json();
+    const inSel = document.getElementById('bridgeInputSelect');
+    const outSel = document.getElementById('bridgeOutputSelect');
+    if (!inSel || !outSel) return;
+    const prevIn = inSel.value, prevOut = outSel.value;
+    inSel.innerHTML = '<option value="-1">— Default —</option>';
+    (inputs || []).forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = d.name || 'Device ' + d.id;
+      inSel.appendChild(opt);
+    });
+    outSel.innerHTML = '<option value="-1">— Default —</option>';
+    (outputs || []).forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.id;
+      opt.textContent = d.name || 'Device ' + d.id;
+      outSel.appendChild(opt);
+    });
+    if (prevIn && [...inSel.options].some(o => o.value === prevIn)) inSel.value = prevIn;
+    if (prevOut && [...outSel.options].some(o => o.value === prevOut)) outSel.value = prevOut;
+    showToast('Devices refreshed');
+  } catch (err) {
+    showToast('Bridge unavailable — run npm install and restart');
+    const st = document.getElementById('bridgeStatus');
+    if (st) { st.textContent = 'Bridge API unavailable'; st.className = 'bridge-status error'; }
+  }
+}
+
+async function refreshBridgeUI() {
+  try {
+    const r = await fetch(BRIDGE_API + '/bridge/status');
+    if (!r.ok) return;
+    const st = await r.json();
+    const startBtn = document.getElementById('bridgeStartBtn');
+    const stopBtn = document.getElementById('bridgeStopBtn');
+    const statusEl = document.getElementById('bridgeStatus');
+    if (startBtn && stopBtn && statusEl) {
+      if (st.running) {
+        startBtn.style.display = 'none';
+        stopBtn.style.display = 'inline-block';
+        statusEl.textContent = 'Bridge running';
+        statusEl.className = 'bridge-status running';
+      } else {
+        startBtn.style.display = 'inline-block';
+        stopBtn.style.display = 'none';
+        statusEl.textContent = '';
+        statusEl.className = 'bridge-status';
+      }
+      renderEQDisplay('bridge-eq-display', st.eqGains || {});
+    }
+    await refreshBridgeDevices();
+  } catch (_) {}
+}
+
+function getActiveEQForBridge() {
+  for (const p of ['speakers', 'presets', 'genre']) {
+    const eq = state[p]?.activeEQ;
+    if (eq && Object.keys(eq).some(k => (eq[k] ?? eq[String(k)]) !== 0)) return eq;
+  }
+  return state.speakers?.activeEQ || state.presets?.activeEQ || state.genre?.activeEQ || {};
+}
+
+async function startBridge() {
+  const inputId = parseInt(document.getElementById('bridgeInputSelect')?.value || -1, 10);
+  const outputId = parseInt(document.getElementById('bridgeOutputSelect')?.value || -1, 10);
+  const eqGains = getActiveEQForBridge();
+  try {
+    const r = await fetch(BRIDGE_API + '/bridge/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputDeviceId: inputId, outputDeviceId: outputId, eqGains })
+    });
+    const result = await r.json();
+    const statusEl = document.getElementById('bridgeStatus');
+    if (result.ok) {
+      showToast('Bridge started — set system output to CABLE Input');
+      refreshBridgeUI();
+    } else {
+      showToast('Bridge error: ' + (result.error || 'Unknown'));
+      if (statusEl) { statusEl.textContent = result.error || 'Error'; statusEl.className = 'bridge-status error'; }
+    }
+  } catch (err) {
+    showToast('Bridge failed — ' + err.message);
+    const statusEl = document.getElementById('bridgeStatus');
+    if (statusEl) { statusEl.textContent = err.message; statusEl.className = 'bridge-status error'; }
+  }
+}
+
+async function stopBridge() {
+  try {
+    const r = await fetch(BRIDGE_API + '/bridge/stop', { method: 'POST' });
+    const result = await r.json();
+    if (result.ok) {
+      showToast('Bridge stopped');
+      refreshBridgeUI();
+    }
+  } catch (err) {
+    showToast('Stop failed');
+  }
 }
 
 // ═══════════════════════════════════════════

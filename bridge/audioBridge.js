@@ -8,7 +8,6 @@
  * This bridge captures from "CABLE Output" and forwards to your speakers with EQ.
  */
 const { Transform } = require('stream');
-const path = require('path');
 
 let portAudio;
 try {
@@ -55,10 +54,11 @@ function createEqTransform(eqGains) {
     objectMode: false,
     transform(chunk, enc, cb) {
       const numSamples = chunk.length / 4;
+      if (numSamples < CHANNELS) return cb(null, chunk);
       const buffer = new Float32Array(chunk.buffer, chunk.byteOffset, numSamples);
-      const numFrames = numSamples / CHANNELS;
+      const numFrames = Math.floor(numSamples / CHANNELS);
       processInterleavedStereo(stereoEq, buffer, numFrames);
-      cb(null, Buffer.from(buffer.buffer));
+      cb(null, Buffer.from(buffer.buffer, buffer.byteOffset, buffer.byteLength));
     }
   });
 }
