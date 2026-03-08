@@ -1017,14 +1017,37 @@
     }
     .device-refresh-btn:hover { border-color: var(--muted-teal); color: var(--text); }
 
-    @media (max-width: 700px) {
-      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; padding: 1.5rem 4vw; }
       nav { flex-wrap: wrap; border-radius: 16px; }
       .top-tab-bar { flex-wrap: wrap; width: 100%; }
+      .top-tab { padding: 0.6rem 1.2rem; min-height: 44px; }
+      main { padding: 3rem 4vw 4rem; }
       .play-buttons { flex-direction: column; }
+      .play-btn { min-height: 44px; width: 100%; justify-content: center; }
       .added-header { flex-direction: column; text-align: center; }
-      footer { flex-direction: column; text-align: center; }
+      .device-selector-row { flex-direction: column; align-items: stretch; }
+      .device-select-pair { min-width: 100%; }
+      .survey-progress { flex-wrap: wrap; gap: 1rem; padding: 1rem 1.5rem; }
+      .progress-steps { flex-wrap: wrap; }
+      .sliderContainer { justify-content: center; }
+      #panel-know .sliderBlock, .edit-speaker-view .sliderBlock { width: 64px; }
+      #panel-know .sliderBlock input[type="range"], .edit-speaker-view .sliderBlock input[type="range"] { height: 120px; }
+      footer { flex-direction: column; text-align: center; padding: 2rem 4vw; }
       .footer-links { justify-content: center; }
+      .btn-primary, .btn-ghost, .btn-danger { min-height: 44px; padding: 0.75rem 1.5rem; }
+      .spk-edit-btn, .spk-delete-btn { min-width: 44px; min-height: 44px; }
+    }
+    @media (max-width: 480px) {
+      .topbar { padding: 1rem 4vw; }
+      nav a { padding: 0.6rem 1rem; min-height: 44px; }
+      .page-title-strip { padding: 2rem 0 2.5rem; }
+      .page-title-strip h1 { font-size: clamp(1.8rem, 6vw, 2.5rem); }
+      .know-preset-form { flex-direction: column; }
+      .know-input-group { min-width: 100%; }
+      .preferences-grid { grid-template-columns: 1fr; }
+      .speaker-list-card { flex-wrap: wrap; }
+      .edit-back-bar { flex-wrap: wrap; gap: 1rem; }
     }
   </style>
 </head>
@@ -1317,8 +1340,9 @@
       </div>
 
       <div class="know-card">
-        <div class="know-section-label">Preset Management</div>
-        <h3>Save &amp; recall your presets</h3>
+        <div class="know-section-label">Naming &amp; Saving</div>
+        <h3>Name and <em>save</em> your speaker</h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">Give your speaker a name and save it to My Speakers. To recall or edit an existing calibration, use the My Speakers tab.</p>
         <div class="know-preset-form">
           <div class="know-input-group">
             <label>Speaker Name</label>
@@ -1328,28 +1352,19 @@
             <button class="btn-primary" onclick="knowSavePreset()">Save Preset</button>
           </div>
         </div>
-        <div class="know-input-group">
-          <label>Saved Presets</label>
-          <select id="knowPresetMenu" onchange="knowLoadPreset()">
-            <option value="">Select preset...</option>
-          </select>
-        </div>
-        <div class="know-preset-actions">
-          <button class="btn-ghost" onclick="knowDeletePreset()">Delete Preset</button>
-        </div>
       </div>
 
       <div class="know-card">
         <div class="know-section-label">Speaker Response</div>
-        <h3>Speaker <em>Frequency Response</em> (Editable)</h3>
-        <p class="know-instructions" style="margin-bottom: 1rem;">Adjust each band to match your speaker's known response. Positive = boost, negative = cut.</p>
+        <h3>Speaker's Known Response <em>(Boost/Cut)</em></h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">Enter how your speaker changes sound at each band. Positive = speaker boosts; negative = speaker cuts. This describes your speaker's coloration.</p>
         <div id="knowSpeakerSliders" class="sliderContainer"></div>
       </div>
 
       <div class="know-card">
-        <div class="know-section-label">Auto Correction</div>
-        <h3>Correction <em>EQ Applied</em> (Auto Generated)</h3>
-        <p class="know-instructions" style="margin-bottom: 1rem;">The inverse of your speaker response — applied in real time when playing audio.</p>
+        <div class="know-section-label">Correction EQ</div>
+        <h3>Correction EQ <em>(flattens speaker)</em></h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">Auto-generated inverse of your speaker response. This is what gets applied to audio — it flattens the speaker so you can add your personal EQ on top of a neutral base.</p>
         <div id="knowCorrectionSliders" class="sliderContainer"></div>
       </div>
 
@@ -1415,16 +1430,16 @@
     </div>
 
     <div class="know-card">
-      <div class="know-section-label">EQ Correction</div>
-      <h3>Speaker <em>Frequency Response</em> (Editable)</h3>
-      <p class="know-instructions" style="margin-bottom: 1rem;">Adjust each band to match your speaker's known frequency response. Positive = boost, negative = cut.</p>
+      <div class="know-section-label">Speaker Response</div>
+      <h3>Speaker's Known Response <em>(Boost/Cut)</em></h3>
+      <p class="know-instructions" style="margin-bottom: 1rem;">Adjust each band to match your speaker's known frequency response. Positive = speaker boosts; negative = speaker cuts. Editable.</p>
       <div id="editSpeakerSliders" class="sliderContainer"></div>
     </div>
 
     <div class="know-card">
-      <div class="know-section-label">Auto Correction</div>
-      <h3>Correction <em>EQ Applied</em> (Auto Generated)</h3>
-      <p class="know-instructions" style="margin-bottom: 1rem;">The inverse of your speaker response — applied automatically.</p>
+      <div class="know-section-label">Correction EQ</div>
+      <h3>Correction EQ <em>(flattens speaker)</em></h3>
+      <p class="know-instructions" style="margin-bottom: 1rem;">Auto-generated inverse — read-only. This is what gets applied to test audio and playback. Applied to flatten the speaker.</p>
       <div id="editCorrectionSliders" class="sliderContainer"></div>
     </div>
 
@@ -1883,10 +1898,12 @@
     }
 
     knowFrequencies.forEach(freq => {
-      // For learn-type speakers, derive approximate band value from readings
+      // For know-type: speaker response is editable; correction is applied to audio
       let initialVal = 0;
-      if (bands[freq] !== undefined) {
-        initialVal = -bands[freq]; // stored as correction, display as speaker response
+      if (spk.speakerResponseBands && spk.speakerResponseBands[freq] !== undefined) {
+        initialVal = spk.speakerResponseBands[freq];
+      } else if (bands[freq] !== undefined) {
+        initialVal = -bands[freq]; // stored as correction, derive speaker response
       } else if (spk.source === 'learn' && spk.readings) {
         // Map the 5 survey bands to the 7 EQ bands approximately
         const nearestReading = spk.readings.find(r => {
@@ -1964,15 +1981,18 @@
     const spk = speakers.find(s => String(s.id) === String(editingSpkId));
     if (!spk) return;
 
-    // Collect EQ bands
+    // Collect: speaker response (editable) and correction (applied to audio)
+    const speakerResponseBands = {};
     const eqBands = {};
     knowFrequencies.forEach(freq => {
       const spkVal = parseFloat(document.getElementById('editSpk' + freq).value);
-      eqBands[freq] = -spkVal; // store as correction value
+      speakerResponseBands[freq] = spkVal;
+      eqBands[freq] = -spkVal; // correction = inverse of speaker response
     });
 
     spk.name = newName;
     spk.eqBands = eqBands;
+    spk.speakerResponseBands = speakerResponseBands;
 
     // Persist EQ preset for know-type speakers
     if (spk.eqPresetKey) {
@@ -2075,7 +2095,7 @@
       card1.className = 'pref-card';
       card1.innerHTML = `<div class="pref-card-label">Manual Calibration</div>`;
       Object.entries(preset).forEach(([freq, val]) => {
-        card1.innerHTML += `<div class="pref-freq-row"><span class="pref-freq-name">${freq} Hz</span><div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div><span class="pref-val">${val > 0 ? '+' : ''}${val} dB</span></div>`;
+        card1.innerHTML += `<div class="pref-freq-row"><span class="pref-freq-name">${freq} Hz</span><div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div><span class="pref-val">${val > 0 ? '+' : ''}${Number(val).toFixed(2)} dB</span></div>`;
       });
       grid.appendChild(card1);
       const card3 = document.createElement('div');
@@ -2162,7 +2182,6 @@
       }
     });
 
-    knowPopulatePresetMenu();
     knowUpdateEQ();
   })();
 
@@ -2192,9 +2211,9 @@
     knowFrequencies.forEach((freq, i) => {
       const speakerValue = parseFloat(document.getElementById('knowSpeaker' + freq).value);
       const correction = -speakerValue;
-      document.getElementById('knowSpeakerVal' + freq).innerText = speakerValue + ' dB';
+      document.getElementById('knowSpeakerVal' + freq).innerText = (speakerValue >= 0 ? '+' : '') + Number(speakerValue).toFixed(2) + ' dB';
       document.getElementById('knowCorr' + freq).value = correction;
-      document.getElementById('knowCorrVal' + freq).innerText = correction + ' dB';
+      document.getElementById('knowCorrVal' + freq).innerText = (correction >= 0 ? '+' : '') + Number(correction).toFixed(2) + ' dB';
       if (knowFilters[i]) knowFilters[i].gain.value = correction;
     });
   }
@@ -2228,57 +2247,38 @@
         alert('Enter a speaker name'); return;
       }
     }
-    const preset = {};
-    knowFrequencies.forEach(freq => { preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value); });
+    // Correction = inverse of speaker response; this is what gets applied to audio and sent to /audio/optimize
+    const correction = {};
+    const speakerResponse = {};
+    knowFrequencies.forEach(freq => {
+      const spkVal = parseFloat(document.getElementById('knowSpeaker' + freq).value);
+      speakerResponse[freq] = spkVal;
+      correction[freq] = -spkVal;
+    });
     const key = 'eq_' + name;
-    localStorage.setItem(key, JSON.stringify(preset));
-    await apiCall(() => API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: preset }), 'Could not save preset');
+    localStorage.setItem(key, JSON.stringify(correction));
+    await apiCall(() => API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: correction }), 'Could not save preset');
     knowPopulatePresetMenu();
     const existing = speakers.find(s => s.source === 'know' && s.eqPresetKey === key);
     if (!existing) {
-      const spk = { id: key + '_' + Date.now(), name, addedAt: new Date().toLocaleDateString(), source: 'know', eqPresetKey: key, eqBands: preset };
+      const spk = { id: key + '_' + Date.now(), name, addedAt: new Date().toLocaleDateString(), source: 'know', eqPresetKey: key, eqBands: correction, speakerResponseBands: speakerResponse };
       speakers.push(spk);
       saveSpeakers();
       updateSpeakerCount();
       rebuildSpeakerList();
       showAddedPage(spk);
     } else {
-      alert('Preset saved!');
+      existing.eqBands = correction;
+      existing.speakerResponseBands = speakerResponse;
+      saveSpeakers();
+      rebuildSpeakerList();
+      showToast('Speaker updated');
     }
   }
 
-  function knowLoadPreset() {
-    const key = document.getElementById('knowPresetMenu').value;
-    if (!key) return;
-    const preset = JSON.parse(localStorage.getItem(key));
-    knowFrequencies.forEach(freq => { document.getElementById('knowSpeaker' + freq).value = -preset[freq]; });
-    knowUpdateEQ();
-  }
-
-  async function knowDeletePreset() {
-    const key = document.getElementById('knowPresetMenu').value;
-    if (!key) { alert('Select a preset'); return; }
-    if (!confirm('Delete this preset?')) return;
-    localStorage.removeItem(key);
-    await apiCall(() => API.eqPresetsDelete(key), 'Could not delete preset');
-    speakers = speakers.filter(s => !(s.source === 'know' && s.eqPresetKey === key));
-    saveSpeakers();
-    updateSpeakerCount();
-    rebuildSpeakerList();
-    knowPopulatePresetMenu();
-  }
-
-  async function knowPopulatePresetMenu() {
-    const menu = document.getElementById('knowPresetMenu');
-    menu.innerHTML = '<option value="">Select preset...</option>';
-    // Build preset list from saved speakers only (not raw localStorage scan)
-    const keys = speakers.filter(s => s.eqPresetKey).map(s => s.eqPresetKey);
-    [...new Set(keys)].sort().forEach(key => {
-      const opt = document.createElement('option');
-      opt.value = key;
-      opt.textContent = key.replace('eq_', '');
-      menu.appendChild(opt);
-    });
+  function knowPopulatePresetMenu() {
+    // Preset recall removed from I Know panel — only through My Speakers.
+    // Kept for compatibility with delete/save flows that may call this.
   }
 </script>
 

@@ -25,8 +25,8 @@ PipelineResult AudioPipeline::run(
     // 2 - Spectrum analyzer
     auto spectrum = spectrum_analyzer_.analyze(samples);
 
-    // 3 - Track profiler
-    auto track_profile = track_profiler_.profile(spectrum);
+    // 3 - Track profiler (use samples for real loudness → volume compensation)
+    auto track_profile = track_profiler_.profile_from_samples(samples);
 
     // 4 - User preferences -> Target EQ
     auto target_curve = preference_engine_.build_target_curve(user_preferences);

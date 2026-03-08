@@ -162,7 +162,9 @@ void HttpServer::setup_routes() {
                 cr.speaker_system_id = speaker_system_id;
                 cr.frequency_band = r.value("label", r.value("name", ""));
                 cr.volume_rating = r.value("val", 50);
-                cr.quality_rating = (r.value("issue", "none") == "none");
+                std::string issue = r.value("issue", "none");
+                cr.quality_rating = (issue == "none");
+                cr.issue = issue;
                 if (!db::DatabaseManager::getInstance().save_calibration_result(cr)) ok = false;
             }
             res.set_content(json{{"status", ok ? "saved" : "partial_save"}}.dump(), "application/json");
@@ -222,7 +224,9 @@ void HttpServer::setup_routes() {
                 cr.speaker_system_id = speaker_system_id;
                 cr.frequency_band = r.value("label", r.value("name", ""));
                 cr.volume_rating = r.value("val", 50);
-                cr.quality_rating = (r.value("issue", "none") == "none");
+                std::string issue = r.value("issue", "none");
+                cr.quality_rating = (issue == "none");
+                cr.issue = issue;
                 results.push_back(cr);
             }
             if (db::DatabaseManager::getInstance().replace_calibration_results(speaker_system_id, results)) {
@@ -273,7 +277,8 @@ void HttpServer::setup_routes() {
         auto results = db::DatabaseManager::getInstance().get_calibration_results(speaker_system_id);
         json arr = json::array();
         for (const auto& r : results) {
-            arr.push_back({{"label", r.frequency_band}, {"val", r.volume_rating}, {"issue", r.quality_rating ? "none" : "other"}});
+            std::string issue = r.issue.empty() ? (r.quality_rating ? "none" : "other") : r.issue;
+            arr.push_back({{"label", r.frequency_band}, {"val", r.volume_rating}, {"issue", issue}});
         }
         res.set_content(arr.dump(), "application/json");
     });

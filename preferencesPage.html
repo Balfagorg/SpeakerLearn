@@ -558,11 +558,28 @@ header::after {
     .footer-links a:hover { color: var(--muted-teal); }
     .footer-copy { font-size: 0.68rem; color: rgba(255,255,255,0.2); font-family: 'Space Mono', monospace; }
 
+    @media (max-width: 768px) {
+      .pref-layout { padding: 2rem 4vw 4rem; gap: 1.5rem; }
+      .player-card { position: static; }
+    }
     @media (max-width: 600px) {
       .topbar { flex-wrap: wrap; gap: 1rem; padding: 1.2rem 4vw; }
       nav { flex-wrap: wrap; border-radius: 14px; }
-      .eq-band { grid-template-columns: 72px 1fr 54px; }
-      footer { flex-direction: column; text-align: center; }
+      nav a { padding: 0.6rem 1rem; min-height: 44px; }
+      .eq-band { grid-template-columns: 72px 1fr 54px; gap: 0.75rem; }
+      .card { padding: 1.5rem 1.2rem; }
+      .preset-row { flex-direction: column; align-items: stretch; }
+      .preset-name-input { min-width: 100%; }
+      .btn { min-height: 44px; }
+      .play-btn, .stop-btn { width: 48px; height: 48px; }
+      footer { flex-direction: column; text-align: center; padding: 2rem 4vw; }
+      .footer-links { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .eq-band { grid-template-columns: 60px 1fr 48px; }
+      .band-value { min-width: 44px; font-size: 0.72rem; }
+      .styled-select { min-width: 100%; }
+      .upload-zone { padding: 1.5rem 1rem; }
     }
   </style>
 </head>
@@ -746,7 +763,7 @@ function buildEQ() {
       </div>
       <div class="slider-wrap">
         <div class="slider-zero"></div>
-        <input type="range" min="-12" max="12" step="0.5" value="${val}"
+        <input type="range" min="-16" max="16" step="0.5" value="${val}"
                id="slider_${band.hz}" oninput="onSliderChange(${band.hz}, this.value)"/>
       </div>
       <div class="band-value" id="val_${band.hz}">${formatDb(val)}</div>
@@ -774,7 +791,7 @@ function onSliderChange(hz, raw) {
 function updateSliderTrack(hz, v) {
   const slider = document.getElementById('slider_' + hz);
   if (!slider) return;
-  const pct = ((v + 12) / 24) * 100;
+  const pct = ((v + 16) / 32) * 100;
   // Color fill from center to thumb
   const center = 50;
   const left  = Math.min(center, pct);

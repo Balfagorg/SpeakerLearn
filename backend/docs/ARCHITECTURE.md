@@ -1,83 +1,41 @@
-# SpeakerLearn Backend — Architecture
+# SpeakerLearn Backend Architecture
 
-## Framework & Stack
+## Stack
 
-| Layer | Technology |
-|-------|------------|
-| **Runtime** | C++20 native executable (`speakerlearn_serverd`) |
-| **HTTP** | cpp-httplib (header-only, single-threaded) |
-| **Serialization** | nlohmann/json |
-| **Persistence** | SQLite3 (embedded, WAL mode) |
-| **DSP** | Custom pipeline + optional `dsp_engine` shared library |
+| Layer | Tech |
+|-------|------|
+| Runtime | C++20 (`speakerlearn_serverd`) |
+| HTTP | cpp-httplib (single-threaded) |
+| JSON | nlohmann/json |
+| DB | SQLite3 (WAL mode) |
+| DSP | Custom pipeline + optional `dsp_engine` |
 
 ---
 
 ## Component Diagram
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│                         speakerlearn_serverd                              │
-│                              (main.cpp)                                   │
-├──────────────────────────────────────────────────────────────────────────┤
-│                                                                          │
-│  ┌─────────────────────────────────────────────────────────────────────┐ │
-│  │  api::HttpServer                                                     │ │
-│  │  • CORS pre-routing                                                  │ │
-│  │  • Routes: /, /audio/optimize, /speaker-systems/*, /preferences/*,   │
-│  │    /devices/detect                                                    │ │
-│  │  • JSON request parsing / response serialization                     │ │
-│  └───────────────────────────────┬─────────────────────────────────────┘ │
-│                                  │                                        │
-│                                  ▼                                        │
-│  ┌─────────────────────────────────────────────────────────────────────┐ │
-│  │  core::AudioPipeline                                                 │ │
-│  │  • 8-stage processing chain                                          │ │
-│  │  • Orchestrates: SourceDetector → SpectrumAnalyzer → TrackProfiler   │ │
-│  │    → PreferenceEngine → SpeakerModel → EQOptimizer → DSP → Limiter   │ │
-│  └───────────────────────────────┬─────────────────────────────────────┘ │
-│                                  │                                        │
-│          ┌───────────────────────┼───────────────────────┐                │
-│          ▼                       ▼                       ▼                │
-│  ┌───────────────┐     ┌─────────────────┐     ┌─────────────────┐        │
-│  │ core::stages  │     │ db::Database    │     │ dsp_engine      │        │
-│  │ • SourceDet   │     │ Manager         │     │ (optional)      │        │
-│  │ • Spectrum    │     │ • SQLite CRUD   │     │ Biquad, Comp,   │        │
-│  │ • TrackProf   │     │ • Models        │     │ Limiter         │        │
-│  │ • PrefEngine  │     │ • Singleton     │     │ C API for       │        │
-│  │ • SpeakerMod  │     └─────────────────┘     │ Python ctypes   │        │
-│  │ • EQOptimizer │                              └─────────────────┘        │
-│  │ • SafetyLimit │                                                         │
-│  └───────────────┘                                                         │
-│                                                                          │
-└──────────────────────────────────────────────────────────────────────────┘
+speakerlearn_serverd (main.cpp)
+├── HttpServer — CORS, routes, JSON parse/serialize
+├── AudioPipeline — 8-stage chain
+│   ├── SourceDetector → SpectrumAnalyzer → TrackProfiler
+│   ├── PreferenceEngine → SpeakerModel → EQOptimizer
+│   └── DSP → SafetyLimiter
+├── DatabaseManager (Singleton) — SQLite CRUD
+└── dsp_engine (optional) — Biquad, Compressor, Limiter (C API)
 ```
 
 ---
 
 ## Data Flow
 
-### Audio Optimization Request
-
 ```
-Client POST /audio/optimize
-    │
-    ▼
-HttpServer::setup_routes → lambda parses JSON
-    │
-    ▼
-AudioPipeline::run(samples, preferences, speaker_capability, platform_hint)
-    │
-    ├─► SourceDetector::detect(platform_hint)     → SourceInfo
-    ├─► SpectrumAnalyzer::analyze(samples)       → Spectrum
-    ├─► TrackProfiler::profile(spectrum)          → TrackProfile
-    ├─► PreferenceEngine::build_target_curve()     → TargetEQCurve
-    ├─► SpeakerModel::load_constraints()         → SpeakerConstraints
-    ├─► EQOptimizer::compute(...)                → final_eq map
-    ├─► (DSP stub / dsp_engine)                  → processed_samples
-    └─► SafetyLimiter::limit()                   → headroom, warnings
-    │
-    ▼
-JSON response { final_eq, headroom_db, track_profile, warnings }
+POST /audio/optimize
+  → HttpServer parses JSON
+  → AudioPipeline::run(samples, preferences, speaker_calibration, platform_hint)
+  → SourceDetector → Spectrum → TrackProfile → PreferenceEngine → SpeakerModel
+  → EQOptimizer → DSP → SafetyLimiter
+  → JSON { final_eq, headroom_db, track_profile, warnings }
 ```
 
 ---
@@ -87,51 +45,34 @@ JSON response { final_eq, headroom_db, track_profile, warnings }
 ```
 backend/
 ├── src/
-│   ├── main.cpp              # Entry: DB init, HttpServer(8001), server.start()
-│   ├── api/
-│   │   ├── HttpServer.cpp    # Route handlers, CORS
-│   │   └── HttpServer.h
-│   ├── db/
-│   │   ├── DatabaseManager.cpp
-│   │   ├── DatabaseManager.h
-│   │   └── Models.h          # User, SpeakerSystem, SpeakerCapability, etc.
-│   └── core/
-│       ├── AudioPipeline.cpp
-│       ├── AudioPipeline.h
-│       └── stages/
-│           ├── Stages.cpp
-│           └── Stages.h
-├── dsp_engine/
-│   └── engine.cpp            # C API: init_dsp, configure_eq, process_audio_interleaved
-├── docs/
-│   ├── API.md
-│   └── ARCHITECTURE.md
-├── CMakeLists.txt
-└── README.md
+│   ├── main.cpp
+│   ├── api/HttpServer.{cpp,h}
+│   ├── db/DatabaseManager.{cpp,h}, Models.h
+│   └── core/AudioPipeline.{cpp,h}, stages/{Stages.cpp, Stages.h}
+├── dsp_engine/engine.cpp
+├── docs/API.md, ARCHITECTURE.md
+└── CMakeLists.txt
 ```
 
 ---
 
-## Build Outputs
+## Pipeline Stages
 
-| Target | Type | Description |
-|--------|------|-------------|
-| `speakerlearn_core` | Static library | Core logic (api, db, core) — linkable into apps/tests |
-| `speakerlearn_serverd` | Executable | Desktop HTTP server |
-
----
-
-## Concurrency Model
-
-- **HTTP:** cpp-httplib uses a single-threaded blocking server. One request at a time.
-- **Database:** `DatabaseManager` uses a `std::mutex` for thread-safe access (future multi-threaded use).
-- **DSP:** Pipeline stages are stateless per call; no shared mutable state.
+| Stage | Purpose |
+|-------|---------|
+| SourceDetector | Platform hint → source profile |
+| SpectrumAnalyzer | FFT → band energies |
+| TrackProfiler | Loudness, dynamic range |
+| PreferenceEngine | User prefs → target curve |
+| SpeakerModel | Speaker constraints |
+| EQOptimizer | Final EQ from curve + constraints |
+| DSP | Multiband EQ (stub/pass-through) |
+| SafetyLimiter | Brickwall, headroom |
 
 ---
 
-## Extensibility
+## Concurrency
 
-1. **New API routes:** Add handlers in `HttpServer::setup_routes()`.
-2. **New pipeline stages:** Implement in `core/stages/`, wire in `AudioPipeline::run()`.
-3. **Platform-specific code:** Add `src/platform/{windows,macos,linux}/*.cpp` — CMake auto-includes.
-4. **DSP integration:** Link `dsp_engine` and replace pass-through in `AudioPipeline` with `process_audio_interleaved()`.
+- HTTP: single-threaded, one request at a time
+- DB: `std::mutex` for thread-safe access
+- Pipeline stages: stateless per call

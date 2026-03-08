@@ -1,5 +1,6 @@
 #include "DatabaseManager.h"
 #include <iostream>
+#include <string>
 
 namespace db {
 
@@ -53,6 +54,7 @@ bool DatabaseManager::init_db(const std::string& db_path) {
             frequency_band VARCHAR(32) NOT NULL,
             volume_rating INTEGER NOT NULL,
             quality_rating BOOLEAN NOT NULL,
+            issue VARCHAR(64) DEFAULT 'none',
             tested_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(speaker_system_id) REFERENCES speaker_systems(id)
         );
@@ -94,6 +96,16 @@ bool DatabaseManager::init_db(const std::string& db_path) {
 
     // Enable WAL mode for better concurrency
     execute_sql("PRAGMA journal_mode=WAL;");
+
+    // Migration: add issue column for calibration (ignore if already exists)
+    {
+        char* err = nullptr;
+        int rc = sqlite3_exec(db_, "ALTER TABLE calibration_results ADD COLUMN issue VARCHAR(64) DEFAULT 'none';", 0, 0, &err);
+        if (rc != SQLITE_OK && err && std::string(err).find("duplicate column") == std::string::npos) {
+            std::cerr << "Migration warning: " << (err ? err : "unknown") << std::endl;
+        }
+        if (err) sqlite3_free(err);
+    }
 
     seed_default_source_profiles();
     return true;
@@ -315,7 +327,7 @@ std::vector<UserPreference> DatabaseManager::get_user_preferences(const std::str
 
 bool DatabaseManager::save_calibration_result(const CalibrationResult& result) {
     std::lock_guard<std::mutex> lock(db_mutex_);
-    const char* sql = "INSERT INTO calibration_results (id, speaker_system_id, frequency_band, volume_rating, quality_rating, tested_at) VALUES (?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP));";
+    const char* sql = "INSERT INTO calibration_results (id, speaker_system_id, frequency_band, volume_rating, quality_rating, issue, tested_at) VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP));";
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
 
@@ -324,10 +336,11 @@ bool DatabaseManager::save_calibration_result(const CalibrationResult& result) {
     sqlite3_bind_text(stmt, 3, result.frequency_band.c_str(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 4, result.volume_rating);
     sqlite3_bind_int(stmt, 5, result.quality_rating ? 1 : 0);
+    sqlite3_bind_text(stmt, 6, result.issue.empty() ? "none" : result.issue.c_str(), -1, SQLITE_TRANSIENT);
     if (!result.tested_at.empty()) {
-        sqlite3_bind_text(stmt, 6, result.tested_at.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(stmt, 7, result.tested_at.c_str(), -1, SQLITE_TRANSIENT);
     } else {
-        sqlite3_bind_null(stmt, 6);
+        sqlite3_bind_null(stmt, 7);
     }
 
     bool success = (sqlite3_step(stmt) == SQLITE_DONE);
@@ -345,7 +358,7 @@ bool DatabaseManager::replace_calibration_results(const std::string& speaker_sys
     sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    const char* ins_sql = "INSERT INTO calibration_results (id, speaker_system_id, frequency_band, volume_rating, quality_rating, tested_at) VALUES (?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP));";
+    const char* ins_sql = "INSERT INTO calibration_results (id, speaker_system_id, frequency_band, volume_rating, quality_rating, issue, tested_at) VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP));";
     for (const auto& r : results) {
         if (sqlite3_prepare_v2(db_, ins_sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
         sqlite3_bind_text(stmt, 1, r.id.c_str(), -1, SQLITE_TRANSIENT);
@@ -353,10 +366,11 @@ bool DatabaseManager::replace_calibration_results(const std::string& speaker_sys
         sqlite3_bind_text(stmt, 3, r.frequency_band.c_str(), -1, SQLITE_TRANSIENT);
         sqlite3_bind_int(stmt, 4, r.volume_rating);
         sqlite3_bind_int(stmt, 5, r.quality_rating ? 1 : 0);
+        sqlite3_bind_text(stmt, 6, r.issue.empty() ? "none" : r.issue.c_str(), -1, SQLITE_TRANSIENT);
         if (!r.tested_at.empty()) {
-            sqlite3_bind_text(stmt, 6, r.tested_at.c_str(), -1, SQLITE_TRANSIENT);
+            sqlite3_bind_text(stmt, 7, r.tested_at.c_str(), -1, SQLITE_TRANSIENT);
         } else {
-            sqlite3_bind_null(stmt, 6);
+            sqlite3_bind_null(stmt, 7);
         }
         if (sqlite3_step(stmt) != SQLITE_DONE) {
             sqlite3_finalize(stmt);
@@ -370,7 +384,7 @@ bool DatabaseManager::replace_calibration_results(const std::string& speaker_sys
 std::vector<CalibrationResult> DatabaseManager::get_calibration_results(const std::string& speaker_system_id) {
     std::lock_guard<std::mutex> lock(db_mutex_);
     std::vector<CalibrationResult> results;
-    const char* sql = "SELECT id, speaker_system_id, frequency_band, volume_rating, quality_rating, tested_at FROM calibration_results WHERE speaker_system_id = ? ORDER BY tested_at ASC;";
+    const char* sql = "SELECT id, speaker_system_id, frequency_band, volume_rating, quality_rating, COALESCE(issue,'none'), tested_at FROM calibration_results WHERE speaker_system_id = ? ORDER BY tested_at ASC;";
     sqlite3_stmt* stmt = nullptr;
     if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return results;
 
@@ -383,7 +397,9 @@ std::vector<CalibrationResult> DatabaseManager::get_calibration_results(const st
         cr.frequency_band = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
         cr.volume_rating = sqlite3_column_int(stmt, 3);
         cr.quality_rating = sqlite3_column_int(stmt, 4) != 0;
-        const char* tested = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        const char* iss = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 5));
+        cr.issue = iss ? iss : "none";
+        const char* tested = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 6));
         if (tested) cr.tested_at = tested;
         results.push_back(cr);
     }

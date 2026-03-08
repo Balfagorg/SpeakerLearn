@@ -36,6 +36,7 @@ struct TrackProfile {
 class TrackProfiler {
 public:
     TrackProfile profile(const Spectrum& spectrum);
+    TrackProfile profile_from_samples(const std::vector<double>& samples);
 };
 
 struct TargetEQCurve {

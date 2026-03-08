@@ -67,9 +67,10 @@ struct CalibrationResult {
     std::string frequency_band;
     int volume_rating;
     bool quality_rating;
+    std::string issue;  // e.g. "muffled", "harsh", "none" — for issueToCompensation
     std::string tested_at;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(CalibrationResult, id, speaker_system_id, frequency_band, volume_rating, quality_rating, tested_at)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(CalibrationResult, id, speaker_system_id, frequency_band, volume_rating, quality_rating, issue, tested_at)
 };
 
 struct UserPreference {

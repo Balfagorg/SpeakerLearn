@@ -436,51 +436,54 @@
       font-size: 0.58rem;
       color: var(--text-muted);
       margin-top: 2px;
+      min-width: 3.5em;
+      text-align: center;
     }
 
-    /* Upload zone */
+    /* Upload zone — aligned with preferencesPage */
     .upload-zone {
-      background: var(--surface);
-      border: 1px dashed rgba(255,255,255,0.15);
+      border: 2px dashed rgba(146,201,177,0.25);
+      background: rgba(146,201,177,0.03);
       border-radius: 20px;
       padding: 2.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.25s ease;
       position: relative;
     }
     .upload-zone:hover, .upload-zone.drag-over {
       border-color: var(--muted-teal);
-      background: rgba(146,201,177,0.04);
+      background: rgba(146,201,177,0.07);
     }
     .upload-zone.has-file {
-      border-style: solid;
-      border-color: rgba(162,250,163,0.25);
-      background: rgba(162,250,163,0.04);
+      border-color: rgba(162,250,163,0.35);
+      background: rgba(162,250,163,0.05);
     }
 
-    .upload-icon { font-size: 2.2rem; display: block; margin-bottom: 0.75rem; }
+    .upload-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
 
     .upload-title {
-      font-weight: 500;
-      font-size: 0.95rem;
+      font-weight: 600;
+      font-size: 0.9rem;
       margin-bottom: 0.3rem;
     }
 
     .upload-hint {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-    }
-
-    .upload-filename {
-      margin-top: 0.6rem;
       font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--light-green);
       letter-spacing: 0.04em;
     }
 
-    #fileInput { display: none; }
+    .upload-filename {
+      font-size: 0.78rem;
+      color: var(--light-green);
+      font-family: 'Space Mono', monospace;
+      margin-top: 0.4rem;
+      word-break: break-all;
+    }
+
+    #fileInput1, #fileInput2, #fileInput3 { display: none; }
 
     /* Player controls */
     .player-controls {
@@ -692,6 +695,90 @@
     }
     .genre-card.active .genre-active-dot { opacity: 1; }
 
+    /* ─── OUTPUT DEVICE CARD (compact, recycled from add-speaker) ─── */
+    .output-device-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+    }
+    .output-device-card .output-device-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    .output-device-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .output-device-row select {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.5rem 0.9rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+      cursor: pointer;
+    }
+    .output-device-row select:focus { outline: none; border-color: var(--muted-teal); }
+    .output-device-refresh {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .output-device-refresh:hover { border-color: var(--muted-teal); color: var(--text); }
+
+    /* My Presets: compact speaker selector (output only, no calibration) */
+    .speaker-selector-compact {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .speaker-selector-compact .speaker-selector-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .speaker-selector-compact select {
+      width: 100%;
+      padding: 0.45rem 0.8rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.78rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a09ab0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      padding-right: 1.8rem;
+    }
+
     /* ─── EMPTY / PLACEHOLDER STATES ─── */
     .empty-state {
       text-align: center;
@@ -756,14 +843,33 @@
     .footer-links a:hover { color: var(--muted-teal); }
     .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
 
-    @media (max-width: 750px) {
-      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; padding: 1.5rem 4vw; }
       nav { flex-wrap: wrap; border-radius: 16px; }
-      .panel-layout { grid-template-columns: 1fr; }
+      .panel-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+      .selection-sidebar { min-width: 0; }
       .top-tab-bar { flex-wrap: wrap; width: 100%; }
-      .genre-grid { grid-template-columns: repeat(2, 1fr); }
-      footer { flex-direction: column; text-align: center; }
+      .top-tab { padding: 0.6rem 1.2rem; min-height: 44px; }
+      .genre-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; }
+      main { padding: 3rem 4vw 4rem; }
+      .eq-display { overflow-x: auto; padding-bottom: 0.5rem; -webkit-overflow-scrolling: touch; }
+      .eq-col { min-width: 44px; }
+      .upload-zone { padding: 1.5rem 1rem; }
+      .player-controls { padding: 1.2rem; }
+      .ctrl-btn, .play-btn-big { min-width: 44px; min-height: 44px; }
+      .play-btn-big { width: 56px; height: 56px; }
+      footer { flex-direction: column; text-align: center; padding: 2rem 4vw; }
       .footer-links { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .topbar { padding: 1rem 4vw; }
+      nav a { padding: 0.6rem 1rem; min-height: 44px; }
+      .page-title-strip { padding: 2rem 0 2.5rem; }
+      .genre-grid { grid-template-columns: 1fr; }
+      .genre-card { padding: 1.2rem 1rem; }
+      .sidebar-item { padding: 0.75rem 0.8rem; min-height: 44px; }
+      .active-preset-card { padding: 1.2rem; }
+      .track-name { font-size: 1rem; }
     }
   </style>
 </head>
@@ -815,6 +921,15 @@
           <div class="preset-card-desc" id="speakers-preset-desc">Select a speaker to load its EQ profile.</div>
           <div class="eq-display" id="speakers-eq-display"></div>
         </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="speakersOutputSelect" onchange="onPlayMusicOutputChange('speakers')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
+        </div>
         <div class="upload-zone" id="uploadZone1" onclick="document.getElementById('fileInput1').click()"
              ondragover="handleDragOver(event,'uploadZone1')" ondragleave="handleDragLeave(event,'uploadZone1')" ondrop="handleDrop(event,'fileInput1')">
           <span class="upload-icon">🎵</span>
@@ -856,7 +971,7 @@
       <div class="empty-icon">🎛️</div>
       <h3>No saved presets</h3>
       <p>Create custom EQ presets in the Preferences page, then return here to apply them during playback.</p>
-      <a href="#" class="btn-primary">Go to Preferences</a>
+      <a href="preferencesPage.html" class="btn-primary">Go to Preferences</a>
     </div>
     <div id="presets-layout" class="panel-layout" style="display:none;">
       <div class="selection-sidebar">
@@ -869,6 +984,21 @@
           <div class="preset-card-name" id="presets-preset-name">—</div>
           <div class="preset-card-desc" id="presets-preset-desc">Select a preset to load its EQ settings.</div>
           <div class="eq-display" id="presets-eq-display"></div>
+        </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="presetsOutputSelect" onchange="onPlayMusicOutputChange('presets')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
+          <div class="speaker-selector-compact">
+            <div class="speaker-selector-label">Optional: Calibrated speaker</div>
+            <select id="presetsSpeakerSelect" onchange="onPresetsSpeakerChange()">
+              <option value="">— None (EQ only) —</option>
+            </select>
+          </div>
         </div>
         <div class="upload-zone" id="uploadZone2" onclick="document.getElementById('fileInput2').click()"
              ondragover="handleDragOver(event,'uploadZone2')" ondragleave="handleDragLeave(event,'uploadZone2')" ondrop="handleDrop(event,'fileInput2')">
@@ -919,6 +1049,15 @@
           <div class="preset-card-name" id="genre-preset-name">Select a Genre</div>
           <div class="preset-card-desc" id="genre-preset-desc">Choose a genre below to load its tuned EQ curve.</div>
           <div class="eq-display" id="genre-eq-display"></div>
+        </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="genreOutputSelect" onchange="onPlayMusicOutputChange('genre')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
         </div>
         <div class="upload-zone" id="uploadZone3" onclick="document.getElementById('fileInput3').click()"
              ondragover="handleDragOver(event,'uploadZone3')" ondragleave="handleDragLeave(event,'uploadZone3')" ondrop="handleDrop(event,'fileInput3')">
@@ -1068,9 +1207,14 @@ panels.forEach(p => {
     durationSec: 0,
     volume: 0.8,
     animFrame: null,
-    activeEQ: null    // { 60: dB, 500: dB, ... }
+    activeEQ: null,   // { 60: dB, 500: dB, ... }
+    _calBands: null,  // for per-song correction
+    _calIssues: null
   };
 });
+
+// Output device selection (per-panel, syncs to same device for system-wide routing)
+let playMusicOutputDeviceId = '';
 
 // ═══════════════════════════════════════════
 // TAB SWITCHING
@@ -1088,6 +1232,58 @@ document.querySelectorAll('.top-tab').forEach(btn => {
 function panelFromTabName(name) {
   const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre' };
   return map[name] || name;
+}
+
+// ═══════════════════════════════════════════
+// OUTPUT DEVICE (system-wide routing via setSinkId)
+// ═══════════════════════════════════════════
+async function populatePlayMusicOutputDevices() {
+  try {
+    if (typeof API !== 'undefined' && API.requestDeviceLabels) await API.requestDeviceLabels();
+  } catch (_) {}
+  let devices = [];
+  try {
+    if (typeof API !== 'undefined' && API.getAudioOutputDevices) devices = await API.getAudioOutputDevices();
+  } catch (_) {}
+  const opts = devices.map(d => ({ value: d.deviceId, text: d.label }));
+  const prev = playMusicOutputDeviceId;
+  ['speakersOutputSelect', 'presetsOutputSelect', 'genreOutputSelect'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Default output —</option>';
+    opts.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.value;
+      opt.textContent = o.text;
+      sel.appendChild(opt);
+    });
+    if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) sel.value = prev;
+  });
+  const first = document.getElementById('speakersOutputSelect');
+  if (first) playMusicOutputDeviceId = first.value || '';
+}
+
+function onPlayMusicOutputChange(panel) {
+  const sel = document.getElementById(panel === 'speakers' ? 'speakersOutputSelect' : panel === 'presets' ? 'presetsOutputSelect' : 'genreOutputSelect');
+  playMusicOutputDeviceId = sel ? sel.value : '';
+  // Sync all three output selects (system-wide: one device for entire Play Music page)
+  ['speakersOutputSelect', 'presetsOutputSelect', 'genreOutputSelect'].forEach(id => {
+    const s = document.getElementById(id);
+    if (s && s.value !== playMusicOutputDeviceId) s.value = playMusicOutputDeviceId;
+  });
+  // Apply to all audio contexts so playback uses selected device
+  panels.forEach(p => {
+    const s = state[p];
+    if (s.audioCtx && s.audioCtx.setSinkId) {
+      s.audioCtx.setSinkId(playMusicOutputDeviceId || '').catch(() => {});
+    }
+  });
+}
+
+function refreshPlayMusicOutputDevices() {
+  populatePlayMusicOutputDevices().then(() => {
+    showToast('Device list refreshed');
+  });
 }
 
 // ═══════════════════════════════════════════
@@ -1153,6 +1349,7 @@ async function loadSpeakers() {
 
 async function activateSpeakerEQ(spk) {
   let calBands = null;
+  let calIssues = {};
 
   if (spk.source === 'know' && spk.eqPresetKey) {
     const raw = localStorage.getItem(spk.eqPresetKey);
@@ -1168,14 +1365,18 @@ async function activateSpeakerEQ(spk) {
     }
   } else if (spk.bands_7) {
     calBands = spk.bands_7;
+    if (spk.issues_7) calIssues = spk.issues_7;
   } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
     const converted = learn5To7Band(spk.readings);
     calBands = converted.bands;
+    calIssues = converted.issues || {};
   } else {
     try {
       const cal = await API.speakerSystemsCalibration(spk.id);
       if (Array.isArray(cal) && cal.length >= 5) {
-        calBands = learn5To7Band(cal).bands;
+        const converted = learn5To7Band(cal);
+        calBands = converted.bands;
+        calIssues = converted.issues || {};
       }
     } catch (_) {}
   }
@@ -1190,6 +1391,7 @@ async function activateSpeakerEQ(spk) {
 
   state.speakers.activeEQ = eqGains;
   state.speakers._calBands = calBands || {};
+  state.speakers._calIssues = calIssues;
   applyEQToNodes('speakers');
 
   document.getElementById('speakers-preset-name').innerHTML = spk.name || 'Speaker Profile';
@@ -1238,18 +1440,20 @@ async function loadPresets() {
   const list = document.getElementById('presets-sidebar-list');
   list.innerHTML = '';
 
-  [...keys].forEach((k, i) => {
+  const keyArr = [...keys];
+  keyArr.forEach((k, i) => {
     let data;
     try { data = JSON.parse(localStorage.getItem(k)); } catch (_) { return; }
     if (!data) return;
 
     const item = document.createElement('div');
     item.className = 'sidebar-item' + (i === 0 ? ' active' : '');
+    item.dataset.presetKey = k;
     item.innerHTML = `
       <div class="sidebar-item-icon">🎛️</div>
       <div class="sidebar-item-info">
         <div class="sidebar-item-name">${data.name}</div>
-        <div class="sidebar-item-sub">${data.speaker ? 'Speaker: ' + data.speaker : 'Custom preset'}</div>
+        <div class="sidebar-item-sub">EQ preset from Preferences</div>
       </div>
       <div class="sidebar-check">✓</div>
     `;
@@ -1261,34 +1465,84 @@ async function loadPresets() {
     list.appendChild(item);
     if (i === 0) activatePresetEQ(data);
   });
+  populatePresetsSpeakerSelect();
+}
+
+async function populatePresetsSpeakerSelect() {
+  const sel = document.getElementById('presetsSpeakerSelect');
+  if (!sel) return;
+  let speakers = [];
+  try {
+    if (typeof API !== 'undefined' && API.getAllSpeakers) speakers = await API.getAllSpeakers();
+  } catch (_) {}
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— None (EQ only) —</option>';
+  speakers.forEach(spk => {
+    const opt = document.createElement('option');
+    opt.value = spk.id;
+    opt.textContent = spk.name || 'Speaker ' + spk.id;
+    sel.appendChild(opt);
+  });
+  if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) sel.value = prev;
+  const data = getActivePresetData();
+  if (data) activatePresetEQ(data);
+}
+
+function onPresetsSpeakerChange() {
+  const data = getActivePresetData();
+  if (data) activatePresetEQ(data);
+}
+
+function getActivePresetData() {
+  const list = document.getElementById('presets-sidebar-list');
+  if (!list) return null;
+  const active = list.querySelector('.sidebar-item.active');
+  if (!active || !active.dataset.presetKey) return null;
+  try {
+    return JSON.parse(localStorage.getItem(active.dataset.presetKey));
+  } catch (_) {}
+  return null;
 }
 
 async function activatePresetEQ(data) {
+  // My Presets = EQ from preferences only (no speaker calibration by default)
   const prefBands = data.bands || {};
   const prefGains = bandsTo10Band(prefBands);
 
   let calGains = {};
-  if (data.speaker) {
+  let calBands = null;
+  let calIssues = {};
+  const speakerSel = document.getElementById('presetsSpeakerSelect');
+  const speakerId = speakerSel ? speakerSel.value : '';
+
+  // Optional: apply speaker calibration when user selects a calibrated speaker
+  if (speakerId) {
     try {
       const speakers = await API.getAllSpeakers();
-      const spk = speakers.find(s => s.id === data.speaker);
+      const spk = speakers.find(s => s.id === speakerId);
       if (spk) {
-        let calBands = null;
         if (spk.source === 'know' && spk.eqPresetKey) {
           const raw = localStorage.getItem(spk.eqPresetKey);
           if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
-          if (!calBands) {
+          if (!calBands && typeof API !== 'undefined' && API.eqPresetsList) {
             const list = await API.eqPresetsList();
             const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
             if (p && p.bands) calBands = p.bands;
           }
         } else if (spk.bands_7) {
           calBands = spk.bands_7;
+          if (spk.issues_7) calIssues = spk.issues_7;
         } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
-          calBands = learn5To7Band(spk.readings).bands;
-        } else {
+          const converted = learn5To7Band(spk.readings);
+          calBands = converted.bands;
+          calIssues = converted.issues || {};
+        } else if (typeof API !== 'undefined' && API.speakerSystemsCalibration) {
           const cal = await API.speakerSystemsCalibration(spk.id);
-          if (Array.isArray(cal) && cal.length >= 5) calBands = learn5To7Band(cal).bands;
+          if (Array.isArray(cal) && cal.length >= 5) {
+            const converted = learn5To7Band(cal);
+            calBands = converted.bands;
+            calIssues = converted.issues || {};
+          }
         }
         if (calBands) calGains = bandsTo10Band(calBands);
       }
@@ -1299,10 +1553,14 @@ async function activatePresetEQ(data) {
   FREQ_BANDS.forEach(f => { eqGains[f] = (calGains[f] || 0) + (prefGains[f] || 0); });
 
   state.presets.activeEQ = eqGains;
+  state.presets._calBands = calBands || {};
+  state.presets._calIssues = calIssues;
   applyEQToNodes('presets');
 
   document.getElementById('presets-preset-name').innerHTML = `<em>${data.name}</em>`;
-  document.getElementById('presets-preset-desc').textContent = `Custom EQ preset${data.speaker ? ' · Speaker calibration applied' : ''}.`;
+  document.getElementById('presets-preset-desc').textContent = speakerId
+    ? 'Custom EQ preset · Speaker calibration applied'
+    : 'Custom EQ preset from Preferences.';
   renderEQDisplay('presets-eq-display', eqGains);
 }
 
@@ -1377,7 +1635,7 @@ function renderEQDisplay(containerId, eqGains) {
       </div>
       <div class="eq-col-cut-label">Cut</div>
       <div class="eq-col-freq">${FREQ_LABELS[i]}</div>
-      <div class="eq-col-db">${gain > 0 ? '+' : ''}${gain} dB</div>
+      <div class="eq-col-db">${gain > 0 ? '+' : ''}${Number(gain).toFixed(2)} dB</div>
     `;
     el.appendChild(col);
   });
@@ -1390,6 +1648,11 @@ function ensureAudioCtx(panel) {
   const s = state[panel];
   if (!s.audioCtx) {
     s.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Route to selected output device (system-wide)
+    if (s.audioCtx.setSinkId && playMusicOutputDeviceId) {
+      s.audioCtx.setSinkId(playMusicOutputDeviceId).catch(() => {});
+    }
 
     // Build EQ filter chain: one peaking filter per band
     // Lower bands get wider Q (more musical), higher bands get tighter Q
@@ -1412,6 +1675,8 @@ function ensureAudioCtx(panel) {
     }
     s.filters[s.filters.length - 1].connect(s.gainNode);
     s.gainNode.connect(s.audioCtx.destination);
+  } else if (s.audioCtx.setSinkId && playMusicOutputDeviceId) {
+    s.audioCtx.setSinkId(playMusicOutputDeviceId).catch(() => {});
   }
 }
 
@@ -1437,10 +1702,12 @@ async function tryOptimizeOnLoad(audioBuffer, panel) {
     }
 
     const calBands = state[panel]._calBands || {};
+    const calIssues = state[panel]._calIssues || {};
     const speakerId = API.getActiveSpeaker();
     const platform = localStorage.getItem('freqsync_platform') || 'local';
 
-    const result = await API.audioOptimize(samples, calBands, platform, calBands, speakerId);
+    const speakerCalibration = { bands: calBands, issues: calIssues };
+    const result = await API.audioOptimize(samples, {}, platform, speakerCalibration, speakerId);
     if (result && result.final_eq) {
       const optimized = bandsTo10Band(result.final_eq);
       const current = state[panel].activeEQ || {};
@@ -1516,7 +1783,7 @@ function loadFile(file, panel) {
       document.getElementById('trackStatus' + n).className = 'track-status';
       document.getElementById('playBtn' + n).disabled = false;
       applyEQToNodes(panel);
-      if (panel === 'speakers') tryOptimizeOnLoad(buf, panel);
+      tryOptimizeOnLoad(buf, panel);
     }, err => {
       document.getElementById('trackStatus' + n).textContent = 'Decode error';
       console.error(err);
@@ -1685,6 +1952,7 @@ window.addEventListener('storage', async (e) => {
 // ═══════════════════════════════════════════
 buildGenreCards();
 (async () => {
+  await populatePlayMusicOutputDevices();
   await loadSpeakers();
   await loadPresets();
 })();

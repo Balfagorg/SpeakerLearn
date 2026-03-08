@@ -1,5 +1,6 @@
 #include "Stages.h"
 #include "../../db/DatabaseManager.h"
+#include <cmath>
 
 namespace core::stages {
 
@@ -29,9 +30,26 @@ Spectrum SpectrumAnalyzer::analyze(const std::vector<double>& audio) {
     return spec;
 }
 
+static double compute_rms_loudness(const std::vector<double>& audio) {
+    if (audio.empty()) return -60.0;
+    double sum = 0.0;
+    for (double s : audio) sum += s * s;
+    double rms = std::sqrt(sum / audio.size());
+    if (rms <= 1e-10) return -60.0;
+    return 20.0 * std::log10(rms);
+}
+
 TrackProfile TrackProfiler::profile(const Spectrum& spectrum) {
     TrackProfile tp;
     tp.profile_data = {{"avg_loudness", -14.0}, {"dynamic_range", 8.0}};
+    return tp;
+}
+
+TrackProfile TrackProfiler::profile_from_samples(const std::vector<double>& samples) {
+    TrackProfile tp;
+    double loudness = compute_rms_loudness(samples);
+    tp.profile_data["avg_loudness"] = loudness;
+    tp.profile_data["dynamic_range"] = 8.0;
     return tp;
 }
 
@@ -61,7 +79,9 @@ static const std::vector<int> BANDS_7_HZ = {60, 170, 350, 1000, 3500, 8000, 1600
 static double issueToCompensation(const std::string& issue, int hz) {
     if (issue.empty() || issue == "none") return 0.0;
     if (issue == "muffled") return (hz >= 1000 && hz <= 3500) ? 1.5 : 0.0;
-    if (issue == "harsh") return (hz >= 3500 && hz <= 8000) ? -1.5 : 0.0;
+    if (issue == "harsh" || issue == "fatigue") return (hz >= 3500 && hz <= 8000) ? -1.5 : 0.0;
+    if (issue == "sibilance") return (hz >= 3500 && hz <= 8000) ? -1.2 : 0.0;
+    if (issue == "nasal") return (hz >= 500 && hz <= 2000) ? -1.0 : 0.0;
     if (issue == "tinny") return (hz >= 8000) ? -1.0 : (hz >= 60 && hz <= 350) ? 0.5 : 0.0;
     if (issue == "crackle") return -1.0;
     if (issue == "rolloff") return (hz <= 170) ? 2.0 : 0.0;
@@ -93,9 +113,14 @@ std::map<std::string, double> EQOptimizer::compute(
         else inv_src = -(off.count("air") ? off.at("air") : 0);
         v += inv_src;
         if (speaker_issues.count(hz)) v += issueToCompensation(speaker_issues.at(hz), hz);
-        double spec = 0.0;
-        if (track_profile.profile_data.count("avg_loudness")) spec = track_profile.profile_data.at("avg_loudness") < -18 ? 0.5 : 0;
-        v += spec * 0.3;
+        double vol_comp = 0.0;
+        if (track_profile.profile_data.count("avg_loudness")) {
+            double loudness = track_profile.profile_data.at("avg_loudness");
+            if (loudness < -22) vol_comp = 1.2;       // very quiet: +1.2 dB
+            else if (loudness < -18) vol_comp = 0.8;  // quiet: +0.8 dB
+            else if (loudness < -14) vol_comp = 0.4;  // slightly quiet: +0.4 dB
+        }
+        v += vol_comp;
         final_eq[std::to_string(hz)] = std::max(-16.0, std::min(16.0, v));
     }
     return final_eq;
