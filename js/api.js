@@ -1,5 +1,5 @@
 /**
- * FreqSync API — Backend integration with localStorage fallback
+ * SpeakEasy API — Backend integration with localStorage fallback
  * Preserves full functionality when backend is unavailable
  */
 const API = {

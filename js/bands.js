@@ -1,5 +1,5 @@
 /**
- * FreqSync — Universal 7-band EQ constants and conversion utilities
+ * SpeakEasy — Universal 7-band EQ constants and conversion utilities
  * Single source of truth for all pages (addSpeaker, preferences, playMusic)
  */
 const BANDS_7 = [60, 170, 350, 1000, 3500, 8000, 16000];

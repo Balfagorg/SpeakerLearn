@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Local runner for FreqSync — builds backend, serves frontend, runs both for testing.
+Local runner for SpeakEasy — builds backend, serves frontend, runs both for testing.
 Backend: http://localhost:8001
 Frontend: http://localhost:8080
 """
@@ -104,7 +104,7 @@ def main():
             httpd.allow_reuse_address = True
             print()
             print("=" * 50)
-            print("  FreqSync — Local Test Runner")
+            print("  SpeakEasy — Local Test Runner")
             print("=" * 50)
             print(f"  Frontend:  http://localhost:{FRONTEND_PORT}/homePage.html")
             print(f"  Backend:   http://localhost:{BACKEND_PORT}/")

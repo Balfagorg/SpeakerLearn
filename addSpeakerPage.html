@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>FreqSync — Add Speaker</title>
+  <title>SpeakEasy — Add Speaker</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
   <style>
     :root {
@@ -928,6 +928,95 @@
     .footer-links a:hover { color: var(--muted-teal); }
     .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
 
+    /* ─── OUTPUT DEVICE SELECTOR ─── */
+    .device-select-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .device-select-card .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.25rem;
+    }
+    .device-select-card .card-title em { font-style: italic; color: var(--light-green); }
+    .device-select-card .card-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+    .device-selector-row {
+      display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;
+    }
+    .device-select-pair {
+      flex: 1; min-width: 180px;
+    }
+    .device-select-label {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .device-same-warning {
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: #f0a050;
+      background: rgba(240,160,80,0.1);
+      border: 1px solid rgba(240,160,80,0.25);
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+    }
+    .device-styled-select {
+      width: 100%; min-width: 160px;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+    .device-styled-select:focus { border-color: var(--muted-teal); }
+    .device-badge {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted-teal);
+      background: rgba(146,201,177,0.1);
+      border: 1px solid rgba(146,201,177,0.2);
+      padding: 0.45rem 0.9rem;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+    .device-refresh-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .device-refresh-btn:hover { border-color: var(--muted-teal); color: var(--text); }
+
     @media (max-width: 700px) {
       .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
       nav { flex-wrap: wrap; border-radius: 16px; }
@@ -973,6 +1062,28 @@
 
     <!-- ══ PANEL: LEARN MY SPEAKER ══ -->
     <div class="tab-panel active" id="panel-learn">
+
+      <div class="device-select-card">
+        <div class="card-title">Output <em>Devices</em></div>
+        <div class="card-subtitle">Choose different outputs for each button — otherwise both tones play through the same device</div>
+        <div class="device-selector-row">
+          <div class="device-select-pair">
+            <label class="device-select-label">💻 Computer</label>
+            <select class="device-styled-select" id="learnComputerDeviceSelect" onchange="onLearnDeviceChange()">
+              <option value="">— Default output —</option>
+            </select>
+          </div>
+          <div class="device-select-pair">
+            <label class="device-select-label">🔊 Speaker</label>
+            <select class="device-styled-select" id="learnSpeakerDeviceSelect" onchange="onLearnDeviceChange()">
+              <option value="">— Default output —</option>
+            </select>
+          </div>
+          <button class="device-refresh-btn" onclick="refreshOutputDevices('learn')" title="Refresh devices">↻</button>
+        </div>
+        <div class="device-same-warning" id="learnDeviceSameWarning" style="display:none;">Computer and speaker use the same output — select different devices for a meaningful comparison.</div>
+      </div>
+
       <div class="survey-wrapper">
 
         <div class="survey-progress">
@@ -1166,7 +1277,7 @@
         <div class="survey-slide" id="slide-5">
           <div class="slide-freq-tag"><div class="dot"></div> Review</div>
           <h2 class="slide-title">Ready to <em>add</em> your speaker?</h2>
-          <p class="slide-desc">Your frequency calibration data has been recorded across all 5 ranges. FreqSync will build a correction profile based on your responses. You can always re-run this survey later.</p>
+          <p class="slide-desc">Your frequency calibration data has been recorded across all 5 ranges. SpeakEasy will build a correction profile based on your responses. You can always re-run this survey later.</p>
           <div style="background: var(--surface-2); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 1.5rem; margin-bottom: 2rem;">
             <div style="font-family:'Space Mono',monospace; font-size:0.68rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-muted); margin-bottom:1.2rem;">Survey Summary</div>
             <div id="survey-summary" style="display:flex; flex-direction:column; gap:0.6rem;"></div>
@@ -1182,12 +1293,25 @@
 
     <!-- ══ PANEL: I KNOW MY SPEAKER ══ -->
     <div class="tab-panel" id="panel-know">
+
+      <div class="device-select-card">
+        <div class="card-title">Output <em>Device</em></div>
+        <div class="card-subtitle">Select the speaker or Bluetooth device you are configuring</div>
+        <div class="device-selector-row">
+          <select class="device-styled-select" id="knowDeviceSelect" onchange="onKnowDeviceChange()">
+            <option value="">— Default output —</option>
+          </select>
+          <div class="device-badge" id="knowDeviceBadge">Default output</div>
+          <button class="device-refresh-btn" onclick="refreshOutputDevices('know')" title="Refresh devices">↻</button>
+        </div>
+      </div>
+
       <div class="know-card know-instructions">
         <div class="know-section-label">How It Works</div>
         <h3>Enter your speaker's known frequency response</h3>
         <p class="know-instructions">Enter how your <b>speaker changes sound</b> at each frequency band.</p>
         <p class="know-instructions"><strong>Example:</strong> If your speaker boosts <b>8 kHz by +2 dB</b>, move the slider to <b>+2</b>.</p>
-        <p class="know-instructions">FreqSync will automatically generate the <b>opposite correction EQ</b> below.</p>
+        <p class="know-instructions">SpeakEasy will automatically generate the <b>opposite correction EQ</b> below.</p>
         <p class="know-instructions"><strong>Example:</strong><br>Speaker response: <b>+2 dB at 8 kHz</b><br>Correction EQ: <b>-2 dB at 8 kHz</b></p>
         <p class="know-instructions">This makes audio sound <b>more consistent across different speakers.</b></p>
       </div>
@@ -1335,7 +1459,7 @@
       <div class="added-icon">🔊</div>
       <div class="added-info">
         <h2>Speaker <em>Added</em></h2>
-        <p>Your speaker has been calibrated and added to FreqSync. Below is a summary of its frequency profile based on your survey responses.</p>
+        <p>Your speaker has been calibrated and added to SpeakEasy. Below is a summary of its frequency profile based on your survey responses.</p>
         <div class="added-badge">✓ Profile Active</div>
       </div>
     </div>
@@ -1402,6 +1526,84 @@
     return null;
   }
 
+  // ─── OUTPUT DEVICE ENUMERATION ───
+  let selectedLearnComputerDeviceId = '';
+  let selectedLearnSpeakerDeviceId = '';
+  let selectedKnowDeviceId = '';
+
+  async function populateOutputDevices() {
+    try {
+      await API.requestDeviceLabels();
+    } catch (_) {}
+    const devices = await API.getAudioOutputDevices();
+    const opts = devices.map(d => ({ value: d.deviceId, text: d.label }));
+
+    // Learn panel: Computer + Speaker (two separate selectors)
+    ['learnComputerDeviceSelect', 'learnSpeakerDeviceSelect'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      const prev = sel.value;
+      sel.innerHTML = '<option value="">— Default output —</option>';
+      opts.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = o.text;
+        sel.appendChild(opt);
+      });
+      if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) sel.value = prev;
+    });
+
+    // Know panel: single selector
+    const knowSel = document.getElementById('knowDeviceSelect');
+    if (knowSel) {
+      const prev = knowSel.value;
+      knowSel.innerHTML = '<option value="">— Default output —</option>';
+      opts.forEach(o => {
+        const opt = document.createElement('option');
+        opt.value = o.value;
+        opt.textContent = o.text;
+        knowSel.appendChild(opt);
+      });
+      if (prev && knowSel.querySelector('option[value="' + CSS.escape(prev) + '"]')) knowSel.value = prev;
+    }
+
+    onLearnDeviceChange();
+  }
+
+  function refreshOutputDevices(panel) {
+    populateOutputDevices().then(() => {
+      showToast('Device list refreshed');
+    });
+  }
+
+  function onLearnDeviceChange() {
+    const compSel = document.getElementById('learnComputerDeviceSelect');
+    const spkSel = document.getElementById('learnSpeakerDeviceSelect');
+    const warn = document.getElementById('learnDeviceSameWarning');
+    selectedLearnComputerDeviceId = compSel ? compSel.value : '';
+    selectedLearnSpeakerDeviceId = spkSel ? spkSel.value : '';
+
+    const compId = selectedLearnComputerDeviceId || '';
+    const spkId = selectedLearnSpeakerDeviceId || '';
+    const same = compId === spkId;
+    if (warn) warn.style.display = same ? 'block' : 'none';
+  }
+
+  function onKnowDeviceChange() {
+    const sel = document.getElementById('knowDeviceSelect');
+    const badge = document.getElementById('knowDeviceBadge');
+    selectedKnowDeviceId = sel.value;
+    badge.textContent = sel.value ? sel.options[sel.selectedIndex].text : 'Default output';
+    const deviceId = sel.value || '';
+    const player = document.getElementById('knowPlayer');
+    if (player && player.setSinkId) {
+      player.setSinkId(deviceId).catch(() => {});
+    }
+    if (knowAudioContext && knowAudioContext.setSinkId) {
+      knowAudioContext.setSinkId(deviceId).catch(() => {});
+    }
+  }
+
   // ─── LOAD SPEAKERS ───
   async function loadSpeakers() {
     // Load from localStorage first — this is the source of truth
@@ -1444,6 +1646,8 @@
     knowPopulatePresetMenu();
   });
 
+  populateOutputDevices();
+
   // ─── SLIDE NAVIGATION ───
   function goToSlide(idx) {
     stopTone();
@@ -1473,7 +1677,13 @@
     stopTone();
     document.querySelectorAll('.play-btn').forEach(b => b.classList.remove('playing'));
     btn.classList.add('playing');
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    const deviceId = source === 'computer' ? selectedLearnComputerDeviceId : selectedLearnSpeakerDeviceId;
+    if (audioCtx.setSinkId) {
+      audioCtx.setSinkId(deviceId || '').catch(() => {});
+    }
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = 'sine';
@@ -1526,7 +1736,8 @@
       issue: (document.getElementById('issues-' + i) || {value:'none'}).value
     }));
     let id = Date.now();
-    let name = 'Speaker ' + (speakers.filter(s => s.source === 'learn').length + 1);
+    const spkSel = document.getElementById('learnSpeakerDeviceSelect');
+    let name = (spkSel && spkSel.value && spkSel.selectedIndex > 0) ? spkSel.options[spkSel.selectedIndex].text : 'Speaker ' + (speakers.filter(s => s.source === 'learn').length + 1);
     try {
       const created = await apiCall(() => API.speakerSystemsCreate({ name }), 'Could not save speaker');
       if (created) { id = created.id; await apiCall(() => API.speakerSystemsCalibrate(id, readings), 'Could not save calibration'); }
@@ -1957,7 +2168,13 @@
 
   function knowSetupAudio() {
     const audioElement = document.getElementById('knowPlayer');
+    if (selectedKnowDeviceId && audioElement.setSinkId) {
+      audioElement.setSinkId(selectedKnowDeviceId).catch(() => {});
+    }
     knowAudioContext = new AudioContext();
+    if (selectedKnowDeviceId && knowAudioContext.setSinkId) {
+      knowAudioContext.setSinkId(selectedKnowDeviceId).catch(() => {});
+    }
     const track = knowAudioContext.createMediaElementSource(audioElement);
     knowFilters = knowFrequencies.map(freq => {
       const filter = knowAudioContext.createBiquadFilter();
@@ -2001,8 +2218,16 @@
   function knowPauseAudio() { document.getElementById('knowPlayer').pause(); }
 
   async function knowSavePreset() {
-    const name = document.getElementById('knowSpeakerName').value;
-    if (!name) { alert('Enter a speaker name'); return; }
+    let name = document.getElementById('knowSpeakerName').value.trim();
+    if (!name) {
+      const kSel = document.getElementById('knowDeviceSelect');
+      if (kSel && kSel.value && kSel.selectedIndex > 0) {
+        name = kSel.options[kSel.selectedIndex].text;
+        document.getElementById('knowSpeakerName').value = name;
+      } else {
+        alert('Enter a speaker name'); return;
+      }
+    }
     const preset = {};
     knowFrequencies.forEach(freq => { preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value); });
     const key = 'eq_' + name;
