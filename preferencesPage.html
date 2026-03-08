@@ -529,12 +529,12 @@
 
 <!-- ══ TOPBAR ══ -->
 <div class="topbar">
-  <a href="index.html" class="logo">Freq<span>Sync</span></a>
+  <a href="homePage.html" class="logo">Freq<span>Sync</span></a>
   <nav>
-    <a href="index.html">Home</a>
+    <a href="homePage.html">Home</a>
     <a href="addSpeakerPage.html">Add Speaker</a>
-    <a href="preferencessPage.html" class="active">Preferences</a>
-    <a href="#">Music Presets</a>
+    <a href="preferencesPage.html" class="active">Preferences</a>
+    <a href="preferencesPage.html">Music Presets</a>
   </nav>
 </div>
 
@@ -558,10 +558,6 @@
       <div class="speaker-selector-row">
         <select class="styled-select" id="speakerSelect" onchange="onSpeakerChange()">
           <option value="">— No speaker selected —</option>
-          <option value="studio-monitor">Studio Monitor A</option>
-          <option value="bookshelf">Bookshelf B</option>
-          <option value="bluetooth">Portable BT-1</option>
-          <option value="pa-wedge">PA Wedge C</option>
         </select>
         <div class="speaker-badge" id="speakerBadge">No speaker</div>
       </div>
@@ -664,11 +660,12 @@
 <footer>
   <div class="footer-logo">FreqSync</div>
   <div class="footer-links">
-    <a href="index.html">Home</a>
+    <a href="homePage.html">Home</a>
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
-    <a href="#">Music Presets</a>
+    <a href="preferencesPage.html">Music Presets</a>
     <a href="#">Contact</a>
+    <a href="#">Privacy</a>
   </div>
   <div class="footer-copy">© 2026 FreqSync. All rights reserved.</div>
 </footer>
@@ -676,8 +673,7 @@
 <!-- ══ TOAST ══ -->
 <div class="toast" id="toast"></div>
 
-
-
+<script src="js/api.js"></script>
 <script>
 // ── BAND CONFIG ──
 const BANDS = [
@@ -989,21 +985,49 @@ function updateVizBars(active) {
 }
 
 // ── SPEAKER SELECTOR ──
-function onSpeakerChange() {
+async function populateSpeakerSelect() {
+  const sel = document.getElementById('speakerSelect');
+  const firstOpt = sel.querySelector('option[value=""]') || (() => {
+    const o = document.createElement('option');
+    o.value = '';
+    o.textContent = '— No speaker selected —';
+    sel.appendChild(o);
+    return o;
+  })();
+  sel.innerHTML = '';
+  sel.appendChild(firstOpt);
+  try {
+    const list = await API.speakerSystemsList();
+    if (Array.isArray(list)) {
+      list.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
+    }
+  } catch (_) {}
+}
+
+async function onSpeakerChange() {
   const sel = document.getElementById('speakerSelect');
   const badge = document.getElementById('speakerBadge');
   const val = sel.value;
   const label = val ? sel.options[sel.selectedIndex].text : 'No speaker';
   badge.textContent = label;
+  try { await API.speakerSystemsSwitch(val); } catch (_) {}
 }
 
 // ── PRESETS ──
-function savePreset() {
+async function savePreset() {
   const name = document.getElementById('presetNameInput').value.trim();
   if (!name) { showToast('Give your preset a name first', true); return; }
   const speaker = document.getElementById('speakerSelect').value;
   const key = 'freqsync_pref_' + name;
   const data = { name, speaker, bands: { ...eqValues } };
+  try {
+    await API.eqPresetsSave({ id: key, name, speaker_system_id: speaker, bands: data.bands });
+  } catch (_) {}
   localStorage.setItem(key, JSON.stringify(data));
   activePresetKey = key;
   document.getElementById('presetNameInput').value = '';
@@ -1011,10 +1035,20 @@ function savePreset() {
   showToast('Preset "' + name + '" saved!');
 }
 
-function loadPreset(key) {
+async function loadPreset(key) {
+  let data = null;
   const raw = localStorage.getItem(key);
-  if (!raw) return;
-  const data = JSON.parse(raw);
+  if (raw) {
+    try { data = JSON.parse(raw); } catch (_) {}
+  }
+  if (!data) {
+    try {
+      const list = await API.eqPresetsList();
+      const p = Array.isArray(list) ? list.find(x => x.id === key) : null;
+      if (p) data = { name: p.name, speaker: p.speaker_system_id || '', bands: p.bands || {} };
+    } catch (_) {}
+  }
+  if (!data) return;
   activePresetKey = key;
   BANDS.forEach(b => {
     const v = data.bands[b.hz] !== undefined ? data.bands[b.hz] : 0;
@@ -1038,30 +1072,38 @@ function loadPreset(key) {
   showToast('Loaded "' + data.name + '"');
 }
 
-function deletePreset(key, e) {
+async function deletePreset(key, e) {
   e.stopPropagation();
+  try { await API.eqPresetsDelete(key); } catch (_) {}
   localStorage.removeItem(key);
   if (activePresetKey === key) activePresetKey = null;
   renderPresets();
   showToast('Preset deleted');
 }
 
-function renderPresets() {
+async function renderPresets() {
   const list = document.getElementById('presetsList');
-  const keys = [];
+  const keys = new Set();
+  try {
+    const apiList = await API.eqPresetsList();
+    if (Array.isArray(apiList)) apiList.forEach(p => keys.add(p.id));
+  } catch (_) {}
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith('freqsync_pref_')) keys.push(k);
+    if (k && k.startsWith('freqsync_pref_')) keys.add(k);
   }
-  if (keys.length === 0) {
+  if (keys.size === 0) {
     list.innerHTML = '<div class="empty-presets">No presets saved yet</div>';
     return;
   }
   list.innerHTML = '';
-  keys.forEach(key => {
-    const raw = localStorage.getItem(key);
-    if (!raw) return;
-    const data = JSON.parse(raw);
+  [...keys].forEach(key => {
+    let data = null;
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) data = JSON.parse(raw);
+    } catch (_) {}
+    if (!data) data = { name: key.replace(/^(freqsync_pref_|eq_)/, ''), speaker: '' };
     const item = document.createElement('div');
     item.className = 'preset-item' + (key === activePresetKey ? ' active-preset' : '');
     item.onclick = () => loadPreset(key);
@@ -1095,8 +1137,8 @@ function showToast(msg, error = false) {
 // ── INIT ──
 buildEQ();
 buildVizBars();
+populateSpeakerSelect().then(() => onSpeakerChange());
 renderPresets();
-onSpeakerChange();
 </script>
 </body>
 </html>

@@ -275,6 +275,153 @@
       margin: 0 auto;
     }
 
+    /* ─── I KNOW MY SPEAKER PANEL ─── */
+    #panel-know .know-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 24px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    #panel-know .know-card:last-child { margin-bottom: 0; }
+    #panel-know .know-section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--muted-teal);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    #panel-know .know-section-label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--muted-teal);
+    }
+    #panel-know .know-card h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+    #panel-know .know-card h3 em { font-style: italic; color: var(--muted-teal); }
+    #panel-know .know-instructions {
+      line-height: 1.7;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    #panel-know .know-instructions p { margin-bottom: 1rem; }
+    #panel-know .know-instructions b { color: var(--light-green); }
+    #panel-know .know-preset-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: flex-end;
+      margin-bottom: 1.5rem;
+    }
+    #panel-know .know-input-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    #panel-know .know-input-group label {
+      display: block;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+    #panel-know .know-input-group input,
+    #panel-know .know-input-group select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    #panel-know .know-input-group select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+    #panel-know .know-input-group input::placeholder { color: var(--text-muted); }
+    #panel-know .know-input-group input:focus,
+    #panel-know .know-input-group select:focus { border-color: var(--muted-teal); }
+    #panel-know .know-preset-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem; }
+    #panel-know .sliderContainer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+    #panel-know .sliderBlock {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 80px;
+      flex-shrink: 0;
+    }
+    #panel-know .sliderBlock.locked { opacity: 0.7; }
+    #panel-know .sliderBlock input[type="range"] {
+      writing-mode: vertical-lr;
+      -webkit-appearance: slider-vertical;
+      width: 8px;
+      height: 160px;
+      margin: 0.5rem 0;
+      -webkit-appearance: none;
+      appearance: none;
+      background: linear-gradient(to top, var(--cerulean) 0%, rgba(255,255,255,0.1) 50%, var(--light-green) 100%);
+      border-radius: 100px;
+      outline: none;
+    }
+    #panel-know .sliderBlock input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--text);
+      border: 3px solid var(--surface);
+      box-shadow: 0 0 0 2px var(--muted-teal);
+      cursor: pointer;
+    }
+    #panel-know .know-boost { font-size: 0.65rem; color: var(--light-green); font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
+    #panel-know .know-cut { font-size: 0.65rem; color: #f07070; font-family: 'Space Mono', monospace; letter-spacing: 0.08em; }
+    #panel-know .know-sliderLabel { font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 0.08em; color: var(--text-muted); margin-top: 0.5rem; }
+    #panel-know .know-value { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted-teal); margin-top: 0.25rem; }
+    #panel-know .know-upload-zone {
+      border: 2px dashed rgba(146,201,177,0.25);
+      border-radius: 14px;
+      padding: 2rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin: 1rem 0;
+      background: rgba(146,201,177,0.03);
+    }
+    #panel-know .know-upload-zone:hover,
+    #panel-know .know-upload-zone.drag-over { border-color: var(--muted-teal); background: rgba(146,201,177,0.07); }
+    #panel-know .know-upload-zone.has-file { border-color: rgba(162,250,163,0.35); background: rgba(162,250,163,0.05); }
+    #panel-know .know-upload-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
+    #panel-know .know-upload-title { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem; }
+    #panel-know .know-upload-hint { font-size: 0.75rem; color: var(--text-muted); font-family: 'Space Mono', monospace; }
+    #panel-know .know-player-controls { display: flex; gap: 0.75rem; align-items: center; margin-top: 1rem; flex-wrap: wrap; }
+    #panel-know .know-player-controls audio { flex: 1; min-width: 200px; height: 36px; }
+    #panel-know #knowFileInput { display: none; }
+
     /* ─── SURVEY / LEARN FLOW ─── */
     .survey-wrapper {
       background: var(--surface);
@@ -847,9 +994,9 @@
     <div class="tagline-top">Speaker · Frequency · Harmony</div>
     <nav>
       <a href="homePage.html">Home</a>
-      <a href="add-speaker.html" class="active">Add Speaker</a>
+      <a href="addSpeakerPage.html" class="active">Add Speaker</a>
       <a href="preferencesPage.html">Preferences</a>
-      <a href="#">Music Presets</a>
+      <a href="preferencesPage.html">Music Presets</a>
     </nav>
   </div>
 
@@ -1204,10 +1351,70 @@
 
     <!-- ══ PANEL: I KNOW MY SPEAKER ══ -->
     <div class="tab-panel" id="panel-know">
-      <div class="advanced-placeholder">
-        <div class="badge">Advanced Mode</div>
-        <h3>Manual <em>configuration</em></h3>
-        <p>Enter your speaker's known frequency response data, EQ curves, or manufacturer specifications directly. Advanced implementation coming soon.</p>
+      <div class="know-card know-instructions">
+        <div class="know-section-label">How It Works</div>
+        <h3>Enter your speaker's known frequency response</h3>
+        <p class="know-instructions">Enter how your <b>speaker changes sound</b> at each frequency band.</p>
+        <p class="know-instructions"><strong>Example:</strong> If your speaker boosts <b>8 kHz by +2 dB</b>, move the slider to <b>+2</b>.</p>
+        <p class="know-instructions">FreqSync will automatically generate the <b>opposite correction EQ</b> below.</p>
+        <p class="know-instructions"><strong>Example:</strong><br>Speaker response: <b>+2 dB at 8 kHz</b><br>Correction EQ: <b>-2 dB at 8 kHz</b></p>
+        <p class="know-instructions">This makes audio sound <b>more consistent across different speakers.</b></p>
+      </div>
+
+      <div class="know-card">
+        <div class="know-section-label">Preset Management</div>
+        <h3>Save &amp; recall your presets</h3>
+        <div class="know-preset-form">
+          <div class="know-input-group">
+            <label>Speaker Name</label>
+            <input id="knowSpeakerName" placeholder="Example: My Headphones">
+          </div>
+          <div class="know-preset-actions">
+            <button class="btn-primary" onclick="knowSavePreset()">Save Preset</button>
+          </div>
+        </div>
+        <div class="know-input-group">
+          <label>Saved Presets</label>
+          <select id="knowPresetMenu" onchange="knowLoadPreset()">
+            <option value="">Select preset...</option>
+          </select>
+        </div>
+        <div class="know-preset-actions">
+          <button class="btn-ghost" onclick="knowDeletePreset()">Delete Preset</button>
+        </div>
+      </div>
+
+      <div class="know-card">
+        <div class="know-section-label">Speaker Response</div>
+        <h3>Speaker <em>Frequency Response</em> (Editable)</h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">Adjust each band to match your speaker's known response. Positive = boost, negative = cut.</p>
+        <div id="knowSpeakerSliders" class="sliderContainer"></div>
+      </div>
+
+      <div class="know-card">
+        <div class="know-section-label">Auto Correction</div>
+        <h3>Correction <em>EQ Applied</em> (Auto Generated)</h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">The inverse of your speaker response — applied in real time when playing audio.</p>
+        <div id="knowCorrectionSliders" class="sliderContainer"></div>
+      </div>
+
+      <div class="know-card">
+        <div class="know-section-label">Test</div>
+        <h3>Test <em>Music</em></h3>
+        <p class="know-instructions" style="margin-bottom: 1rem;">Upload a track to hear the correction EQ applied in real time.</p>
+        <div class="know-upload-zone" id="knowUploadZone" onclick="document.getElementById('knowFileInput').click()"
+             ondragover="knowHandleDragOver(event)" ondragleave="knowHandleDragLeave(event)" ondrop="knowHandleDrop(event)">
+          <span class="know-upload-icon">🎵</span>
+          <div class="know-upload-title">Drop an audio file here</div>
+          <div class="know-upload-hint">or click to browse</div>
+          <div class="know-upload-filename" id="knowUploadFilename"></div>
+        </div>
+        <input type="file" id="knowFileInput" accept="audio/*">
+        <div class="know-player-controls">
+          <button class="btn-primary" onclick="knowPlayAudio()">Play</button>
+          <button class="btn-ghost" onclick="knowPauseAudio()">Pause</button>
+          <audio id="knowPlayer" controls></audio>
+        </div>
       </div>
     </div>
 
@@ -1216,7 +1423,7 @@
       <div id="empty-speakers" class="empty-state">
         <div class="empty-icon">🔇</div>
         <h3>No speakers yet</h3>
-        <p>You haven't added any speakers. Use the "Learn My Speaker" tab to calibrate your first device.</p>
+        <p>You haven't added any speakers. Use "Learn My Speaker" or "I Know My Speaker" to add your first device.</p>
         <button class="btn-primary" onclick="switchTab('learn')">+ Add Your First Speaker</button>
       </div>
       <div id="speakers-list-wrap" class="speakers-list" style="display:none;"></div>
@@ -1257,20 +1464,69 @@
   <div class="footer-links">
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
-    <a href="#">Music Presets</a>
+    <a href="preferencesPage.html">Music Presets</a>
     <a href="#">Contact</a>
     <a href="#">Privacy</a>
   </div>
   <div class="footer-copy">© 2026 FreqSync. All rights reserved.</div>
 </footer>
 
+<script src="js/api.js"></script>
 <script>
   // ─── STATE ───
   const freqLabels = ['60 Hz', '500 Hz', '1,000 Hz', '3,500 Hz', '16,000 Hz'];
   const freqNames  = ['Sub-bass', 'Low midrange', 'Midrange', 'Upper midrange', 'Air / Treble'];
+  const SPEAKERS_STORAGE_KEY = 'freqsync_speakers';
   let speakers = [];
   let currentTone = null;
   let audioCtx = null;
+
+  async function loadSpeakers() {
+    try {
+      const raw = localStorage.getItem(SPEAKERS_STORAGE_KEY);
+      speakers = raw ? JSON.parse(raw) : [];
+      // Sync from backend when available
+      try {
+        const list = await API.speakerSystemsList();
+        if (Array.isArray(list) && list.length > 0) {
+          list.forEach(s => {
+            if (!speakers.some(sp => sp.id === s.id)) {
+              speakers.push({
+                id: s.id,
+                name: s.name,
+                addedAt: s.created_at ? new Date(s.created_at).toLocaleDateString() : new Date().toLocaleDateString(),
+                source: 'learn',
+                readings: []
+              });
+            }
+          });
+        }
+      } catch (_) {}
+      // Migrate existing eq_ presets into speakers list if not already present
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('eq_')) {
+          const name = key.replace('eq_', '');
+          if (!speakers.some(s => s.source === 'know' && s.eqPresetKey === key)) {
+            speakers.push({
+              id: 'eq_' + name + '_' + Date.now(),
+              name,
+              addedAt: new Date().toLocaleDateString(),
+              source: 'know',
+              eqPresetKey: key
+            });
+          }
+        }
+      }
+      saveSpeakers();
+    } catch (e) { speakers = []; }
+  }
+
+  function saveSpeakers() {
+    try {
+      localStorage.setItem(SPEAKERS_STORAGE_KEY, JSON.stringify(speakers));
+    } catch (e) {}
+  }
 
   // ─── TAB SWITCHING ───
   document.querySelectorAll('.top-tab').forEach(btn => {
@@ -1281,6 +1537,11 @@
     document.querySelectorAll('.top-tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   }
+
+  // ─── INIT: Load speakers from storage ───
+  loadSpeakers().then(() => {});
+  updateSpeakerCount();
+  rebuildSpeakerList();
 
   // ─── SLIDE NAVIGATION ───
   function goToSlide(idx) {
@@ -1364,21 +1625,30 @@
   }
 
   // ─── ADD SPEAKER ───
-  function addSpeaker() {
+  async function addSpeaker() {
     stopTone();
-    const id = Date.now();
+    const readings = freqLabels.map((label, i) => ({
+      label,
+      name: freqNames[i],
+      val: parseInt(document.getElementById('slider-' + i).value),
+      issue: document.getElementById('issues-' + i).value
+    }));
+    let id = Date.now();
+    let name = 'Speaker ' + (speakers.filter(s => s.source === 'learn').length + 1);
+    try {
+      const created = await API.speakerSystemsCreate({ name });
+      id = created.id;
+      await API.speakerSystemsCalibrate(id, readings);
+    } catch (_) {}
     const spk = {
       id,
-      name: 'Speaker ' + (speakers.length + 1),
+      name,
       addedAt: new Date().toLocaleDateString(),
-      readings: freqLabels.map((label, i) => ({
-        label,
-        name: freqNames[i],
-        val: parseInt(document.getElementById('slider-' + i).value),
-        issue: document.getElementById('issues-' + i).value
-      }))
+      source: 'learn',
+      readings
     };
     speakers.push(spk);
+    saveSpeakers();
     updateSpeakerCount();
     rebuildSpeakerList();
     showAddedPage(spk);
@@ -1400,13 +1670,15 @@
     empty.style.display = 'none';
     wrap.style.display = 'grid';
     speakers.forEach(spk => {
+      const bands = spk.source === 'know' ? '7 frequency bands' : '5 frequency bands';
+      const method = spk.source === 'know' ? 'Manual' : 'Learn';
       const card = document.createElement('div');
       card.className = 'speaker-list-card';
       card.innerHTML = `
         <div class="spk-card-icon">🔊</div>
         <div class="spk-card-info">
           <div class="spk-card-name">${spk.name}</div>
-          <div class="spk-card-meta">Added ${spk.addedAt} · 5 frequency bands calibrated</div>
+          <div class="spk-card-meta">Added ${spk.addedAt} · ${bands} · ${method}</div>
         </div>
         <div class="spk-card-arrow">›</div>
       `;
@@ -1420,11 +1692,46 @@
     const page = document.getElementById('speaker-added-page');
     page.classList.add('active');
 
-    // Build prefs grid
+    // Build prefs grid (Learn speakers have readings; Know speakers don't)
     const grid = document.getElementById('prefs-grid');
     grid.innerHTML = '';
 
-    // Card 1: Frequency balance
+    if (spk.source === 'know') {
+      // Know speaker: show EQ preset summary
+      const preset = spk.eqPresetKey ? JSON.parse(localStorage.getItem(spk.eqPresetKey) || '{}') : {};
+      const card1 = document.createElement('div');
+      card1.className = 'pref-card';
+      card1.innerHTML = `<div class="pref-card-label">Manual Calibration</div>`;
+      Object.entries(preset).forEach(([freq, val]) => {
+        card1.innerHTML += `
+          <div class="pref-freq-row">
+            <span class="pref-freq-name">${freq} Hz</span>
+            <div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div>
+            <span class="pref-val">${val > 0 ? '+' : ''}${val} dB</span>
+          </div>
+        `;
+      });
+      grid.appendChild(card1);
+      const card3 = document.createElement('div');
+      card3.className = 'pref-card';
+      card3.innerHTML = `
+        <div class="pref-card-label">Calibration Status</div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
+            <span style="color:var(--text-muted);">Bands calibrated</span>
+            <span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">7 / 7</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
+            <span style="color:var(--text-muted);">Method</span>
+            <span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Manual</span>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card3);
+      return;
+    }
+
+    // Card 1: Frequency balance (Learn only)
     const card1 = document.createElement('div');
     card1.className = 'pref-card';
     card1.innerHTML = `<div class="pref-card-label">Frequency Balance</div>`;
@@ -1494,6 +1801,187 @@
     document.querySelectorAll('.problems-select').forEach(s => s.selectedIndex = 0);
     document.querySelectorAll('input[type="range"]').forEach((r, i) => { r.value = 50; updateReadout(i); });
     switchTab('learn');
+  }
+
+  // ─── I KNOW MY SPEAKER PANEL ───
+  const knowFrequencies = [60, 170, 350, 1000, 3500, 8000, 16000];
+  let knowAudioContext = null;
+  let knowFilters = [];
+
+  (function initKnowPanel() {
+    const speakerDiv = document.getElementById('knowSpeakerSliders');
+    const correctionDiv = document.getElementById('knowCorrectionSliders');
+    const audioElement = document.getElementById('knowPlayer');
+    if (!speakerDiv || !correctionDiv) return;
+
+    knowFrequencies.forEach(freq => {
+      const block = document.createElement('div');
+      block.className = 'sliderBlock';
+      block.innerHTML = `
+        <div class="know-boost">Boost</div>
+        <input type="range" min="-12" max="12" step="0.1" value="0" id="knowSpeaker${freq}">
+        <div class="know-cut">Cut</div>
+        <div class="know-sliderLabel">${freq} Hz</div>
+        <div class="know-value" id="knowSpeakerVal${freq}">0 dB</div>
+      `;
+      speakerDiv.appendChild(block);
+
+      const block2 = document.createElement('div');
+      block2.className = 'sliderBlock locked';
+      block2.innerHTML = `
+        <div class="know-boost">Boost</div>
+        <input type="range" min="-12" max="12" step="0.1" value="0" id="knowCorr${freq}" disabled>
+        <div class="know-cut">Cut</div>
+        <div class="know-sliderLabel">${freq} Hz</div>
+        <div class="know-value" id="knowCorrVal${freq}">0 dB</div>
+      `;
+      correctionDiv.appendChild(block2);
+
+      document.getElementById('knowSpeaker' + freq).addEventListener('input', knowUpdateEQ);
+    });
+
+    document.getElementById('knowFileInput').addEventListener('change', function() {
+      const file = this.files[0];
+      if (file) {
+        audioElement.src = URL.createObjectURL(file);
+        document.getElementById('knowUploadFilename').textContent = file.name;
+        document.getElementById('knowUploadZone').classList.add('has-file');
+        if (!knowAudioContext) knowSetupAudio();
+      }
+    });
+
+    knowPopulatePresetMenu();
+    knowUpdateEQ();
+  })();
+
+  function knowSetupAudio() {
+    const audioElement = document.getElementById('knowPlayer');
+    knowAudioContext = new AudioContext();
+    const track = knowAudioContext.createMediaElementSource(audioElement);
+    knowFilters = knowFrequencies.map(freq => {
+      const filter = knowAudioContext.createBiquadFilter();
+      filter.type = 'peaking';
+      filter.frequency.value = freq;
+      filter.Q.value = 1;
+      filter.gain.value = 0;
+      return filter;
+    });
+    const chain = [track, ...knowFilters, knowAudioContext.destination];
+    for (let i = 0; i < chain.length - 1; i++) chain[i].connect(chain[i + 1]);
+  }
+
+  function knowUpdateEQ() {
+    knowFrequencies.forEach((freq, i) => {
+      const speakerValue = parseFloat(document.getElementById('knowSpeaker' + freq).value);
+      const correction = -speakerValue;
+      document.getElementById('knowSpeakerVal' + freq).innerText = speakerValue + ' dB';
+      document.getElementById('knowCorr' + freq).value = correction;
+      document.getElementById('knowCorrVal' + freq).innerText = correction + ' dB';
+      if (knowFilters[i]) knowFilters[i].gain.value = correction;
+    });
+  }
+
+  function knowHandleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('knowUploadZone').classList.add('drag-over');
+  }
+  function knowHandleDragLeave() {
+    document.getElementById('knowUploadZone').classList.remove('drag-over');
+  }
+  function knowHandleDrop(e) {
+    e.preventDefault();
+    document.getElementById('knowUploadZone').classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      const audioElement = document.getElementById('knowPlayer');
+      audioElement.src = URL.createObjectURL(file);
+      document.getElementById('knowUploadFilename').textContent = file.name;
+      document.getElementById('knowUploadZone').classList.add('has-file');
+      if (!knowAudioContext) knowSetupAudio();
+    }
+  }
+
+  function knowPlayAudio() {
+    if (!knowAudioContext) knowSetupAudio();
+    document.getElementById('knowPlayer').play();
+  }
+  function knowPauseAudio() {
+    document.getElementById('knowPlayer').pause();
+  }
+
+  async function knowSavePreset() {
+    const name = document.getElementById('knowSpeakerName').value;
+    if (!name) { alert('Enter a speaker name'); return; }
+    const preset = {};
+    knowFrequencies.forEach(freq => {
+      preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value);
+    });
+    const key = 'eq_' + name;
+    try {
+      await API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: preset });
+    } catch (_) {}
+    localStorage.setItem(key, JSON.stringify(preset));
+    knowPopulatePresetMenu();
+    const existing = speakers.find(s => s.source === 'know' && s.eqPresetKey === key);
+    if (!existing) {
+      const spk = {
+        id: key + '_' + Date.now(),
+        name,
+        addedAt: new Date().toLocaleDateString(),
+        source: 'know',
+        eqPresetKey: key
+      };
+      speakers.push(spk);
+      saveSpeakers();
+      updateSpeakerCount();
+      rebuildSpeakerList();
+      showAddedPage(spk);
+    } else {
+      alert('Preset saved!');
+    }
+  }
+
+  function knowLoadPreset() {
+    const key = document.getElementById('knowPresetMenu').value;
+    if (!key) return;
+    const preset = JSON.parse(localStorage.getItem(key));
+    knowFrequencies.forEach(freq => {
+      document.getElementById('knowSpeaker' + freq).value = -preset[freq];
+    });
+    knowUpdateEQ();
+  }
+
+  async function knowDeletePreset() {
+    const key = document.getElementById('knowPresetMenu').value;
+    if (!key) { alert('Select a preset'); return; }
+    if (!confirm('Delete this preset?')) return;
+    try { await API.eqPresetsDelete(key); } catch (_) {}
+    localStorage.removeItem(key);
+    speakers = speakers.filter(s => !(s.source === 'know' && s.eqPresetKey === key));
+    saveSpeakers();
+    updateSpeakerCount();
+    rebuildSpeakerList();
+    knowPopulatePresetMenu();
+  }
+
+  async function knowPopulatePresetMenu() {
+    const menu = document.getElementById('knowPresetMenu');
+    menu.innerHTML = '<option value="">Select preset...</option>';
+    const keys = new Set();
+    try {
+      const list = await API.eqPresetsList();
+      if (Array.isArray(list)) list.forEach(p => keys.add(p.id));
+    } catch (_) {}
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith('eq_')) keys.add(key);
+    }
+    [...keys].sort().forEach(key => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key.replace('eq_', '');
+      menu.appendChild(opt);
+    });
   }
 </script>
 

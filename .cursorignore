@@ -1,0 +1,4 @@
+# Build outputs - exclude from Cursor indexing/reads
+**/build/
+**/out/
+backend/build/
