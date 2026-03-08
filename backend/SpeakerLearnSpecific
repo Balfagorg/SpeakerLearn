@@ -1,0 +1,379 @@
+Speaker learn is an app we are desigining to be a professional music and speaker equalizing platform. 
+Its goal is to make all speakers sounds the same based on user preferences (with resepect to hardware limitations)
+
+It begins be having the user test their speaker as follows: 
+    -The speaker should be connected to your device
+    -The user can select from queried connected audio devices
+    -There will be five test audios (a button connected to each sound): 
+        1. A sound that is pure bass
+        2. A sound that is pure mids
+        3. A sound that is pure treble
+        4. A sound that is all three
+        5. A sound that is a mix of known troublesome frequencies
+    -Each audio will be played on the local device speakers (if they are detected), then played on the speaker.
+    -They will rate the volume of the tone on 5 point scale (3 being same volume as local device speakers)
+    -They will rate the quality of the tone by selected the tone and designating if it was good or bad
+    -After all five tones have been played and rated, the app will calculate the optimal EQ settings for the speaker, flattening the frequency response as much as possible and compensating troublesome frequencies.
+    -The app will then play a test tone with the optimal EQ settings for the user to listen to. And a short clip of music with the optimal EQ settings for the user to listen to.
+    -
+    
+    The user can then adjust the EQ settings to their liking.
+    -The app will save the EQ settings for the speaker. And auto configure the device to play at those configs.
+    -The user can then select from queried connected audio devices
+    -The user will then be able to create a custom profile for their speakrer. This profile will be used to adjust the EQ settings for the speaker to their personal preferences for what their audio should sound like with resepect to the device's quality and baseline volume constraints.
+    
+
+*I want this to be an app that can be used on mobile devices and pc's. It should be able to connect to any audio source on the device and play it through the speakers. It should also be able to connect to any speaker system and play it through the speakers. We will be building a website that is used for downloading the app. Speaker data will be stored locally on the device, allowing this to be used offline. The app should be able to run in the background and adjust the EQ settings for the speaker in real time. The app should also be able to detect when the user is listening to music and adjust the EQ settings for the speaker in real time. Use c++ and python in tandem for processing. We will be using a slider format for users to customize their profile.*
+
+    
+# Adaptive Multi-System Audio Balancing Platform
+## Framework Generation Prompt for Google Antigravity
+
+## Objective
+
+Design an initial software framework for an **Adaptive Audio Balancing Platform** that dynamically optimizes audio playback across different songs, streaming platforms, and speaker systems while protecting hardware from distortion or overload.
+
+The system must analyze each track in real time, apply user preference models, enforce speaker capability constraints, and rebalance playback automatically for every song.
+
+The framework should focus on backend architecture, processing pipelines, API design, and database schema suitable for a first working prototype.
+
+Use **clean modular architecture** so components can later scale into a production-grade DSP system.
+
+---
+
+# Core System Goals
+
+The system must:
+
+1. Rebalance audio dynamically **for each song**
+2. Adjust for **source platform differences** (Spotify, Apple Music, local files, etc.)
+3. Support **multiple speaker systems**
+4. Automatically **detect connected audio devices**
+5. Allow users to **name and switch between speaker systems**
+6. Store **user listening preferences**
+7. Prevent **speaker overstress and distortion**
+8. Maintain **consistent sound quality across all music sources**
+
+---
+
+# Core Processing Pipeline
+
+The backend architecture should implement the following processing pipeline:
+
+Audio Input  
+↓  
+Source Detection  
+↓  
+Spectrum Analysis Engine  
+↓  
+Track Profile Generator  
+↓  
+User Preference Model  
+↓  
+Speaker System Model  
+↓  
+Adaptive EQ Optimizer  
+↓  
+DSP Processing Layer  
+↓  
+Limiter / Safety Protection  
+↓  
+Speaker Output
+
+Each stage must be implemented as an independent module.
+
+---
+
+# User Interaction Features
+
+## Speaker Calibration System
+
+Users must be able to run a **speaker stress test** to determine hardware capability.
+
+During calibration:
+
+The system sequentially plays:
+
+- Sub-bass tones
+- Bass tones
+- Midrange tones
+- High frequency tones
+- Full spectrum noise
+
+After each tone, the user rates the sound quality:
+
+- Outstanding
+- Great
+- Fair
+- Degraded
+
+These responses are used to estimate:
+
+- frequency handling capability
+- distortion thresholds
+- relative speaker performance
+
+The system then generates a **speaker capability model**.
+
+Example internal structure:
+
+Bass capability  
+Mid capability  
+High capability  
+Maximum safe SPL
+
+Each speaker system must store its own capability profile.
+
+---
+
+# User Preference System
+
+Users should be able to configure listening preferences including:
+
+- Bass wash
+- Heavy beat bass
+- Clear vocals
+- Bright highs
+- Balanced sound
+- Wide soundstage
+
+Preferences must be converted into **target EQ curves** that influence final optimization.
+
+Preferences apply globally across all speaker systems but can be weighted differently per system if desired.
+
+---
+
+# Source Platform Compensation
+
+Different music sources deliver audio with different mastering characteristics.
+
+Examples:
+
+Spotify – strong loudness normalization  
+Apple Music – wider stereo mix  
+YouTube – aggressive compression  
+Local FLAC – neutral profile
+
+The system should maintain **source correction profiles** to normalize these differences.
+
+Example concept:
+
+Spotify profile  
+Bass: +1  
+Mid: 0  
+High: -1  
+
+Apple Music profile  
+Bass: 0  
+Mid: +1  
+High: +1  
+
+---
+
+# Track-Based Rebalancing
+
+When a new song starts:
+
+1. Capture the first few seconds of audio
+2. Perform spectral analysis
+3. Classify the track profile
+4. Calculate optimal EQ adjustments
+
+Spectral analysis should evaluate energy across bands:
+
+20–60 Hz (Sub Bass)  
+60–200 Hz (Bass)  
+200–800 Hz (Low Midrange)  
+800–3k Hz (Midrange)  
+3k–10k Hz (High)  
+10k–20k Hz (Air)
+
+The system must continuously update EQ during playback.
+
+---
+
+# Speaker System Management
+
+Users may create multiple named speaker systems.
+
+Examples:
+
+Desk Speakers  
+Living Room System  
+Headphones  
+Car Audio  
+Bluetooth Speaker
+
+Each system stores:
+
+- calibration results
+- speaker capability limits
+- channel configuration
+- device identifiers
+
+The system must automatically switch configurations based on the connected audio device.
+
+Example mapping:
+
+USB DAC → Desk Speakers  
+Bluetooth Device ID → Headphones
+
+Manual override should also be supported.
+
+---
+
+# Adaptive EQ Optimization Logic
+
+Final EQ should combine four components:
+
+User Preference Curve  
+Source Correction Profile  
+Track Spectral Bias  
+Speaker Capability Constraints
+
+Conceptual formula:
+
+Final EQ = (User Preference + Source Correction − Track Bias) × Speaker Capability
+
+This ensures:
+
+- user taste is respected
+- track characteristics are balanced
+- speakers are never pushed beyond limits
+
+---
+
+# DSP Processing Layer
+
+The DSP layer should implement:
+
+- Multi-band EQ filters
+- Per-channel gain adjustments
+- Spatial delay correction
+- Dynamic compression
+- Limiting
+
+DSP should run continuously and update smoothly to avoid audible artifacts.
+
+---
+
+# Speaker Protection Layer
+
+The final stage must enforce hardware safety.
+
+Components:
+
+Multiband compression to control frequency spikes
+
+Hard limiter to prevent clipping
+
+Maximum output ceiling example:
+
+-1 dB peak output
+
+The protection system must override optimization if necessary.
+
+---
+
+# Backend Framework Requirements
+
+The initial framework should include:
+
+Backend API server  
+DSP processing module interface  
+Device detection module  
+Track analysis module  
+User preference management  
+Speaker system management  
+Database layer
+
+Recommended stack:
+
+Backend API: Python (FastAPI)  
+DSP Engine Interface: Rust or C++ module stub  
+Database: SQLite  
+Audio IO: abstraction layer for future integration
+
+---
+
+# API Design Requirements
+
+The API should include endpoints for:
+
+Speaker system management  
+Calibration tests  
+Preference configuration  
+Device detection  
+Audio optimization
+
+Example endpoints:
+
+POST /speaker-systems/create  
+POST /speaker-systems/calibrate  
+GET /speaker-systems/list  
+POST /speaker-systems/switch  
+
+POST /preferences/update  
+GET /preferences  
+
+POST /audio/optimize
+
+---
+
+# Database Schema (SQLite)
+
+Design SQLite tables for:
+
+Users  
+SpeakerSystems  
+SpeakerCapabilities  
+CalibrationResults  
+UserPreferences  
+SourceProfiles
+
+Each speaker system must be linked to a device identifier.
+
+---
+
+# Continuous Adaptation
+
+During playback, the system should periodically:
+
+Analyze spectrum  
+Update track profile  
+Recalculate EQ  
+Apply gradual adjustments
+
+Recommended update interval:
+
+200–500 ms
+
+This ensures smooth adaptation without audible jumps.
+
+---
+
+# Expected Outcome
+
+The framework should provide a modular architecture capable of evolving into a full adaptive audio engine that:
+
+- rebalances every song
+- adapts to different streaming platforms
+- supports multiple speaker systems
+- automatically switches based on connected devices
+- protects speakers from distortion
+- maintains consistent listening quality
+
+---
+
+# Deliverables
+
+Generate:
+
+1. Project directory structure
+2. Backend service skeleton
+3. API endpoint definitions
+4. SQLite schema migrations
+5. Core processing module stubs
+6. Documentation comments for each component
+
+The goal is a **clean initial framework that developers can expand into a full adaptive audio DSP system. Currently does not include a frontend or UI, should provide proper documentation for implementing that in the future for other developers who are focused on that aspect.**

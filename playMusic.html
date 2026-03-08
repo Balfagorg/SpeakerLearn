@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SpeakEasy — Play Music</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --light-green: #a2faa3;
+      --muted-teal: #92c9b1;
+      --cerulean: #4f759b;
+      --grape: #5d5179;
+      --deep-purple: #571f4e;
+      --bg: #0e0b14;
+      --surface: #16101f;
+      --surface-2: #1e1630;
+      --text: #f0ede8;
+      --text-muted: #a09ab0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.35;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: relative;
+      padding: 0 5vw;
+      background: linear-gradient(135deg, var(--deep-purple) 0%, var(--grape) 40%, var(--cerulean) 100%);
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 80%, rgba(162,250,163,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 20% 20%, rgba(146,201,177,0.1) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2rem 0 1.5rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      letter-spacing: -0.02em;
+      color: var(--light-green);
+      text-shadow: 0 0 40px rgba(162,250,163,0.35);
+      text-decoration: none;
+    }
+    .logo span { color: var(--muted-teal); }
+
+    .tagline-top {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    nav {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      display: inline-flex;
+      gap: 0.25rem;
+      padding: 0.3rem;
+      position: relative;
+      z-index: 10;
+    }
+
+    nav a {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      padding: 0.55rem 1.4rem;
+      border-radius: 100px;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+    }
+    nav a:hover { background: rgba(162,250,163,0.15); color: var(--light-green); }
+    nav a.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
+
+    .page-title-strip {
+      position: relative;
+      z-index: 5;
+      padding: 3rem 0 3.5rem;
+    }
+
+    .page-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted-teal);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .page-eyebrow::before {
+      content: '';
+      display: block;
+      width: 32px;
+      height: 1px;
+      background: var(--muted-teal);
+    }
+
+    .page-title-strip h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+    }
+    .page-title-strip h1 em { font-style: italic; color: var(--light-green); }
+
+    /* ─── MAIN ─── */
+    main {
+      padding: 4rem 5vw 6rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* ─── TOP TABS ─── */
+    .top-tab-bar {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 0.4rem;
+      margin-bottom: 2.5rem;
+      width: fit-content;
+    }
+
+    .top-tab {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+      color: var(--text-muted);
+      padding: 0.65rem 1.6rem;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      transition: all 0.22s ease;
+      white-space: nowrap;
+    }
+    .top-tab:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .top-tab.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; animation: fade-up 0.35s ease both; }
+
+    @keyframes fade-up {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── SHARED: TWO-COLUMN LAYOUT ─── */
+    .panel-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    /* ─── SELECTION SIDEBAR ─── */
+    .selection-sidebar {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 1.2rem 1.4rem;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .sidebar-list { padding: 0.5rem; }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.85rem 0.9rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .sidebar-item:hover { background: rgba(255,255,255,0.04); }
+    .sidebar-item.active {
+      background: rgba(162,250,163,0.08);
+      border-color: rgba(162,250,163,0.2);
+    }
+
+    .sidebar-item-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+      background: var(--surface-2);
+    }
+
+    .sidebar-item.active .sidebar-item-icon { background: rgba(162,250,163,0.1); }
+
+    .sidebar-item-info { flex: 1; min-width: 0; }
+
+    .sidebar-item-name {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar-item.active .sidebar-item-name { color: var(--light-green); }
+
+    .sidebar-item-sub {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+
+    .sidebar-check {
+      font-size: 0.8rem;
+      color: var(--light-green);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .sidebar-item.active .sidebar-check { opacity: 1; }
+
+    .sidebar-empty {
+      padding: 2rem 1rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .sidebar-empty a {
+      color: var(--muted-teal);
+      text-decoration: none;
+    }
+    .sidebar-empty a:hover { text-decoration: underline; }
+
+    /* ─── PLAYER PANEL ─── */
+    .player-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Active preset info */
+    .active-preset-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .preset-card-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .preset-card-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      margin-bottom: 0.3rem;
+    }
+    .preset-card-name em { font-style: italic; color: var(--light-green); }
+
+    .preset-card-desc {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+
+    /* EQ vertical slider display */
+    .eq-display {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      padding: 0.25rem 0 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .eq-display::-webkit-scrollbar { display: none; }
+
+    .eq-col {
+      flex: 1;
+      min-width: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .eq-col-boost-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      color: var(--muted-teal);
+      margin-bottom: 5px;
+    }
+
+    .eq-col-track-wrap {
+      position: relative;
+      width: 6px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Full gradient track behind the slider */
+    .eq-col-track {
+      width: 6px;
+      height: 120px;
+      border-radius: 100px;
+      background: linear-gradient(
+        to bottom,
+        var(--muted-teal) 0%,
+        rgba(146,201,177,0.3) 48%,
+        rgba(79,117,155,0.3) 52%,
+        var(--cerulean) 100%
+      );
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* Filled portion highlight */
+    .eq-col-fill {
+      position: absolute;
+      left: 0;
+      width: 6px;
+      border-radius: 100px;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .eq-col-fill.positive {
+      background: linear-gradient(to bottom, var(--muted-teal), rgba(146,201,177,0.5));
+    }
+
+    .eq-col-fill.negative {
+      background: linear-gradient(to bottom, rgba(79,117,155,0.5), var(--cerulean));
+    }
+
+    /* Thumb knob */
+    .eq-col-thumb {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 38% 38%, #d0cfd8, #6b6880);
+      border: 2px solid rgba(255,255,255,0.15);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.15);
+      left: 50%;
+      transform: translateX(-50%);
+      transition: top 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      z-index: 2;
+    }
+
+    .eq-col-cut-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.06em;
+      color: var(--cerulean);
+      margin-top: 5px;
+    }
+
+    .eq-col-freq {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      white-space: nowrap;
+    }
+
+    .eq-col-db {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Upload zone */
+    .upload-zone {
+      background: var(--surface);
+      border: 1px dashed rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--muted-teal);
+      background: rgba(146,201,177,0.04);
+    }
+    .upload-zone.has-file {
+      border-style: solid;
+      border-color: rgba(162,250,163,0.25);
+      background: rgba(162,250,163,0.04);
+    }
+
+    .upload-icon { font-size: 2.2rem; display: block; margin-bottom: 0.75rem; }
+
+    .upload-title {
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .upload-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .upload-filename {
+      margin-top: 0.6rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--light-green);
+      letter-spacing: 0.04em;
+    }
+
+    #fileInput { display: none; }
+
+    /* Player controls */
+    .player-controls {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 1.5rem;
+    }
+
+    .track-info {
+      margin-bottom: 1.2rem;
+    }
+
+    .track-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      margin-bottom: 0.2rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .track-status {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .track-status.playing { color: var(--light-green); }
+    .track-status.loading { color: var(--muted-teal); }
+
+    /* Progress bar */
+    .progress-wrap {
+      margin-bottom: 0.6rem;
+      cursor: pointer;
+      position: relative;
+      height: 6px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .progress-wrap:hover { height: 8px; margin-bottom: 0.45rem; transition: height 0.15s; }
+
+    #progressFill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--cerulean), var(--light-green));
+      border-radius: 100px;
+      width: 0%;
+      transition: width 0.1s linear;
+      pointer-events: none;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-bottom: 1.4rem;
+    }
+
+    /* Big play button + controls row */
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+    }
+
+    .ctrl-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+    .ctrl-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+
+    .play-btn-big {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--light-green);
+      color: var(--deep-purple);
+      font-size: 1.5rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 0 0 rgba(162,250,163,0.3);
+      flex-shrink: 0;
+    }
+    .play-btn-big:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 8px rgba(162,250,163,0.12);
+    }
+    .play-btn-big:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .play-btn-big.playing {
+      animation: pulse-glow 1.8s ease infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(162,250,163,0.3); }
+      50% { box-shadow: 0 0 0 14px rgba(162,250,163,0.05); }
+    }
+
+    /* Volume */
+    .volume-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.2rem;
+      padding-top: 1.2rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .vol-icon { font-size: 0.9rem; color: var(--text-muted); }
+
+    input[type="range"].vol-slider {
+      flex: 1;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 4px;
+      border-radius: 100px;
+      background: rgba(255,255,255,0.12);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"].vol-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--text);
+      border: 2px solid var(--surface);
+      box-shadow: 0 0 0 1.5px var(--muted-teal);
+      cursor: pointer;
+    }
+
+    /* ─── GENRE PRESET CARDS ─── */
+    .genre-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 0;
+    }
+
+    .genre-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1.4rem 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.22s ease;
+      position: relative;
+    }
+    .genre-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    .genre-card.active {
+      border-color: rgba(162,250,163,0.35);
+      background: rgba(162,250,163,0.05);
+      box-shadow: 0 0 0 1px rgba(162,250,163,0.15);
+    }
+
+    .genre-emoji { font-size: 1.8rem; display: block; margin-bottom: 0.7rem; }
+
+    .genre-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem;
+      margin-bottom: 0.2rem;
+    }
+    .genre-card.active .genre-name { color: var(--light-green); }
+
+    .genre-desc {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .genre-active-dot {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--light-green);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .genre-card.active .genre-active-dot { opacity: 1; }
+
+    /* ─── EMPTY / PLACEHOLDER STATES ─── */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+    }
+    .empty-icon { font-size: 2.8rem; margin-bottom: 1.2rem; opacity: 0.4; }
+    .empty-state h3 { font-family: 'DM Serif Display', serif; font-size: 1.5rem; margin-bottom: 0.6rem; }
+    .empty-state p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.7; max-width: 340px; margin: 0 auto 1.5rem; }
+
+    .btn-primary {
+      background: var(--light-green);
+      color: var(--deep-purple);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.85rem 2rem;
+      border: none;
+      border-radius: 100px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-block;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(162,250,163,0.3); }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface-2);
+      border: 1px solid rgba(162,250,163,0.25);
+      color: var(--light-green);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 0.75rem 1.5rem;
+      border-radius: 100px;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--deep-purple);
+      padding: 3rem 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--light-green); }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; font-family: 'DM Sans', sans-serif; }
+    .footer-links a:hover { color: var(--muted-teal); }
+    .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
+
+    @media (max-width: 750px) {
+      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
+      nav { flex-wrap: wrap; border-radius: 16px; }
+      .panel-layout { grid-template-columns: 1fr; }
+      .top-tab-bar { flex-wrap: wrap; width: 100%; }
+      .genre-grid { grid-template-columns: repeat(2, 1fr); }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <a class="logo" href="homePage.html">Speak<span>Easy</span></a>
+    <div class="tagline-top">Speaker · Frequency · Balance</div>
+    <nav>
+      <a href="homePage.html">Home</a>
+      <a href="addSpeakerPage.html">Add Speaker</a>
+      <a href="preferencesPage.html">Preferences</a>
+      <a href="playMusic.html" class="active">Play Music</a>
+    </nav>
+  </div>
+  <div class="page-title-strip">
+    <div class="page-eyebrow">Enjoy your presets</div>
+    <h1>Play <em>Music</em></h1>
+  </div>
+</header>
+
+<main>
+
+  <!-- Tab bar -->
+  <div class="top-tab-bar">
+    <button class="top-tab active" data-panel="my-speakers">My Speakers</button>
+    <button class="top-tab" data-panel="my-presets">My Presets</button>
+    <button class="top-tab" data-panel="genre-presets">Genre Presets</button>
+  </div>
+
+  <!-- ══ MY SPEAKERS PANEL ══ -->
+  <div class="tab-panel active" id="panel-my-speakers">
+    <div id="speakers-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">🔇</div>
+      <h3>No speakers calibrated</h3>
+      <p>Add and calibrate a speaker first, then come back here to play music through its profile.</p>
+      <a href="addSpeakerPage.html" class="btn-primary">Calibrate a Speaker</a>
+    </div>
+    <div id="speakers-layout" class="panel-layout" style="display:none;">
+      <div class="selection-sidebar">
+        <div class="sidebar-header">Your Speakers</div>
+        <div class="sidebar-list" id="speakers-sidebar-list"></div>
+      </div>
+      <div class="player-panel">
+        <div class="active-preset-card" id="speakers-preset-card">
+          <div class="preset-card-label">Active Speaker Profile</div>
+          <div class="preset-card-name" id="speakers-preset-name">—</div>
+          <div class="preset-card-desc" id="speakers-preset-desc">Select a speaker to load its EQ profile.</div>
+          <div class="eq-display" id="speakers-eq-display"></div>
+        </div>
+        <div class="upload-zone" id="uploadZone1" onclick="document.getElementById('fileInput1').click()"
+             ondragover="handleDragOver(event,'uploadZone1')" ondragleave="handleDragLeave(event,'uploadZone1')" ondrop="handleDrop(event,'fileInput1')">
+          <span class="upload-icon">🎵</span>
+          <div class="upload-title">Drop an MP3 here</div>
+          <div class="upload-hint">or click to browse</div>
+          <div class="upload-filename" id="uploadFilename1"></div>
+        </div>
+        <input type="file" id="fileInput1" accept="audio/*" onchange="handleFileSelect(this, 'speakers')"/>
+        <div class="player-controls">
+          <div class="track-info">
+            <div class="track-name" id="trackName1">No track loaded</div>
+            <div class="track-status" id="trackStatus1">Upload an MP3 to begin</div>
+          </div>
+          <div class="progress-wrap" id="progressWrap1" onclick="seekTo(event,'speakers')">
+            <div id="progressFill1" style="height:100%;background:linear-gradient(90deg,var(--cerulean),var(--light-green));border-radius:100px;width:0%;transition:width 0.1s linear;"></div>
+          </div>
+          <div class="time-row">
+            <span id="timeCurrent1">0:00</span>
+            <span id="timeDuration1">0:00</span>
+          </div>
+          <div class="controls-row">
+            <button class="ctrl-btn" onclick="skipBack('speakers')" title="−10s">⏮</button>
+            <button class="play-btn-big" id="playBtn1" onclick="togglePlay('speakers')" disabled>▶</button>
+            <button class="ctrl-btn" onclick="skipForward('speakers')" title="+10s">⏭</button>
+          </div>
+          <div class="volume-row">
+            <span class="vol-icon">🔈</span>
+            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value,'speakers')"/>
+            <span class="vol-icon">🔊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MY PRESETS PANEL ══ -->
+  <div class="tab-panel" id="panel-my-presets">
+    <div id="presets-empty" class="empty-state" style="display:none;">
+      <div class="empty-icon">🎛️</div>
+      <h3>No saved presets</h3>
+      <p>Create custom EQ presets in the Preferences page, then return here to apply them during playback.</p>
+      <a href="#" class="btn-primary">Go to Preferences</a>
+    </div>
+    <div id="presets-layout" class="panel-layout" style="display:none;">
+      <div class="selection-sidebar">
+        <div class="sidebar-header">Your Presets</div>
+        <div class="sidebar-list" id="presets-sidebar-list"></div>
+      </div>
+      <div class="player-panel">
+        <div class="active-preset-card" id="presets-preset-card">
+          <div class="preset-card-label">Active Preference Preset</div>
+          <div class="preset-card-name" id="presets-preset-name">—</div>
+          <div class="preset-card-desc" id="presets-preset-desc">Select a preset to load its EQ settings.</div>
+          <div class="eq-display" id="presets-eq-display"></div>
+        </div>
+        <div class="upload-zone" id="uploadZone2" onclick="document.getElementById('fileInput2').click()"
+             ondragover="handleDragOver(event,'uploadZone2')" ondragleave="handleDragLeave(event,'uploadZone2')" ondrop="handleDrop(event,'fileInput2')">
+          <span class="upload-icon">🎵</span>
+          <div class="upload-title">Drop an MP3 here</div>
+          <div class="upload-hint">or click to browse</div>
+          <div class="upload-filename" id="uploadFilename2"></div>
+        </div>
+        <input type="file" id="fileInput2" accept="audio/*" onchange="handleFileSelect(this, 'presets')"/>
+        <div class="player-controls">
+          <div class="track-info">
+            <div class="track-name" id="trackName2">No track loaded</div>
+            <div class="track-status" id="trackStatus2">Upload an MP3 to begin</div>
+          </div>
+          <div class="progress-wrap" id="progressWrap2" onclick="seekTo(event,'presets')">
+            <div id="progressFill2" style="height:100%;background:linear-gradient(90deg,var(--cerulean),var(--light-green));border-radius:100px;width:0%;transition:width 0.1s linear;"></div>
+          </div>
+          <div class="time-row">
+            <span id="timeCurrent2">0:00</span>
+            <span id="timeDuration2">0:00</span>
+          </div>
+          <div class="controls-row">
+            <button class="ctrl-btn" onclick="skipBack('presets')" title="−10s">⏮</button>
+            <button class="play-btn-big" id="playBtn2" onclick="togglePlay('presets')" disabled>▶</button>
+            <button class="ctrl-btn" onclick="skipForward('presets')" title="+10s">⏭</button>
+          </div>
+          <div class="volume-row">
+            <span class="vol-icon">🔈</span>
+            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value,'presets')"/>
+            <span class="vol-icon">🔊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ GENRE PRESETS PANEL ══ -->
+  <div class="tab-panel" id="panel-genre-presets">
+    <div class="panel-layout">
+      <div>
+        <div class="genre-grid" id="genre-grid">
+          <!-- filled by JS -->
+        </div>
+      </div>
+      <div class="player-panel">
+        <div class="active-preset-card" id="genre-preset-card">
+          <div class="preset-card-label">Active Genre Preset</div>
+          <div class="preset-card-name" id="genre-preset-name">Select a Genre</div>
+          <div class="preset-card-desc" id="genre-preset-desc">Choose a genre below to load its tuned EQ curve.</div>
+          <div class="eq-display" id="genre-eq-display"></div>
+        </div>
+        <div class="upload-zone" id="uploadZone3" onclick="document.getElementById('fileInput3').click()"
+             ondragover="handleDragOver(event,'uploadZone3')" ondragleave="handleDragLeave(event,'uploadZone3')" ondrop="handleDrop(event,'fileInput3')">
+          <span class="upload-icon">🎵</span>
+          <div class="upload-title">Drop an MP3 here</div>
+          <div class="upload-hint">or click to browse</div>
+          <div class="upload-filename" id="uploadFilename3"></div>
+        </div>
+        <input type="file" id="fileInput3" accept="audio/*" onchange="handleFileSelect(this, 'genre')"/>
+        <div class="player-controls">
+          <div class="track-info">
+            <div class="track-name" id="trackName3">No track loaded</div>
+            <div class="track-status" id="trackStatus3">Upload an MP3 to begin</div>
+          </div>
+          <div class="progress-wrap" id="progressWrap3" onclick="seekTo(event,'genre')">
+            <div id="progressFill3" style="height:100%;background:linear-gradient(90deg,var(--cerulean),var(--light-green));border-radius:100px;width:0%;transition:width 0.1s linear;"></div>
+          </div>
+          <div class="time-row">
+            <span id="timeCurrent3">0:00</span>
+            <span id="timeDuration3">0:00</span>
+          </div>
+          <div class="controls-row">
+            <button class="ctrl-btn" onclick="skipBack('genre')" title="−10s">⏮</button>
+            <button class="play-btn-big" id="playBtn3" onclick="togglePlay('genre')" disabled>▶</button>
+            <button class="ctrl-btn" onclick="skipForward('genre')" title="+10s">⏭</button>
+          </div>
+          <div class="volume-row">
+            <span class="vol-icon">🔈</span>
+            <input type="range" class="vol-slider" min="0" max="1" step="0.01" value="0.8" oninput="setVolume(this.value,'genre')"/>
+            <span class="vol-icon">🔊</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-logo">SpeakEasy</div>
+  <div class="footer-links">
+    <a href="addSpeakerPage.html">Add Speaker</a>
+    <a href="preferencesPage.html">Preferences</a>
+    <a href="playMusic.html">Play Music</a>
+  </div>
+  <div class="footer-copy">© 2026 SpeakEasy. All rights reserved.</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/api.js"></script>
+<script src="js/bands.js"></script>
+<script>
+// ═══════════════════════════════════════════
+// GENRE DEFINITIONS
+// ═══════════════════════════════════════════
+// EQ bands: 60Hz, 500Hz, 1kHz, 3.5kHz, 16kHz
+// gain in dB (-12 to +12)
+const GENRES = [
+  {
+    id: 'pop',
+    emoji: '🎤',
+    name: 'Pop',
+    desc: 'Bright, vocal-forward mix with boosted mids and a gentle low cut.',
+    eq: { 32: -1, 64: -1, 125: 0, 250: 2, 500: 3, 1000: 3, 2000: 2, 4000: 0, 8000: -1, 16000: -2 }
+  },
+  {
+    id: 'rock',
+    emoji: '🎸',
+    name: 'Rock',
+    desc: 'Punchy low-end, driven mids, and crisp high-end presence.',
+    eq: { 32: 4, 64: 3, 125: 2, 250: 1, 500: 0, 1000: -1, 2000: 1, 4000: 2, 8000: 3, 16000: 4 }
+  },
+  {
+    id: 'rnb',
+    emoji: '🎷',
+    name: 'R&B',
+    desc: 'Deep sub-bass warmth, rich low-mids, and a smooth top end.',
+    eq: { 32: 2, 64: 7, 125: 5, 250: 1, 500: -2, 1000: -3, 2000: 1, 4000: 2, 8000: 2, 16000: 2 }
+  },
+  {
+    id: 'jazz',
+    emoji: '🎺',
+    name: 'Jazz',
+    desc: 'Natural, airy tone with transparent mids and lifted highs.',
+    eq: { 32: 4, 64: 2, 125: 1, 250: 1, 500: -2, 1000: -2, 2000: 0, 4000: 2, 8000: 3, 16000: 4 }
+  },
+  {
+    id: 'electronic',
+    emoji: '🎛️',
+    name: 'Electronic',
+    desc: 'Boosted sub and air, scooped low-mids for maximum clarity and punch.',
+    eq: { 32: 4, 64: 3, 125: -1, 250: -1, 500: -3, 1000: 1, 2000: 1, 4000: 1, 8000: 3, 16000: 3 }
+  }
+];
+
+const FREQ_BANDS  = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
+const FREQ_LABELS = ['32Hz','64Hz','125Hz','250Hz','500Hz','1kHz','2kHz','4kHz','8kHz','16kHz'];
+
+function bandsTo10Band(bands) {
+  const inputFreqs = [...new Set(
+    Object.keys(bands)
+      .map(k => parseInt(k, 10))
+      .filter(n => !isNaN(n) && (bands[n] ?? bands[String(n)]) !== undefined && (bands[n] ?? bands[String(n)]) !== null)
+  )].sort((a, b) => a - b);
+
+  const eqGains = {};
+  FREQ_BANDS.forEach(f => {
+    const direct = bands[f] ?? bands[String(f)];
+    if (direct !== undefined && direct !== null) {
+      eqGains[f] = parseFloat(direct);
+      return;
+    }
+    if (inputFreqs.length === 0) { eqGains[f] = 0; return; }
+    let lo = null, hi = null;
+    for (const freq of inputFreqs) {
+      if (freq <= f) lo = freq;
+      if (freq >= f && hi === null) { hi = freq; break; }
+    }
+    const vLo = lo !== null ? parseFloat(bands[lo] ?? bands[String(lo)] ?? 0) : 0;
+    const vHi = hi !== null ? parseFloat(bands[hi] ?? bands[String(hi)] ?? 0) : 0;
+    if (lo === null) eqGains[f] = vHi;
+    else if (hi === null) eqGains[f] = vLo;
+    else if (lo === hi) eqGains[f] = vLo;
+    else eqGains[f] = vLo + (vHi - vLo) * (f - lo) / (hi - lo);
+  });
+  return eqGains;
+}
+
+// ═══════════════════════════════════════════
+// PER-TAB AUDIO STATE
+// ═══════════════════════════════════════════
+const panels = ['speakers', 'presets', 'genre'];
+const idx    = { speakers: 1, presets: 2, genre: 3 };
+
+const state = {};
+panels.forEach(p => {
+  state[p] = {
+    audioCtx: null,
+    sourceNode: null,
+    gainNode: null,
+    filters: [],      // one BiquadFilterNode per band
+    decodedBuffer: null,
+    isPlaying: false,
+    startTime: 0,
+    pauseOffset: 0,
+    durationSec: 0,
+    volume: 0.8,
+    animFrame: null,
+    activeEQ: null    // { 60: dB, 500: dB, ... }
+  };
+});
+
+// ═══════════════════════════════════════════
+// TAB SWITCHING
+// ═══════════════════════════════════════════
+document.querySelectorAll('.top-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const name = btn.dataset.panel;
+    document.querySelectorAll('.top-tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+    // stop all other panels
+    panels.forEach(p => { if (p !== panelFromTabName(name) && state[p].isPlaying) stopAudio(p); });
+  });
+});
+
+function panelFromTabName(name) {
+  const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre' };
+  return map[name] || name;
+}
+
+// ═══════════════════════════════════════════
+// LOAD SPEAKERS (API + localStorage merge)
+// ═══════════════════════════════════════════
+async function loadSpeakers() {
+  let saved = [];
+  try {
+    if (typeof API !== 'undefined' && typeof API.getAllSpeakers === 'function') {
+      saved = await API.getAllSpeakers();
+      try { localStorage.setItem('freqsync_speakers', JSON.stringify(saved)); } catch (_) {}
+    } else {
+      saved = JSON.parse(localStorage.getItem('freqsync_speakers') || '[]');
+    }
+  } catch (_) {
+    try { saved = JSON.parse(localStorage.getItem('freqsync_speakers') || '[]'); } catch (_) {}
+  }
+
+  const emptyEl  = document.getElementById('speakers-empty');
+  const layoutEl = document.getElementById('speakers-layout');
+
+  if (!saved || saved.length === 0) {
+    emptyEl.style.display  = 'block';
+    layoutEl.style.display = 'none';
+    return;
+  }
+
+  emptyEl.style.display  = 'none';
+  layoutEl.style.display = 'grid';
+
+  let activeId = '';
+  try { activeId = await API.getActiveSpeakerFromBackend(); } catch (_) {}
+  if (!activeId) activeId = API.getActiveSpeaker();
+
+  let activeIdx = saved.findIndex(s => s.id === activeId);
+  if (activeIdx < 0) activeIdx = 0;
+
+  const list = document.getElementById('speakers-sidebar-list');
+  list.innerHTML = '';
+
+  saved.forEach((spk, i) => {
+    const item = document.createElement('div');
+    item.className = 'sidebar-item' + (i === activeIdx ? ' active' : '');
+    item.innerHTML = `
+      <div class="sidebar-item-icon">🔊</div>
+      <div class="sidebar-item-info">
+        <div class="sidebar-item-name">${spk.name || 'Speaker ' + (i+1)}</div>
+        <div class="sidebar-item-sub">${spk.addedAt || 'Calibrated'}</div>
+      </div>
+      <div class="sidebar-check">✓</div>
+    `;
+    item.addEventListener('click', () => {
+      list.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      API.setActiveSpeaker(spk.id);
+      API.speakerSystemsSwitch(spk.id).catch(() => {});
+      activateSpeakerEQ(spk);
+    });
+    list.appendChild(item);
+    if (i === activeIdx) activateSpeakerEQ(spk);
+  });
+}
+
+async function activateSpeakerEQ(spk) {
+  let calBands = null;
+
+  if (spk.source === 'know' && spk.eqPresetKey) {
+    const raw = localStorage.getItem(spk.eqPresetKey);
+    if (raw) {
+      try { calBands = JSON.parse(raw); } catch (_) {}
+    }
+    if (!calBands) {
+      try {
+        const list = await API.eqPresetsList();
+        const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+        if (p && p.bands) calBands = p.bands;
+      } catch (_) {}
+    }
+  } else if (spk.bands_7) {
+    calBands = spk.bands_7;
+  } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+    const converted = learn5To7Band(spk.readings);
+    calBands = converted.bands;
+  } else {
+    try {
+      const cal = await API.speakerSystemsCalibration(spk.id);
+      if (Array.isArray(cal) && cal.length >= 5) {
+        calBands = learn5To7Band(cal).bands;
+      }
+    } catch (_) {}
+  }
+
+  let eqGains;
+  if (calBands && Object.keys(calBands).length > 0) {
+    eqGains = bandsTo10Band(calBands);
+  } else {
+    eqGains = {};
+    FREQ_BANDS.forEach(f => eqGains[f] = 0);
+  }
+
+  state.speakers.activeEQ = eqGains;
+  state.speakers._calBands = calBands || {};
+  applyEQToNodes('speakers');
+
+  document.getElementById('speakers-preset-name').innerHTML = spk.name || 'Speaker Profile';
+  const bandCount = calBands ? Object.keys(calBands).filter(k => calBands[k] !== 0).length : 0;
+  document.getElementById('speakers-preset-desc').textContent =
+    `Calibrated speaker profile — ${bandCount} frequency bands active.`;
+  renderEQDisplay('speakers-eq-display', eqGains);
+}
+
+// ═══════════════════════════════════════════
+// LOAD PRESETS (API + localStorage merge)
+// ═══════════════════════════════════════════
+async function loadPresets() {
+  const keys = new Set();
+  try {
+    if (typeof API !== 'undefined' && typeof API.eqPresetsList === 'function') {
+      const apiList = await API.eqPresetsList();
+      if (Array.isArray(apiList)) {
+        apiList.forEach(p => {
+          keys.add(p.id);
+          try {
+            const data = { name: p.name, speaker: p.speaker_system_id || '', bands: p.bands || {} };
+            localStorage.setItem(p.id, JSON.stringify(data));
+          } catch (_) {}
+        });
+      }
+    }
+  } catch (_) {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith('freqsync_pref_') || k.startsWith('eq_'))) keys.add(k);
+  }
+
+  const emptyEl  = document.getElementById('presets-empty');
+  const layoutEl = document.getElementById('presets-layout');
+
+  if (keys.size === 0) {
+    emptyEl.style.display  = 'block';
+    layoutEl.style.display = 'none';
+    return;
+  }
+
+  emptyEl.style.display  = 'none';
+  layoutEl.style.display = 'grid';
+
+  const list = document.getElementById('presets-sidebar-list');
+  list.innerHTML = '';
+
+  [...keys].forEach((k, i) => {
+    let data;
+    try { data = JSON.parse(localStorage.getItem(k)); } catch (_) { return; }
+    if (!data) return;
+
+    const item = document.createElement('div');
+    item.className = 'sidebar-item' + (i === 0 ? ' active' : '');
+    item.innerHTML = `
+      <div class="sidebar-item-icon">🎛️</div>
+      <div class="sidebar-item-info">
+        <div class="sidebar-item-name">${data.name}</div>
+        <div class="sidebar-item-sub">${data.speaker ? 'Speaker: ' + data.speaker : 'Custom preset'}</div>
+      </div>
+      <div class="sidebar-check">✓</div>
+    `;
+    item.addEventListener('click', () => {
+      list.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      item.classList.add('active');
+      activatePresetEQ(data);
+    });
+    list.appendChild(item);
+    if (i === 0) activatePresetEQ(data);
+  });
+}
+
+async function activatePresetEQ(data) {
+  const prefBands = data.bands || {};
+  const prefGains = bandsTo10Band(prefBands);
+
+  let calGains = {};
+  if (data.speaker) {
+    try {
+      const speakers = await API.getAllSpeakers();
+      const spk = speakers.find(s => s.id === data.speaker);
+      if (spk) {
+        let calBands = null;
+        if (spk.source === 'know' && spk.eqPresetKey) {
+          const raw = localStorage.getItem(spk.eqPresetKey);
+          if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
+          if (!calBands) {
+            const list = await API.eqPresetsList();
+            const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+            if (p && p.bands) calBands = p.bands;
+          }
+        } else if (spk.bands_7) {
+          calBands = spk.bands_7;
+        } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+          calBands = learn5To7Band(spk.readings).bands;
+        } else {
+          const cal = await API.speakerSystemsCalibration(spk.id);
+          if (Array.isArray(cal) && cal.length >= 5) calBands = learn5To7Band(cal).bands;
+        }
+        if (calBands) calGains = bandsTo10Band(calBands);
+      }
+    } catch (_) {}
+  }
+
+  const eqGains = {};
+  FREQ_BANDS.forEach(f => { eqGains[f] = (calGains[f] || 0) + (prefGains[f] || 0); });
+
+  state.presets.activeEQ = eqGains;
+  applyEQToNodes('presets');
+
+  document.getElementById('presets-preset-name').innerHTML = `<em>${data.name}</em>`;
+  document.getElementById('presets-preset-desc').textContent = `Custom EQ preset${data.speaker ? ' · Speaker calibration applied' : ''}.`;
+  renderEQDisplay('presets-eq-display', eqGains);
+}
+
+// ═══════════════════════════════════════════
+// GENRE CARDS
+// ═══════════════════════════════════════════
+function buildGenreCards() {
+  const grid = document.getElementById('genre-grid');
+  GENRES.forEach((g, i) => {
+    const card = document.createElement('div');
+    card.className = 'genre-card' + (i === 0 ? ' active' : '');
+    card.innerHTML = `
+      <div class="genre-active-dot"></div>
+      <span class="genre-emoji">${g.emoji}</span>
+      <div class="genre-name">${g.name}</div>
+      <div class="genre-desc">${g.desc}</div>
+    `;
+    card.addEventListener('click', () => {
+      grid.querySelectorAll('.genre-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      activateGenre(g);
+    });
+    grid.appendChild(card);
+    if (i === 0) activateGenre(g);
+  });
+}
+
+function activateGenre(g) {
+  state.genre.activeEQ = g.eq;
+  applyEQToNodes('genre');
+  document.getElementById('genre-preset-name').innerHTML = `<em>${g.name}</em>`;
+  document.getElementById('genre-preset-desc').textContent = g.desc;
+  renderEQDisplay('genre-eq-display', g.eq);
+}
+
+// ═══════════════════════════════════════════
+// EQ DISPLAY
+// ═══════════════════════════════════════════
+function renderEQDisplay(containerId, eqGains) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = '';
+  const trackH = 120; // px, must match CSS
+  const thumbH = 22;  // px
+
+  FREQ_BANDS.forEach((f, i) => {
+    const gain = eqGains[f] || 0;
+    // Map gain (-12..+12 dB) to thumb position:
+    // gain=+12 → top=0, gain=0 → top=center, gain=-12 → top=trackH-thumbH
+    const center = (trackH - thumbH) / 2;
+    const thumbTop = center - (gain / 12) * center;
+
+    // Fill bar: from center to thumb
+    let fillTop, fillHeight, fillClass;
+    if (gain >= 0) {
+      fillHeight = (gain / 12) * (trackH / 2);
+      fillTop    = (trackH / 2) - fillHeight;
+      fillClass  = 'positive';
+    } else {
+      fillTop    = trackH / 2;
+      fillHeight = (Math.abs(gain) / 12) * (trackH / 2);
+      fillClass  = 'negative';
+    }
+
+    const col = document.createElement('div');
+    col.className = 'eq-col';
+    col.innerHTML = `
+      <div class="eq-col-boost-label">Boost</div>
+      <div class="eq-col-track-wrap">
+        <div class="eq-col-track"></div>
+        <div class="eq-col-fill ${fillClass}" style="top:${fillTop}px; height:${Math.max(fillHeight,1)}px;"></div>
+        <div class="eq-col-thumb" style="top:${thumbTop}px;"></div>
+      </div>
+      <div class="eq-col-cut-label">Cut</div>
+      <div class="eq-col-freq">${FREQ_LABELS[i]}</div>
+      <div class="eq-col-db">${gain > 0 ? '+' : ''}${gain} dB</div>
+    `;
+    el.appendChild(col);
+  });
+}
+
+// ═══════════════════════════════════════════
+// AUDIO CONTEXT SETUP
+// ═══════════════════════════════════════════
+function ensureAudioCtx(panel) {
+  const s = state[panel];
+  if (!s.audioCtx) {
+    s.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Build EQ filter chain: one peaking filter per band
+    // Lower bands get wider Q (more musical), higher bands get tighter Q
+    const qValues = [1.0, 1.0, 1.2, 1.2, 1.4, 1.4, 1.4, 1.4, 1.2, 1.0];
+    s.filters = FREQ_BANDS.map((freq, i) => {
+      const f = s.audioCtx.createBiquadFilter();
+      f.type = 'peaking';
+      f.frequency.value = freq;
+      f.Q.value = qValues[i];
+      f.gain.value = 0;
+      return f;
+    });
+
+    s.gainNode = s.audioCtx.createGain();
+    s.gainNode.gain.value = s.volume;
+
+    // Chain: source → filter[0] → filter[1] → ... → gain → destination
+    for (let i = 0; i < s.filters.length - 1; i++) {
+      s.filters[i].connect(s.filters[i + 1]);
+    }
+    s.filters[s.filters.length - 1].connect(s.gainNode);
+    s.gainNode.connect(s.audioCtx.destination);
+  }
+}
+
+function applyEQToNodes(panel) {
+  const s = state[panel];
+  if (!s.audioCtx || !s.filters.length) return;
+  const eq = s.activeEQ || {};
+  FREQ_BANDS.forEach((f, i) => {
+    s.filters[i].gain.setTargetAtTime(eq[f] || 0, s.audioCtx.currentTime, 0.05);
+  });
+}
+
+// ═══════════════════════════════════════════
+// AUDIO OPTIMIZE ON LOAD
+// ═══════════════════════════════════════════
+async function tryOptimizeOnLoad(audioBuffer, panel) {
+  try {
+    const channelData = audioBuffer.getChannelData(0);
+    const step = Math.max(1, Math.floor(channelData.length / 2048));
+    const samples = [];
+    for (let i = 0; i < channelData.length && samples.length < 2048; i += step) {
+      samples.push(channelData[i]);
+    }
+
+    const calBands = state[panel]._calBands || {};
+    const speakerId = API.getActiveSpeaker();
+    const platform = localStorage.getItem('freqsync_platform') || 'local';
+
+    const result = await API.audioOptimize(samples, calBands, platform, calBands, speakerId);
+    if (result && result.final_eq) {
+      const optimized = bandsTo10Band(result.final_eq);
+      const current = state[panel].activeEQ || {};
+      FREQ_BANDS.forEach(f => { current[f] = (current[f] || 0) + (optimized[f] || 0); });
+      state[panel].activeEQ = current;
+      applyEQToNodes(panel);
+
+      const displayId = panel + '-eq-display';
+      if (document.getElementById(displayId)) {
+        renderEQDisplay(displayId, current);
+      }
+    }
+  } catch (_) {}
+}
+
+// ═══════════════════════════════════════════
+// FILE LOADING
+// ═══════════════════════════════════════════
+function handleDragOver(e, zoneId) {
+  e.preventDefault();
+  document.getElementById(zoneId).classList.add('drag-over');
+}
+
+function handleDragLeave(e, zoneId) {
+  document.getElementById(zoneId).classList.remove('drag-over');
+}
+
+function handleDrop(e, inputId) {
+  e.preventDefault();
+  const zoneId = e.currentTarget.id;
+  document.getElementById(zoneId).classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const panel = panelFromZoneId(zoneId);
+  loadFile(file, panel);
+}
+
+function handleFileSelect(input, panel) {
+  const file = input.files[0];
+  if (file) loadFile(file, panel);
+}
+
+function panelFromZoneId(zoneId) {
+  if (zoneId === 'uploadZone1') return 'speakers';
+  if (zoneId === 'uploadZone2') return 'presets';
+  return 'genre';
+}
+
+function loadFile(file, panel) {
+  stopAudio(panel);
+  const s = state[panel];
+  const n = idx[panel];
+
+  document.getElementById('uploadFilename' + n).textContent = file.name;
+  document.getElementById('trackName' + n).textContent = file.name.replace(/\.[^.]+$/, '');
+  document.getElementById('uploadZone' + n).classList.add('has-file');
+  document.getElementById('trackStatus' + n).textContent = 'Decoding…';
+  document.getElementById('trackStatus' + n).className = 'track-status loading';
+  document.getElementById('progressFill' + n).style.width = '0%';
+  document.getElementById('timeCurrent' + n).textContent = '0:00';
+  document.getElementById('timeDuration' + n).textContent = '0:00';
+
+  ensureAudioCtx(panel);
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    s.audioCtx.decodeAudioData(e.target.result.slice(0), buf => {
+      s.decodedBuffer = buf;
+      s.durationSec = buf.duration;
+      s.pauseOffset = 0;
+      document.getElementById('timeDuration' + n).textContent = fmtTime(buf.duration);
+      document.getElementById('trackStatus' + n).textContent = 'Ready';
+      document.getElementById('trackStatus' + n).className = 'track-status';
+      document.getElementById('playBtn' + n).disabled = false;
+      applyEQToNodes(panel);
+      if (panel === 'speakers') tryOptimizeOnLoad(buf, panel);
+    }, err => {
+      document.getElementById('trackStatus' + n).textContent = 'Decode error';
+      console.error(err);
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ═══════════════════════════════════════════
+// PLAYBACK
+// ═══════════════════════════════════════════
+function togglePlay(panel) {
+  const s = state[panel];
+  if (!s.decodedBuffer) return;
+  s.isPlaying ? pauseAudio(panel) : playAudio(panel);
+}
+
+function playAudio(panel) {
+  const s = state[panel];
+  const n = idx[panel];
+  if (!s.decodedBuffer) return;
+
+  // stop any other panel
+  panels.forEach(p => { if (p !== panel && state[p].isPlaying) stopAudio(p); });
+
+  ensureAudioCtx(panel);
+  if (s.audioCtx.state === 'suspended') s.audioCtx.resume();
+
+  s.sourceNode = s.audioCtx.createBufferSource();
+  s.sourceNode.buffer = s.decodedBuffer;
+  s.sourceNode.connect(s.filters[0]);
+  s.sourceNode.onended = () => {
+    if (s.isPlaying) {
+      s.isPlaying = false;
+      s.pauseOffset = 0;
+      updatePlayBtn(panel, false);
+      document.getElementById('progressFill' + n).style.width = '0%';
+      document.getElementById('timeCurrent' + n).textContent = '0:00';
+      document.getElementById('trackStatus' + n).textContent = 'Finished';
+      document.getElementById('trackStatus' + n).className = 'track-status';
+      cancelAnimationFrame(s.animFrame);
+    }
+  };
+
+  applyEQToNodes(panel);
+  s.sourceNode.start(0, s.pauseOffset);
+  s.startTime = s.audioCtx.currentTime - s.pauseOffset;
+  s.isPlaying = true;
+
+  updatePlayBtn(panel, true);
+  document.getElementById('trackStatus' + n).textContent = 'Playing';
+  document.getElementById('trackStatus' + n).className = 'track-status playing';
+  tickProgress(panel);
+}
+
+function pauseAudio(panel) {
+  const s = state[panel];
+  const n = idx[panel];
+  if (!s.isPlaying) return;
+  s.pauseOffset = s.audioCtx.currentTime - s.startTime;
+  s.sourceNode.stop();
+  s.isPlaying = false;
+  cancelAnimationFrame(s.animFrame);
+  updatePlayBtn(panel, false);
+  document.getElementById('trackStatus' + n).textContent = 'Paused';
+  document.getElementById('trackStatus' + n).className = 'track-status';
+}
+
+function stopAudio(panel) {
+  const s = state[panel];
+  if (s.sourceNode) { try { s.sourceNode.stop(); } catch (_) {} s.sourceNode = null; }
+  s.isPlaying = false;
+  s.pauseOffset = 0;
+  cancelAnimationFrame(s.animFrame);
+  updatePlayBtn(panel, false);
+}
+
+function skipBack(panel) {
+  const s = state[panel];
+  const wasPlaying = s.isPlaying;
+  if (wasPlaying) stopAudio(panel);
+  s.pauseOffset = Math.max(0, (s.pauseOffset || 0) - 10);
+  if (wasPlaying) playAudio(panel);
+}
+
+function skipForward(panel) {
+  const s = state[panel];
+  const wasPlaying = s.isPlaying;
+  if (wasPlaying) stopAudio(panel);
+  s.pauseOffset = Math.min(s.durationSec - 0.1, (s.pauseOffset || 0) + 10);
+  if (wasPlaying) playAudio(panel);
+}
+
+function seekTo(e, panel) {
+  const s = state[panel];
+  if (!s.decodedBuffer) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const wasPlaying = s.isPlaying;
+  if (wasPlaying) stopAudio(panel);
+  s.pauseOffset = pct * s.durationSec;
+  if (wasPlaying) playAudio(panel);
+}
+
+function setVolume(val, panel) {
+  state[panel].volume = parseFloat(val);
+  if (state[panel].gainNode) state[panel].gainNode.gain.setTargetAtTime(parseFloat(val), state[panel].audioCtx.currentTime, 0.01);
+}
+
+function tickProgress(panel) {
+  const s = state[panel];
+  const n = idx[panel];
+  if (!s.isPlaying) return;
+  const elapsed = s.audioCtx.currentTime - s.startTime;
+  const pct = Math.min(elapsed / s.durationSec * 100, 100);
+  document.getElementById('progressFill' + n).style.width = pct + '%';
+  document.getElementById('timeCurrent' + n).textContent = fmtTime(elapsed);
+  s.animFrame = requestAnimationFrame(() => tickProgress(panel));
+}
+
+function updatePlayBtn(panel, playing) {
+  const btn = document.getElementById('playBtn' + idx[panel]);
+  btn.textContent = playing ? '⏸' : '▶';
+  btn.classList.toggle('playing', playing);
+}
+
+function fmtTime(sec) {
+  const s = Math.floor(sec);
+  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+}
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// CROSS-TAB ACTIVE SPEAKER SYNC
+// ═══════════════════════════════════════════
+window.addEventListener('storage', async (e) => {
+  if (e.key !== 'freqsync_active_speaker') return;
+  const newId = e.newValue || '';
+  try {
+    const speakers = await API.getAllSpeakers();
+    const spk = speakers.find(s => s.id === newId);
+    if (spk) {
+      const list = document.getElementById('speakers-sidebar-list');
+      if (list) {
+        const items = list.querySelectorAll('.sidebar-item');
+        items.forEach((el, i) => {
+          el.classList.toggle('active', speakers[i] && speakers[i].id === newId);
+        });
+      }
+      await activateSpeakerEQ(spk);
+    }
+  } catch (_) {}
+});
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+buildGenreCards();
+(async () => {
+  await loadSpeakers();
+  await loadPresets();
+})();
+</script>
+</body>
+</html>

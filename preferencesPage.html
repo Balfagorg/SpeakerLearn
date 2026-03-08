@@ -1,0 +1,1268 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreqSync — Preferences</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --light-green: #a2faa3;
+      --muted-teal:  #92c9b1;
+      --cerulean:    #4f759b;
+      --grape:       #5d5179;
+      --deep-purple: #571f4e;
+      --bg:          #0e0b14;
+      --surface:     #16101f;
+      --surface-2:   #1e1630;
+      --text:        #f0ede8;
+      --text-muted:  #a09ab0;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* noise texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: 0.35;
+    }
+
+    /* ── TOPBAR ── */
+    /* ── HEADER ── */
+header {
+  position: relative;
+  padding: 0 5vw;
+  background: linear-gradient(135deg, var(--deep-purple) 0%, var(--grape) 40%, var(--cerulean) 100%);
+  overflow: hidden;
+}
+
+header::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 70% 80%, rgba(162,250,163,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 20% 20%, rgba(146,201,177,0.1) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2rem 0 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.tagline-top {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.page-title-strip {
+  position: relative;
+  z-index: 5;
+  padding: 3rem 0 3.5rem;
+}
+
+    .logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 2.5vw, 2rem);
+      letter-spacing: -0.02em;
+      color: var(--light-green);
+      text-shadow: 0 0 40px rgba(162,250,163,0.35);
+      text-decoration: none;
+    }
+    .logo span { color: var(--muted-teal); }
+
+    nav {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 100px;
+      display: inline-flex; gap: 0.25rem; padding: 0.3rem;
+    }
+    nav a {
+      font-family: 'DM Sans', sans-serif; font-weight: 500;
+      font-size: 0.82rem; letter-spacing: 0.04em; text-transform: uppercase;
+      color: rgba(255,255,255,0.7); text-decoration: none;
+      padding: 0.55rem 1.4rem; border-radius: 100px;
+      transition: all 0.25s ease; white-space: nowrap;
+    }
+    nav a:hover  { background: rgba(162,250,163,0.15); color: var(--light-green); }
+    nav a.active { background: var(--light-green); color: var(--deep-purple); font-weight: 600; }
+
+    /* ── PAGE HEADER ── */
+    .page-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted-teal);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page-eyebrow::before {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 1px;
+  background: var(--muted-teal);
+}
+
+.page-title-strip h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.page-title-strip h1 em {
+  font-style: italic;
+  color: var(--light-green);
+}
+
+.page-title-strip p {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  max-width: 580px;
+  margin-top: 0.75rem;
+}
+
+    /* ── MAIN LAYOUT ── */
+    .pref-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 5vw 5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .pref-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .card:last-child { margin-bottom: 0; }
+
+    .card-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem; letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+    }
+    .card-subtitle {
+      font-size: 0.78rem; color: var(--text-muted);
+      font-family: 'Space Mono', monospace;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── SPEAKER SELECTOR ── */
+    .speaker-selector-row {
+      display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;
+    }
+
+    .styled-select {
+      flex: 1; min-width: 160px;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+    }
+    .styled-select:focus { border-color: var(--muted-teal); }
+
+    .speaker-badge {
+      display: flex; align-items: center; gap: 0.5rem;
+      background: rgba(162,250,163,0.08);
+      border: 1px solid rgba(162,250,163,0.18);
+      border-radius: 100px;
+      padding: 0.45rem 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.68rem; letter-spacing: 0.08em;
+      color: var(--light-green); white-space: nowrap;
+    }
+    .speaker-badge::before {
+      content: ''; display: block; width: 7px; height: 7px;
+      border-radius: 50%; background: var(--light-green);
+      box-shadow: 0 0 6px var(--light-green);
+      animation: pulse-dot 1.8s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ── EQ SLIDERS ── */
+    .eq-grid {
+      display: flex; flex-direction: column; gap: 1.4rem;
+      margin-top: 0.5rem;
+    }
+
+    .eq-band {
+      display: grid;
+      grid-template-columns: 90px 1fr 64px;
+      align-items: center; gap: 1rem;
+    }
+
+    .band-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+    .band-label strong {
+      display: block; color: var(--text);
+      font-size: 0.78rem; margin-bottom: 0.1rem;
+    }
+
+    /* custom range slider */
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 4px;
+      background: var(--surface-2);
+      border-radius: 4px; outline: none; cursor: pointer;
+      position: relative;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--light-green);
+      box-shadow: 0 0 10px rgba(162,250,163,0.5);
+      cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 18px rgba(162,250,163,0.7);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%; border: none;
+      background: var(--light-green);
+      box-shadow: 0 0 10px rgba(162,250,163,0.5);
+      cursor: pointer;
+    }
+
+    .band-value {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem; text-align: right;
+      color: var(--muted-teal); min-width: 56px;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 8px; padding: 0.3rem 0.6rem;
+      transition: color 0.15s;
+    }
+    .band-value.positive { color: var(--light-green); }
+    .band-value.negative { color: #f07070; }
+
+    /* zero line indicator on slider */
+    .slider-wrap { position: relative; }
+    .slider-zero {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 2px; height: 10px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    /* ── PRESET STRIP ── */
+    .preset-row {
+      display: flex; gap: 0.6rem; align-items: center;
+      flex-wrap: wrap; margin-top: 1.5rem; padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .preset-name-input {
+      flex: 1; min-width: 150px;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; padding: 0.6rem 1rem;
+      border-radius: 10px; outline: none;
+      transition: border-color 0.2s;
+    }
+    .preset-name-input::placeholder { color: var(--text-muted); }
+    .preset-name-input:focus { border-color: var(--muted-teal); }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif; font-weight: 600;
+      font-size: 0.82rem; letter-spacing: 0.03em;
+      padding: 0.6rem 1.2rem; border: none; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s ease; white-space: nowrap;
+    }
+    .btn-green  { background: var(--light-green); color: var(--deep-purple); }
+    .btn-green:hover  { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(162,250,163,0.3); }
+    .btn-ghost  {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.6);
+    }
+    .btn-ghost:hover  { border-color: var(--muted-teal); color: var(--muted-teal); }
+    .btn-danger {
+      background: transparent;
+      border: 1px solid rgba(255,80,80,0.25);
+      color: rgba(255,120,120,0.8);
+    }
+    .btn-danger:hover { background: rgba(255,80,80,0.1); }
+
+    /* ── SAVED PRESETS LIST ── */
+    .presets-list {
+      display: flex; flex-direction: column; gap: 0.6rem;
+      margin-top: 0.5rem; max-height: 260px;
+      overflow-y: auto; padding-right: 4px;
+    }
+    .presets-list::-webkit-scrollbar { width: 4px; }
+    .presets-list::-webkit-scrollbar-track { background: transparent; }
+    .presets-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+    .preset-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px; padding: 0.7rem 1rem;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .preset-item:hover { border-color: rgba(162,250,163,0.25); background: rgba(162,250,163,0.04); }
+    .preset-item.active-preset {
+      border-color: rgba(162,250,163,0.4);
+      background: rgba(162,250,163,0.07);
+    }
+
+    .preset-info { display: flex; flex-direction: column; gap: 0.2rem; }
+    .preset-name { font-size: 0.88rem; font-weight: 500; }
+    .preset-speaker {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      color: var(--text-muted); letter-spacing: 0.06em;
+    }
+
+    .preset-actions { display: flex; gap: 0.4rem; }
+    .preset-actions button {
+      background: none; border: none; cursor: pointer; padding: 4px 6px;
+      border-radius: 6px; font-size: 0.8rem; line-height: 1;
+      color: var(--text-muted); transition: all 0.15s;
+    }
+    .preset-actions button:hover { background: rgba(255,255,255,0.08); color: var(--text); }
+    .preset-actions .del-btn:hover { color: #f07070; }
+
+    .empty-presets {
+      text-align: center; padding: 2rem 1rem;
+      color: var(--text-muted); font-size: 0.82rem;
+      font-family: 'Space Mono', monospace; letter-spacing: 0.06em;
+    }
+
+    /* ── PLAYER CARD (right column) ── */
+    .player-card {
+      position: sticky; top: 90px;
+    }
+
+    .upload-zone {
+      border: 2px dashed rgba(146,201,177,0.25);
+      border-radius: 14px; padding: 2rem 1.5rem;
+      text-align: center; cursor: pointer;
+      transition: all 0.25s; margin-bottom: 1.2rem;
+      background: rgba(146,201,177,0.03);
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--muted-teal);
+      background: rgba(146,201,177,0.07);
+    }
+    .upload-zone.has-file {
+      border-color: rgba(162,250,163,0.35);
+      background: rgba(162,250,163,0.05);
+    }
+
+    .upload-icon {
+      font-size: 2rem; margin-bottom: 0.6rem; display: block;
+    }
+    .upload-title {
+      font-weight: 600; font-size: 0.9rem; margin-bottom: 0.3rem;
+    }
+    .upload-hint {
+      font-size: 0.75rem; color: var(--text-muted);
+      font-family: 'Space Mono', monospace; letter-spacing: 0.04em;
+    }
+    .upload-filename {
+      font-size: 0.78rem; color: var(--light-green);
+      font-family: 'Space Mono', monospace;
+      margin-top: 0.4rem; word-break: break-all;
+    }
+
+    #fileInput { display: none; }
+
+    /* Player controls */
+    .player-controls {
+      display: flex; gap: 0.6rem; margin-bottom: 1.2rem;
+    }
+    .play-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--light-green); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(162,250,163,0.25);
+    }
+    .play-btn:hover { transform: scale(1.08); box-shadow: 0 6px 22px rgba(162,250,163,0.4); }
+    .play-btn svg { fill: var(--deep-purple); width: 16px; height: 16px; }
+
+    .stop-btn {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; flex-shrink: 0;
+    }
+    .stop-btn:hover { border-color: var(--muted-teal); }
+    .stop-btn svg { fill: var(--text-muted); width: 12px; height: 12px; }
+
+    .track-info {
+      flex: 1; display: flex; flex-direction: column; justify-content: center;
+      overflow: hidden;
+    }
+    .track-name {
+      font-size: 0.85rem; font-weight: 500;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .track-status {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      color: var(--text-muted); letter-spacing: 0.06em; margin-top: 0.1rem;
+    }
+    .track-status.playing { color: var(--light-green); }
+
+    /* Waveform / progress bar */
+    .progress-wrap {
+      background: var(--surface-2); border-radius: 6px;
+      height: 6px; cursor: pointer; margin-bottom: 0.5rem;
+      overflow: hidden; position: relative;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 6px;
+      background: linear-gradient(90deg, var(--muted-teal), var(--light-green));
+      width: 0%; transition: width 0.1s linear;
+    }
+    .time-row {
+      display: flex; justify-content: space-between;
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      color: var(--text-muted);
+    }
+
+    /* Visual EQ bars (mini live display) */
+    .viz-bars {
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 32px; margin: 1rem 0 0.5rem;
+    }
+    .viz-bar {
+      flex: 1; border-radius: 2px 2px 0 0;
+      background: linear-gradient(180deg, var(--light-green), var(--muted-teal));
+      opacity: 0.5; min-height: 3px;
+      transition: height 0.1s ease;
+    }
+    .viz-bar.active { opacity: 1; animation: viz-bounce var(--spd, 0.9s) ease-in-out infinite alternate; }
+    @keyframes viz-bounce {
+      from { transform: scaleY(0.4); }
+      to   { transform: scaleY(1); }
+    }
+
+    /* Spotify teaser */
+    .spotify-teaser {
+      background: linear-gradient(135deg, rgba(30,188,100,0.08), rgba(30,188,100,0.03));
+      border: 1px solid rgba(30,188,100,0.18);
+      border-radius: 14px; padding: 1.1rem 1.2rem;
+      margin-top: 1rem;
+      display: flex; align-items: flex-start; gap: 0.9rem;
+    }
+    .spotify-logo {
+      width: 28px; height: 28px; flex-shrink: 0; margin-top: 2px;
+    }
+    .spotify-text h4 {
+      font-size: 0.85rem; font-weight: 600; margin-bottom: 0.2rem;
+      color: #1ebc64;
+    }
+    .spotify-text p {
+      font-size: 0.72rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .spotify-text .coming-soon {
+      display: inline-block; margin-top: 0.4rem;
+      background: rgba(30,188,100,0.12); border: 1px solid rgba(30,188,100,0.25);
+      color: #1ebc64; font-family: 'Space Mono', monospace;
+      font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: 100px;
+    }
+
+    /* Reset button strip */
+    .reset-strip {
+      display: flex; justify-content: flex-end; gap: 0.6rem;
+      margin-top: 1rem; padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface);
+      border: 1px solid rgba(162,250,163,0.25);
+      color: var(--light-green); font-family: 'Space Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.08em;
+      padding: 0.75rem 1.5rem; border-radius: 100px;
+      z-index: 1000; transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s;
+      opacity: 0; pointer-events: none;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .toast.error { border-color: rgba(255,100,100,0.3); color: #f08080; }
+
+    /* footer */
+    footer {
+      background: var(--deep-purple);
+      padding: 2.5rem 5vw;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--light-green); }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--muted-teal); }
+    .footer-copy { font-size: 0.68rem; color: rgba(255,255,255,0.2); font-family: 'Space Mono', monospace; }
+
+    @media (max-width: 600px) {
+      .topbar { flex-wrap: wrap; gap: 1rem; padding: 1.2rem 4vw; }
+      nav { flex-wrap: wrap; border-radius: 14px; }
+      .eq-band { grid-template-columns: 72px 1fr 54px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <a href="homePage.html" class="logo">Speak<span>Easy</span></a>
+    <div class="tagline-top">Speaker · Frequency · Balance</div>
+    <nav>
+      <a href="homePage.html">Home</a>
+      <a href="addSpeakerPage.html">Add Speaker</a>
+      <a href="preferencesPage.html" class="active">Preferences</a>
+      <a href="playMusic.html">Play Music</a>
+    </nav>
+  </div>
+  <div class="page-title-strip">
+    <div class="page-eyebrow">Your Sound, Your Way</div>
+    <h1>Music <em>Preferences</em></h1>
+    <p>Your speaker's calibration is set as the baseline, but here you can shape how your music actually sounds on top of that. You can boost the bass, accentuate the highs, or whatever feels right to you.</p>
+  </div>
+</header>
+
+<!-- ══ MAIN LAYOUT ══ -->
+<div class="pref-layout">
+
+  <!-- LEFT COLUMN: EQ + Presets -->
+  <div>
+
+    <!-- Speaker selector -->
+    <div class="card">
+      <div class="card-title">Active Speaker</div>
+      <div class="card-subtitle">Calibration baseline</div>
+      <div class="speaker-selector-row">
+        <select class="styled-select" id="speakerSelect" onchange="onSpeakerChange()">
+          <option value="">— No speaker selected —</option>
+        </select>
+        <div class="speaker-badge" id="speakerBadge">No speaker</div>
+      </div>
+    </div>
+
+    <!-- EQ Bands -->
+    <div class="card">
+      <div class="card-title">Frequency Preferences</div>
+      <div class="card-subtitle">Relative to your speaker's calibration — drag to taste</div>
+
+      <div class="eq-grid" id="eqGrid">
+        <!-- bands injected by JS -->
+      </div>
+
+      <div class="reset-strip">
+        <button class="btn btn-ghost" onclick="resetEQ()">Reset to Flat</button>
+      </div>
+    </div>
+
+    <!-- Presets -->
+    <div class="card">
+      <div class="card-title">Saved Presets</div>
+      <div class="card-subtitle">Save & recall your favourite EQ curves</div>
+
+      <div class="presets-list" id="presetsList">
+        <div class="empty-presets">No presets saved yet</div>
+      </div>
+
+      <div class="preset-row">
+        <input class="preset-name-input" id="presetNameInput" placeholder="Name this preset…" maxlength="40"/>
+        <button class="btn btn-green" onclick="savePreset()">Save</button>
+      </div>
+    </div>
+
+  </div><!-- /left -->
+
+  <!-- RIGHT COLUMN: Player -->
+  <div class="player-card">
+
+    <div class="card">
+      <div class="card-title">Test Your Sound</div>
+      <div class="card-subtitle">Upload a track to hear changes live</div>
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()"
+           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <span class="upload-icon">🎵</span>
+        <div class="upload-title">Drop an MP3 here</div>
+        <div class="upload-hint">or click to browse</div>
+        <div class="upload-filename" id="uploadFilename"></div>
+      </div>
+      <input type="file" id="fileInput" accept="audio/*" onchange="handleFileSelect(this)"/>
+
+      <!-- Visualizer bars -->
+      <div class="viz-bars" id="vizBars">
+        <!-- injected by JS -->
+      </div>
+
+      <!-- Controls -->
+      <div class="player-controls">
+        <button class="play-btn" id="playBtn" onclick="togglePlay()">
+          <svg id="playIcon" viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>
+        </button>
+        <button class="stop-btn" onclick="stopAudio()">
+          <svg viewBox="0 0 12 12"><rect width="12" height="12" rx="2"/></svg>
+        </button>
+        <div class="track-info">
+          <div class="track-name" id="trackName">No track loaded</div>
+          <div class="track-status" id="trackStatus">Upload a file to begin</div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="progress-wrap" id="progressWrap" onclick="seekAudio(event)">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="time-row">
+        <span id="timeCurrent">0:00</span>
+        <span id="timeDuration">0:00</span>
+      </div>
+
+      <!-- Spotify teaser -->
+      <div class="spotify-teaser">
+        <svg class="spotify-logo" viewBox="0 0 24 24" fill="#1ebc64" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.857.208c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 01-.277-1.215c3.809-.87 7.076-.496 9.712 1.115a.623.623 0 01.207.856zm1.223-2.722a.78.78 0 01-1.072.257C14.01 12.245 10.59 11.7 7.455 12.6a.78.78 0 01-.456-1.49c3.538-1.083 7.337-.558 10.153 1.52a.78.78 0 01.257 1.072zm.105-2.835C14.69 9.01 9.948 8.857 7.008 9.745a.935.935 0 11-.543-1.79c3.356-1.018 8.938-.82 12.465 1.37a.936.936 0 01-1.016 1.542z"/>
+        </svg>
+        <div class="spotify-text">
+          <h4>Spotify Integration</h4>
+          <p>Soon you'll be able to pull tracks directly from your Spotify library to audition your EQ curves in real time.</p>
+          <span class="coming-soon">Coming soon</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /right -->
+
+</div><!-- /pref-layout -->
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">SpeakEasy</div>
+  <div class="footer-links">
+    <a href="homePage.html">Home</a>
+    <a href="addSpeakerPage.html">Add Speaker</a>
+    <a href="preferencesPage.html">Preferences</a>
+    <a href="playMusic.html">Play Music</a>
+  </div>
+  <div class="footer-copy">© 2026 SpeakEasy. All rights reserved.</div>
+</footer>
+
+<!-- ══ TOAST ══ -->
+<div class="toast" id="toast"></div>
+
+<script src="js/api.js"></script>
+<script src="js/bands.js"></script>
+<script>
+// ── BAND CONFIG ──
+const BANDS = [
+  { hz: 60,    label: '60 Hz',         desc: 'Sub-bass' },
+  { hz: 500,   label: '500 Hz',        desc: 'Low-mid' },
+  { hz: 1000,  label: '1 kHz',         desc: 'Midrange' },
+  { hz: 3500,  label: '3.5 kHz',       desc: 'Presence' },
+  { hz: 8000,  label: '3.5k+500 mix',  desc: 'Mix' },
+];
+
+// ── STATE ──
+let eqValues = {};
+let calibrationValues = {};
+BANDS.forEach(b => { eqValues[b.hz] = 0; calibrationValues[b.hz] = 0; });
+let activePresetKey = null;
+
+// ── BUILD EQ SLIDERS ──
+function buildEQ() {
+  const grid = document.getElementById('eqGrid');
+  grid.innerHTML = '';
+
+  BANDS.forEach(band => {
+    const val = eqValues[band.hz] || 0;
+    const row = document.createElement('div');
+    row.className = 'eq-band';
+    row.innerHTML = `
+      <div class="band-label">
+        <strong>${band.label}</strong>
+        ${band.desc}
+      </div>
+      <div class="slider-wrap">
+        <div class="slider-zero"></div>
+        <input type="range" min="-12" max="12" step="0.5" value="${val}"
+               id="slider_${band.hz}" oninput="onSliderChange(${band.hz}, this.value)"/>
+      </div>
+      <div class="band-value" id="val_${band.hz}">${formatDb(val)}</div>
+    `;
+    grid.appendChild(row);
+    updateSliderTrack(band.hz, val);
+  });
+}
+
+function formatDb(v) {
+  const n = parseFloat(v);
+  return (n > 0 ? '+' : '') + n.toFixed(1) + ' dB';
+}
+
+function onSliderChange(hz, raw) {
+  const v = parseFloat(raw);
+  eqValues[hz] = v;
+  const el = document.getElementById('val_' + hz);
+  el.textContent = formatDb(v);
+  el.className = 'band-value' + (v > 0 ? ' positive' : v < 0 ? ' negative' : '');
+  updateSliderTrack(hz, v);
+  applyEQ();
+}
+
+function updateSliderTrack(hz, v) {
+  const slider = document.getElementById('slider_' + hz);
+  if (!slider) return;
+  const pct = ((v + 12) / 24) * 100;
+  // Color fill from center to thumb
+  const center = 50;
+  const left  = Math.min(center, pct);
+  const right = Math.max(center, pct);
+  slider.style.background = `linear-gradient(to right,
+    var(--surface-2) 0%,
+    var(--surface-2) ${left}%,
+    var(--muted-teal) ${left}%,
+    var(--muted-teal) ${right}%,
+    var(--surface-2) ${right}%,
+    var(--surface-2) 100%)`;
+}
+
+function resetEQ() {
+  BANDS.forEach(b => {
+    eqValues[b.hz] = 0;
+    const slider = document.getElementById('slider_' + b.hz);
+    if (slider) slider.value = 0;
+    const val = document.getElementById('val_' + b.hz);
+    if (val) { val.textContent = '0.0 dB'; val.className = 'band-value'; }
+    updateSliderTrack(b.hz, 0);
+  });
+  applyEQ();
+  activePresetKey = null;
+  renderPresets();
+  showToast('EQ reset to flat');
+}
+
+// ── AUDIO ENGINE ──
+// Uses fetch + decodeAudioData — no <audio> element hijacking, works from file:// too
+let audioCtx      = null;
+let filters       = [];
+let decodedBuffer = null;   // the decoded PCM buffer of the loaded file
+let playingNode   = null;   // current BufferSourceNode
+let startedAt     = 0;      // audioCtx.currentTime when we started
+let pausedAt      = 0;      // track position when paused
+let isPlaying     = false;
+let durationSec   = 0;
+let rafId         = null;
+
+function getCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    // Build filter chain once
+    filters = BANDS.map(band => {
+      const f = audioCtx.createBiquadFilter();
+      f.type = 'peaking';
+      f.frequency.value = band.hz;
+      f.Q.value = 1.4;
+      f.gain.value = 0;
+      return f;
+    });
+  }
+  return audioCtx;
+}
+
+function applyEQ() {
+  if (!filters.length) return;
+  BANDS.forEach((band, i) => {
+    filters[i].gain.value = (calibrationValues[band.hz] ?? 0) + (eqValues[band.hz] ?? 0);
+  });
+}
+
+function chainAndPlay(offset) {
+  // Stop any existing node
+  if (playingNode) { try { playingNode.stop(); } catch(e){} playingNode = null; }
+
+  const ctx = getCtx();
+  const src = ctx.createBufferSource();
+  src.buffer = decodedBuffer;
+
+  // Connect: src → filter0 → … → filterN → destination
+  let prev = src;
+  filters.forEach(f => { prev.connect(f); prev = f; });
+  prev.connect(ctx.destination);
+
+  applyEQ();
+  src.start(0, offset);
+  startedAt = ctx.currentTime - offset;
+  playingNode = src;
+  isPlaying = true;
+  setPlayIcon(true);
+  document.getElementById('trackStatus').textContent = '▶ Playing';
+  document.getElementById('trackStatus').className = 'track-status playing';
+  updateVizBars(true);
+
+  src.onended = () => {
+    // Only fire if we didn't manually stop
+    if (isPlaying) {
+      isPlaying = false;
+      pausedAt = 0;
+      playingNode = null;
+      setPlayIcon(false);
+      document.getElementById('trackStatus').textContent = 'Finished';
+      document.getElementById('trackStatus').className = 'track-status';
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('timeCurrent').textContent = fmtTime(0);
+      updateVizBars(false);
+      cancelAnimationFrame(rafId);
+    }
+  };
+
+  tickProgress();
+}
+
+function tickProgress() {
+  cancelAnimationFrame(rafId);
+  if (!isPlaying || !decodedBuffer) return;
+  const elapsed = audioCtx.currentTime - startedAt;
+  const pct = Math.min(elapsed / durationSec, 1) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('timeCurrent').textContent = fmtTime(elapsed);
+  if (pct < 100) rafId = requestAnimationFrame(tickProgress);
+}
+
+// ── FILE HANDLING ──
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (file) loadFile(file);
+}
+
+function loadFile(file) {
+  stopAudio();
+  decodedBuffer = null;
+  durationSec   = 0;
+
+  document.getElementById('uploadFilename').textContent = file.name;
+  document.getElementById('trackName').textContent = file.name.replace(/\.[^.]+$/, '');
+  document.getElementById('uploadZone').classList.add('has-file');
+  document.getElementById('trackStatus').textContent = 'Decoding…';
+  document.getElementById('trackStatus').className = 'track-status';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('timeCurrent').textContent = '0:00';
+  document.getElementById('timeDuration').textContent = '0:00';
+  updateVizBars(false);
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    getCtx().decodeAudioData(
+      e.target.result,
+      (buffer) => {
+        decodedBuffer = buffer;
+        durationSec   = buffer.duration;
+        document.getElementById('timeDuration').textContent = fmtTime(durationSec);
+        document.getElementById('trackStatus').textContent = 'Ready — press ▶ to play';
+      },
+      (err) => {
+        document.getElementById('trackStatus').textContent = 'Could not decode file';
+        showToast('Could not decode audio — try a standard MP3', true);
+        console.error('decodeAudioData error:', err);
+      }
+    );
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.add('drag-over');
+}
+function handleDragLeave() {
+  document.getElementById('uploadZone').classList.remove('drag-over');
+}
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('uploadZone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) loadFile(file);
+}
+
+// ── PLAYER ──
+async function togglePlay() {
+  if (!decodedBuffer) { showToast('Upload a track first', true); return; }
+  const ctx = getCtx();
+  if (ctx.state === 'suspended') await ctx.resume();
+
+  if (isPlaying) {
+    // Pause: record position
+    pausedAt = ctx.currentTime - startedAt;
+    if (playingNode) { try { playingNode.stop(); } catch(e){} playingNode = null; }
+    isPlaying = false;
+    setPlayIcon(false);
+    document.getElementById('trackStatus').textContent = 'Paused';
+    document.getElementById('trackStatus').className = 'track-status';
+    updateVizBars(false);
+    cancelAnimationFrame(rafId);
+  } else {
+    chainAndPlay(pausedAt);
+  }
+}
+
+function stopAudio() {
+  if (playingNode) { try { playingNode.stop(); } catch(e){} playingNode = null; }
+  isPlaying = false;
+  pausedAt  = 0;
+  setPlayIcon(false);
+  document.getElementById('trackStatus').textContent = decodedBuffer ? 'Ready — press ▶ to play' : 'Upload a file to begin';
+  document.getElementById('trackStatus').className = 'track-status';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('timeCurrent').textContent = '0:00';
+  updateVizBars(false);
+  cancelAnimationFrame(rafId);
+}
+
+function seekAudio(e) {
+  if (!decodedBuffer) return;
+  const rect = document.getElementById('progressWrap').getBoundingClientRect();
+  const pct  = Math.max(0, Math.min((e.clientX - rect.left) / rect.width, 1));
+  pausedAt   = pct * durationSec;
+  if (isPlaying) chainAndPlay(pausedAt);
+  else {
+    document.getElementById('progressFill').style.width = (pct * 100) + '%';
+    document.getElementById('timeCurrent').textContent = fmtTime(pausedAt);
+  }
+}
+
+function fmtTime(s) {
+  if (!s || isNaN(s)) return '0:00';
+  const m = Math.floor(s / 60);
+  return m + ':' + Math.floor(s % 60).toString().padStart(2, '0');
+}
+
+function setPlayIcon(playing) {
+  document.getElementById('playIcon').setAttribute('d',
+    playing ? 'M4 2h3v12H4zm5 0h3v12H9z' : 'M4 2l10 6-10 6z');
+}
+
+// ── VIZ BARS ──
+function buildVizBars() {
+  const container = document.getElementById('vizBars');
+  container.innerHTML = '';
+  for (let i = 0; i < 24; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'viz-bar';
+    bar.style.height = '4px';
+    bar.style.setProperty('--spd', (0.6 + Math.random() * 0.8) + 's');
+    container.appendChild(bar);
+  }
+}
+
+function updateVizBars(active) {
+  document.querySelectorAll('.viz-bar').forEach(b => {
+    if (active) {
+      b.classList.add('active');
+      b.style.height = (20 + Math.random() * 80) + '%';
+    } else {
+      b.classList.remove('active');
+      b.style.height = '4px';
+    }
+  });
+}
+
+// ── SPEAKER SELECTOR ──
+async function populateSpeakerSelect() {
+  const sel = document.getElementById('speakerSelect');
+  sel.innerHTML = '';
+  const none = document.createElement('option');
+  none.value = '';
+  none.textContent = '— No speaker selected —';
+  sel.appendChild(none);
+  try {
+    const list = await API.getAllSpeakers();
+    if (Array.isArray(list)) {
+      list.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = s.name;
+        sel.appendChild(opt);
+      });
+    }
+  } catch (_) {}
+
+  let activeId = '';
+  try { activeId = await API.getActiveSpeakerFromBackend(); } catch (_) {}
+  if (!activeId) activeId = API.getActiveSpeaker();
+  if (activeId && sel.querySelector('option[value="' + CSS.escape(activeId) + '"]')) {
+    sel.value = activeId;
+  }
+  await onSpeakerChange(true);
+}
+
+async function loadSpeakerCalibration(speakerId, silent) {
+  BANDS.forEach(b => calibrationValues[b.hz] = 0);
+  if (!speakerId) { applyEQ(); return; }
+
+  try {
+    const speakers = await API.getAllSpeakers();
+    const spk = speakers.find(s => s.id === speakerId);
+    if (!spk) { applyEQ(); return; }
+
+    let calBands = null;
+
+    if (spk.source === 'know' && spk.eqPresetKey) {
+      const raw = localStorage.getItem(spk.eqPresetKey);
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          calBands = parsed.bands || parsed;
+        } catch (_) {}
+      }
+      if (!calBands) {
+        try {
+          const list = await API.eqPresetsList();
+          const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+          if (p && p.bands) calBands = p.bands;
+        } catch (_) {}
+      }
+    } else if (spk.bands_7) {
+      calBands = spk.bands_7;
+    } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+      const converted = learn5To7Band(spk.readings);
+      calBands = converted.bands;
+    } else {
+      try {
+        const cal = await API.speakerSystemsCalibration(speakerId);
+        if (Array.isArray(cal) && cal.length >= 5) {
+          const converted = learn5To7Band(cal);
+          calBands = converted.bands;
+        }
+      } catch (_) {}
+    }
+
+    if (calBands) {
+      BANDS.forEach(b => {
+        if (calBands[b.hz] !== undefined) {
+          calibrationValues[b.hz] = calBands[b.hz];
+        } else if (b.hz === 8000) {
+          calibrationValues[8000] = calBands[16000] ?? calBands[8000] ?? 0;
+        }
+      });
+    }
+  } catch (e) {
+    if (!silent) showToast('Could not load speaker calibration', true);
+  }
+  applyEQ();
+}
+
+async function onSpeakerChange(silent = false) {
+  const sel = document.getElementById('speakerSelect');
+  const badge = document.getElementById('speakerBadge');
+  const val = sel.value;
+  const label = val ? sel.options[sel.selectedIndex].text : 'No speaker';
+  badge.textContent = label;
+  API.setActiveSpeaker(val);
+  try { await API.speakerSystemsSwitch(val); } catch (_) {
+    if (!silent) showToast('Could not switch speaker', true);
+  }
+  await loadSpeakerCalibration(val, silent);
+}
+
+// ── PRESETS ──
+async function savePreset() {
+  const name = document.getElementById('presetNameInput').value.trim();
+  if (!name) { showToast('Give your preset a name first', true); return; }
+  const speaker = document.getElementById('speakerSelect').value;
+  const key = 'freqsync_pref_' + name;
+  const data = { name, speaker, bands: { ...eqValues } };
+  try {
+    await API.eqPresetsSave({ id: key, name, speaker_system_id: speaker, bands: data.bands });
+  } catch (_) { showToast('Could not save preset to server', true); }
+  localStorage.setItem(key, JSON.stringify(data));
+  activePresetKey = key;
+  document.getElementById('presetNameInput').value = '';
+  renderPresets();
+  showToast('Preset "' + name + '" saved!');
+}
+
+async function loadPreset(key) {
+  let data = null;
+  const raw = localStorage.getItem(key);
+  if (raw) {
+    try { data = JSON.parse(raw); } catch (_) {}
+  }
+  if (!data) {
+    try {
+      const list = await API.eqPresetsList();
+      const p = Array.isArray(list) ? list.find(x => x.id === key) : null;
+      if (p) data = { name: p.name, speaker: p.speaker_system_id || '', bands: p.bands || {} };
+    } catch (_) {}
+  }
+  if (!data) return;
+  activePresetKey = key;
+  BANDS.forEach(b => {
+    const v = data.bands[b.hz] !== undefined ? data.bands[b.hz] : 0;
+    eqValues[b.hz] = v;
+    const slider = document.getElementById('slider_' + b.hz);
+    if (slider) slider.value = v;
+    const val = document.getElementById('val_' + b.hz);
+    if (val) {
+      val.textContent = formatDb(v);
+      val.className = 'band-value' + (v > 0 ? ' positive' : v < 0 ? ' negative' : '');
+    }
+    updateSliderTrack(b.hz, v);
+  });
+  if (data.speaker) {
+    const sel = document.getElementById('speakerSelect');
+    sel.value = data.speaker;
+    onSpeakerChange();
+  }
+  applyEQ();
+  renderPresets();
+  showToast('Loaded "' + data.name + '"');
+}
+
+async function deletePreset(key, e) {
+  e.stopPropagation();
+  try { await API.eqPresetsDelete(key); } catch (_) { showToast('Could not delete preset from server', true); }
+  localStorage.removeItem(key);
+  if (activePresetKey === key) activePresetKey = null;
+  renderPresets();
+  showToast('Preset deleted');
+}
+
+async function renderPresets() {
+  const list = document.getElementById('presetsList');
+  const keys = new Set();
+  try {
+    const apiList = await API.eqPresetsList();
+    if (Array.isArray(apiList)) apiList.forEach(p => keys.add(p.id));
+  } catch (_) {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('freqsync_pref_')) keys.add(k);
+  }
+  if (keys.size === 0) {
+    list.innerHTML = '<div class="empty-presets">No presets saved yet</div>';
+    return;
+  }
+  list.innerHTML = '';
+  [...keys].forEach(key => {
+    let data = null;
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) data = JSON.parse(raw);
+    } catch (_) {}
+    if (!data) data = { name: key.replace(/^(freqsync_pref_|eq_)/, ''), speaker: '' };
+    const item = document.createElement('div');
+    item.className = 'preset-item' + (key === activePresetKey ? ' active-preset' : '');
+    item.onclick = () => loadPreset(key);
+    const spkLabel = data.speaker
+      ? document.querySelector(`#speakerSelect option[value="${data.speaker}"]`)?.text || data.speaker
+      : 'No speaker';
+    item.innerHTML = `
+      <div class="preset-info">
+        <div class="preset-name">${data.name}</div>
+        <div class="preset-speaker">🔊 ${spkLabel}</div>
+      </div>
+      <div class="preset-actions">
+        <button title="Load" onclick="loadPreset('${key}'); event.stopPropagation()">▶</button>
+        <button class="del-btn" title="Delete" onclick="deletePreset('${key}', event)">✕</button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (error ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast' + (error ? ' error' : ''); }, 2800);
+}
+
+// ── CROSS-TAB ACTIVE SPEAKER SYNC ──
+window.addEventListener('storage', (e) => {
+  if (e.key !== 'freqsync_active_speaker') return;
+  const newId = e.newValue || '';
+  const sel = document.getElementById('speakerSelect');
+  if (sel && sel.value !== newId) {
+    if (sel.querySelector('option[value="' + CSS.escape(newId) + '"]')) {
+      sel.value = newId;
+    }
+    loadSpeakerCalibration(newId, true);
+    const badge = document.getElementById('speakerBadge');
+    if (badge) {
+      badge.textContent = newId && sel.selectedIndex > 0 ? sel.options[sel.selectedIndex].text : 'No speaker';
+    }
+  }
+});
+
+// ── INIT ──
+buildEQ();
+buildVizBars();
+populateSpeakerSelect();
+renderPresets();
+</script>
+</body>
+</html>
