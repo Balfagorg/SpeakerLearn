@@ -17,7 +17,7 @@ try {
   throw e;
 }
 
-const { createStereoEq, processInterleavedStereo } = require('./biquadEq');
+const { createStereoEq, processInterleavedStereo, updateStereoEqGains } = require('./biquadEq');
 
 const SAMPLE_RATE = 48000;
 const CHANNELS = 2;
@@ -50,6 +50,7 @@ function getDevices() {
 
 function createEqTransform(eqGains) {
   const stereoEq = createStereoEq(SAMPLE_RATE, eqGains);
+  bridgeState._stereoEq = stereoEq;
   return new Transform({
     objectMode: false,
     transform(chunk, enc, cb) {
@@ -118,6 +119,7 @@ function stopBridge() {
     return { ok: true, message: 'Bridge not running' };
   }
   try {
+    bridgeState._stereoEq = null;
     if (bridgeState.inputStream) {
       bridgeState.inputStream.quit();
       bridgeState.inputStream = null;
@@ -136,6 +138,9 @@ function stopBridge() {
 
 function updateEq(eqGains) {
   bridgeState.eqGains = eqGains || {};
+  if (bridgeState.running && bridgeState._stereoEq) {
+    updateStereoEqGains(bridgeState._stereoEq, eqGains, SAMPLE_RATE);
+  }
   return { ok: true };
 }
 

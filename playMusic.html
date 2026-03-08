@@ -1159,8 +1159,20 @@
         <button class="btn-primary" id="bridgeRefreshBtn" onclick="refreshBridgeDevices()">Refresh devices</button>
       </div>
       <div class="bridge-card">
-        <div class="bridge-card-title">EQ</div>
-        <div class="bridge-eq-hint">Uses the active EQ from My Speakers, My Presets, or Genre. Select one there first, then start the bridge.</div>
+        <div class="bridge-card-title">EQ source</div>
+        <p class="bridge-eq-hint">Choose a speaker (for calibration) and/or a preset. Changes apply instantly without restarting the bridge.</p>
+        <div class="bridge-device-row">
+          <label>Speaker:</label>
+          <select id="bridgeSpeakerSelect" onchange="onBridgeEQSourceChange()">
+            <option value="">— None —</option>
+          </select>
+        </div>
+        <div class="bridge-device-row">
+          <label>Preset:</label>
+          <select id="bridgePresetSelect" onchange="onBridgeEQSourceChange()">
+            <option value="">— None —</option>
+          </select>
+        </div>
         <div class="eq-display" id="bridge-eq-display"></div>
       </div>
       <div class="bridge-card bridge-actions">
@@ -2049,6 +2061,79 @@ function sortAndFilterBridgeDevices(inputs, outputs) {
   return { inputs: inList, outputs: outList };
 }
 
+async function populateBridgeEQSelectors() {
+  const speakerSel = document.getElementById('bridgeSpeakerSelect');
+  const presetSel = document.getElementById('bridgePresetSelect');
+  if (!speakerSel || !presetSel) return;
+  const prevSpk = speakerSel.value, prevPreset = presetSel.value;
+
+  let speakers = [];
+  try {
+    if (typeof API !== 'undefined' && API.getAllSpeakers) speakers = await API.getAllSpeakers();
+  } catch (_) {}
+  speakerSel.innerHTML = '<option value="">— None —</option>';
+  speakers.forEach(spk => {
+    const opt = document.createElement('option');
+    opt.value = spk.id;
+    opt.textContent = spk.name || 'Speaker ' + spk.id;
+    speakerSel.appendChild(opt);
+  });
+  if (prevSpk && speakerSel.querySelector('option[value="' + CSS.escape(prevSpk) + '"]')) speakerSel.value = prevSpk;
+
+  const presetKeys = new Set();
+  const presetNames = {};
+  try {
+    if (typeof API !== 'undefined' && API.eqPresetsList) {
+      const apiList = await API.eqPresetsList();
+      if (Array.isArray(apiList)) {
+        apiList.forEach(p => {
+          presetKeys.add(p.id);
+          if (p.name) presetNames[p.id] = p.name;
+        });
+      }
+    }
+  } catch (_) {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && (k.startsWith('freqsync_pref_') || k.startsWith('eq_'))) {
+      presetKeys.add(k);
+      try {
+        const data = JSON.parse(localStorage.getItem(k));
+        if (data?.name) presetNames[k] = data.name;
+      } catch (_) {}
+    }
+  }
+  presetSel.innerHTML = '<option value="">— None —</option>';
+  [...presetKeys].sort().forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.textContent = presetNames[k] || k;
+    presetSel.appendChild(opt);
+  });
+  if (prevPreset && presetSel.querySelector('option[value="' + CSS.escape(prevPreset) + '"]')) presetSel.value = prevPreset;
+
+  onBridgeEQSourceChange();
+}
+
+async function onBridgeEQSourceChange() {
+  const eqGains = await getBridgeEQFromSource();
+  renderEQDisplay('bridge-eq-display', eqGains);
+  try {
+    const r = await fetch(BRIDGE_API + '/bridge/status');
+    if (!r.ok) return;
+    const st = await r.json();
+      if (st.running) {
+      const res = await fetch(BRIDGE_API + '/bridge/eq', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eqGains })
+      });
+      const data = await res.json();
+      if (data?.ok) showToast('EQ updated');
+    }
+  } catch (_) {}
+}
+
 async function refreshBridgeDevices() {
   try {
     const r = await fetch(BRIDGE_API + '/bridge/devices');
@@ -2106,7 +2191,56 @@ async function refreshBridgeUI() {
       renderEQDisplay('bridge-eq-display', st.eqGains || {});
     }
     await refreshBridgeDevices();
+    await populateBridgeEQSelectors();
   } catch (_) {}
+}
+
+async function getBridgeEQFromSource() {
+  const speakerId = document.getElementById('bridgeSpeakerSelect')?.value || '';
+  const presetKey = document.getElementById('bridgePresetSelect')?.value || '';
+  let prefGains = {};
+  let calGains = {};
+  if (presetKey) {
+    try {
+      const data = JSON.parse(localStorage.getItem(presetKey));
+      if (data?.bands) prefGains = bandsTo10Band(data.bands);
+    } catch (_) {}
+  }
+  if (speakerId && typeof API !== 'undefined' && API.getAllSpeakers) {
+    try {
+      const speakers = await API.getAllSpeakers();
+      const spk = speakers.find(s => s.id === speakerId);
+      if (spk) {
+        let calBands = null;
+        if (spk.source === 'know' && spk.eqPresetKey) {
+          if (spk.eqBands && Object.keys(spk.eqBands).length > 0) calBands = spk.eqBands;
+          else {
+            const raw = localStorage.getItem(spk.eqPresetKey);
+            if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
+            if (!calBands && API.eqPresetsList) {
+              const list = await API.eqPresetsList();
+              const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+              if (p?.bands) calBands = p.bands;
+            }
+          }
+        } else if (spk.bands_7) calBands = spk.bands_7;
+        else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+          const converted = learn5To7Band(spk.readings);
+          calBands = converted.bands;
+        } else if (API.speakerSystemsCalibration) {
+          const cal = await API.speakerSystemsCalibration(spk.id);
+          if (Array.isArray(cal) && cal.length >= 5) {
+            const converted = learn5To7Band(cal);
+            calBands = converted.bands;
+          }
+        }
+        if (calBands) calGains = bandsTo10Band(calBands);
+      }
+    } catch (_) {}
+  }
+  const eqGains = {};
+  FREQ_BANDS.forEach(f => { eqGains[f] = (calGains[f] || 0) + (prefGains[f] || 0); });
+  return eqGains;
 }
 
 function getActiveEQForBridge() {
@@ -2120,7 +2254,9 @@ function getActiveEQForBridge() {
 async function startBridge() {
   const inputId = parseInt(document.getElementById('bridgeInputSelect')?.value || -1, 10);
   const outputId = parseInt(document.getElementById('bridgeOutputSelect')?.value || -1, 10);
-  const eqGains = getActiveEQForBridge();
+  const spkSel = document.getElementById('bridgeSpeakerSelect')?.value || '';
+  const presetSel = document.getElementById('bridgePresetSelect')?.value || '';
+  const eqGains = (spkSel || presetSel) ? await getBridgeEQFromSource() : getActiveEQForBridge();
   const statusEl = document.getElementById('bridgeStatus');
   try {
     const r = await fetch(BRIDGE_API + '/bridge/start', {
@@ -2195,6 +2331,7 @@ buildGenreCards();
   await populatePlayMusicOutputDevices();
   await loadSpeakers();
   await loadPresets();
+  await populateBridgeEQSelectors();
 })();
 </script>
 </body>

@@ -69,10 +69,22 @@ function processInterleavedStereo(stereoEq, buffer, numFrames) {
   }
 }
 
+function updateStereoEqGains(stereoEq, eqGains, sampleRate) {
+  const gains = eqGains || {};
+  const sr = sampleRate || 48000;
+  [stereoEq.left, stereoEq.right].forEach(chain => {
+    chain.forEach((bq, i) => {
+      const gain = parseFloat(gains[FREQ_BANDS[i]] ?? gains[String(FREQ_BANDS[i])] ?? 0) || 0;
+      bq.setPeaking(sr, FREQ_BANDS[i], Q_VALUES[i], gain);
+    });
+  });
+}
+
 module.exports = {
   FREQ_BANDS,
   createEqChain,
   createStereoEq,
   processSample,
-  processInterleavedStereo
+  processInterleavedStereo,
+  updateStereoEqGains
 };
