@@ -13,8 +13,8 @@ let portAudio;
 try {
   portAudio = require('naudiodon');
 } catch (e) {
-  console.error('[bridge] naudiodon not installed. Run: npm install');
-  process.exit(1);
+  console.warn('[bridge] naudiodon not installed. Run: npm install. Bridge will be unavailable.');
+  throw e;
 }
 
 const { createStereoEq, processInterleavedStereo } = require('./biquadEq');
@@ -78,25 +78,24 @@ function startBridge(options = {}) {
   bridgeState.outputDeviceId = outputId;
 
   try {
-    const inputStream = portAudio.AudioIO({
-      inOptions: {
-        channelCount: CHANNELS,
-        sampleFormat: portAudio.SampleFormatFloat32,
-        sampleRate: SAMPLE_RATE,
-        deviceId: inputId,
-        closeOnError: true
-      }
-    });
+    const inOpts = {
+      channelCount: CHANNELS,
+      sampleFormat: portAudio.SampleFormatFloat32,
+      sampleRate: SAMPLE_RATE,
+      closeOnError: true
+    };
+    if (inputId >= 0) inOpts.deviceId = inputId;
 
-    const outputStream = portAudio.AudioIO({
-      outOptions: {
-        channelCount: CHANNELS,
-        sampleFormat: portAudio.SampleFormatFloat32,
-        sampleRate: SAMPLE_RATE,
-        deviceId: outputId,
-        closeOnError: true
-      }
-    });
+    const outOpts = {
+      channelCount: CHANNELS,
+      sampleFormat: portAudio.SampleFormatFloat32,
+      sampleRate: SAMPLE_RATE,
+      closeOnError: true
+    };
+    if (outputId >= 0) outOpts.deviceId = outputId;
+
+    const inputStream = portAudio.AudioIO({ inOptions: inOpts });
+    const outputStream = portAudio.AudioIO({ outOptions: outOpts });
 
     const eqTransform = createEqTransform(eqGains);
     inputStream.pipe(eqTransform).pipe(outputStream);

@@ -99,6 +99,7 @@ let bridge;
 try {
   bridge = require('./bridge/audioBridge');
 } catch (e) {
+  console.warn('[run] Bridge unavailable:', e.message, '— Run "npm install" to enable SpeakEasy Bridge.');
   bridge = null;
 }
 
@@ -124,12 +125,18 @@ function parseBody(req) {
 const server = http.createServer(async (req, res) => {
   const urlPath = (req.url || '/').split('?')[0];
 
-  if (bridge && urlPath.startsWith('/bridge/')) {
+  if (urlPath.startsWith('/bridge/')) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.method === 'OPTIONS') {
       res.writeHead(204);
       res.end();
       return;
+    }
+    if (!bridge) {
+      return sendJson(res, 503, {
+        ok: false,
+        error: 'Bridge not available. Run "npm install" in the project folder, then restart the app.'
+      });
     }
     try {
       if (urlPath === '/bridge/devices' && req.method === 'GET') {
@@ -205,6 +212,7 @@ function main() {
       console.log('='.repeat(50));
       console.log(`  Frontend:  http://localhost:${FRONTEND_PORT}/homePage.html`);
       console.log(`  Backend:   http://localhost:${BACKEND_PORT}/`);
+      console.log(`  Bridge:    ${bridge ? 'enabled' : 'disabled (run npm install)'}`);
       console.log('='.repeat(50));
       console.log('  Press Ctrl+C to stop both servers');
       console.log();

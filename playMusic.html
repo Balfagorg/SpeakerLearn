@@ -763,9 +763,16 @@
     .bridge-steps { margin: 0; padding-left: 1.2rem; color: var(--text); font-size: 0.9rem; line-height: 1.9; }
     .bridge-steps a { color: var(--light-green); text-decoration: none; }
     .bridge-steps a:hover { text-decoration: underline; }
+    .bridge-steps code { background: rgba(0,0,0,0.3); padding: 0.15em 0.4em; border-radius: 4px; font-size: 0.85em; }
     .bridge-device-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
-    .bridge-device-row label { min-width: 140px; font-size: 0.85rem; color: var(--text-muted); }
-    .bridge-device-row select { flex: 1; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.88rem; }
+    .bridge-device-row label { min-width: 140px; flex-shrink: 0; font-size: 0.85rem; color: var(--text-muted); }
+    .bridge-device-row select {
+      flex: 1; min-width: 0; max-width: 320px; width: 100%;
+      background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text);
+      padding: 0.5rem 2rem 0.5rem 1rem; border-radius: 8px; font-size: 0.88rem;
+      appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2392c9b1' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 0.75rem center; background-size: 10px;
+    }
     .bridge-eq-hint { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
     .bridge-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
     .bridge-start-btn, .bridge-stop-btn { min-height: 44px; }
@@ -1126,15 +1133,17 @@
         <div class="bridge-hero-desc">Set your system (or app) output to a virtual cable. SpeakEasy captures that audio, applies your EQ, and forwards it to your speakers. Spotify, YouTube, games — everything gets the same correction.</div>
       </div>
       <div class="bridge-card">
-        <div class="bridge-card-title">Setup</div>
+        <div class="bridge-card-title">Setup (do these in order)</div>
         <ol class="bridge-steps">
-          <li>Install <a href="https://vb-audio.com/Cable/" target="_blank" rel="noopener">VB-Audio Virtual Cable</a> (free)</li>
-          <li>In Windows Sound settings, set <strong>Output</strong> to <em>CABLE Input</em></li>
-          <li>Select devices below and click <strong>Start Bridge</strong></li>
+          <li><strong>Install dependencies:</strong> Open a terminal in the project folder and run <code>npm install</code>. Restart the app after.</li>
+          <li><strong>Install virtual cable:</strong> Download and install <a href="https://vb-audio.com/Cable/" target="_blank" rel="noopener noreferrer">VB-Audio Virtual Cable</a> (free). Reboot if prompted.</li>
+          <li><strong>Set system output:</strong> In Windows Sound settings → Output, choose <em>CABLE Input</em> so all system audio goes through the cable.</li>
+          <li><strong>Select devices:</strong> Choose <em>CABLE Output</em> as Input (capture from) and your speakers as Output (play to). Click <strong>Start Bridge</strong>.</li>
         </ol>
       </div>
       <div class="bridge-card">
         <div class="bridge-card-title">Devices</div>
+        <p class="bridge-eq-hint">Input = where to capture from (choose <em>CABLE Output</em>). Output = where to play (choose your speakers).</p>
         <div class="bridge-device-row">
           <label>Input (capture from):</label>
           <select id="bridgeInputSelect">
@@ -2015,24 +2024,50 @@ function showToast(msg) {
 // ═══════════════════════════════════════════
 const BRIDGE_API = window.location.origin;
 
+function truncateDeviceName(name, maxLen) {
+  if (!name || name.length <= maxLen) return name || '';
+  return name.slice(0, maxLen - 2) + '…';
+}
+
+function sortAndFilterBridgeDevices(inputs, outputs) {
+  const MAX_OPTIONS = 20;
+  const MAX_NAME_LEN = 42;
+  const preferInput = (n) => /cable|vb-audio|virtual/i.test(n || '');
+  const preferOutput = (n) => /speaker|headphone|output|realtek|default/i.test(n || '');
+  const excludeOutput = (n) => /cable input|vb-audio cable input/i.test(n || '');
+
+  const inList = (inputs || [])
+    .map(d => ({ ...d, name: truncateDeviceName(d.name || 'Device ' + d.id, MAX_NAME_LEN) }))
+    .sort((a, b) => (preferInput(b.name) ? 1 : 0) - (preferInput(a.name) ? 1 : 0))
+    .slice(0, MAX_OPTIONS);
+  const outList = (outputs || [])
+    .filter(d => !excludeOutput(d.name))
+    .map(d => ({ ...d, name: truncateDeviceName(d.name || 'Device ' + d.id, MAX_NAME_LEN) }))
+    .sort((a, b) => (preferOutput(b.name) ? 1 : 0) - (preferOutput(a.name) ? 1 : 0))
+    .slice(0, MAX_OPTIONS);
+
+  return { inputs: inList, outputs: outList };
+}
+
 async function refreshBridgeDevices() {
   try {
     const r = await fetch(BRIDGE_API + '/bridge/devices');
     if (!r.ok) throw new Error('Bridge API unavailable');
-    const { inputs, outputs } = await r.json();
+    const data = await r.json();
+    const { inputs, outputs } = sortAndFilterBridgeDevices(data.inputs, data.outputs);
     const inSel = document.getElementById('bridgeInputSelect');
     const outSel = document.getElementById('bridgeOutputSelect');
     if (!inSel || !outSel) return;
     const prevIn = inSel.value, prevOut = outSel.value;
     inSel.innerHTML = '<option value="-1">— Default —</option>';
-    (inputs || []).forEach(d => {
+    inputs.forEach(d => {
       const opt = document.createElement('option');
       opt.value = d.id;
       opt.textContent = d.name || 'Device ' + d.id;
       inSel.appendChild(opt);
     });
     outSel.innerHTML = '<option value="-1">— Default —</option>';
-    (outputs || []).forEach(d => {
+    outputs.forEach(d => {
       const opt = document.createElement('option');
       opt.value = d.id;
       opt.textContent = d.name || 'Device ' + d.id;
@@ -2042,9 +2077,9 @@ async function refreshBridgeDevices() {
     if (prevOut && [...outSel.options].some(o => o.value === prevOut)) outSel.value = prevOut;
     showToast('Devices refreshed');
   } catch (err) {
-    showToast('Bridge unavailable — run npm install and restart');
+    showToast('Bridge unavailable — run "npm install" and restart the app');
     const st = document.getElementById('bridgeStatus');
-    if (st) { st.textContent = 'Bridge API unavailable'; st.className = 'bridge-status error'; }
+    if (st) { st.textContent = 'Bridge unavailable. Run npm install in the project folder, then restart.'; st.className = 'bridge-status error'; }
   }
 }
 
@@ -2086,25 +2121,34 @@ async function startBridge() {
   const inputId = parseInt(document.getElementById('bridgeInputSelect')?.value || -1, 10);
   const outputId = parseInt(document.getElementById('bridgeOutputSelect')?.value || -1, 10);
   const eqGains = getActiveEQForBridge();
+  const statusEl = document.getElementById('bridgeStatus');
   try {
     const r = await fetch(BRIDGE_API + '/bridge/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ inputDeviceId: inputId, outputDeviceId: outputId, eqGains })
     });
-    const result = await r.json();
-    const statusEl = document.getElementById('bridgeStatus');
+    let result;
+    try {
+      result = await r.json();
+    } catch (_) {
+      const msg = r.status === 503 ? 'Bridge not available. Run "npm install" and restart the app.' : 'Server error. Try restarting the app.';
+      showToast(msg);
+      if (statusEl) { statusEl.textContent = msg; statusEl.className = 'bridge-status error'; }
+      return;
+    }
     if (result.ok) {
       showToast('Bridge started — set system output to CABLE Input');
       refreshBridgeUI();
     } else {
-      showToast('Bridge error: ' + (result.error || 'Unknown'));
-      if (statusEl) { statusEl.textContent = result.error || 'Error'; statusEl.className = 'bridge-status error'; }
+      const errMsg = result.error || 'Unknown error';
+      showToast('Bridge error: ' + errMsg);
+      if (statusEl) { statusEl.textContent = errMsg; statusEl.className = 'bridge-status error'; }
     }
   } catch (err) {
-    showToast('Bridge failed — ' + err.message);
-    const statusEl = document.getElementById('bridgeStatus');
-    if (statusEl) { statusEl.textContent = err.message; statusEl.className = 'bridge-status error'; }
+    const msg = err.message || 'Network error';
+    showToast('Bridge failed — ' + msg);
+    if (statusEl) { statusEl.textContent = msg; statusEl.className = 'bridge-status error'; }
   }
 }
 
