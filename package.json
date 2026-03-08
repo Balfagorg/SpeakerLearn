@@ -2,12 +2,65 @@
   "name": "speakeasy-brennan",
   "version": "0.1.0",
   "description": "SpeakEasy adaptive audio — bridge mode for system-wide EQ",
-  "main": "server/run.js",
+  "author": "SpeakEasy",
+  "main": "electron/main.js",
   "scripts": {
     "start": "node server/run.js",
-    "bridge": "node server/bridge/audioBridge.js"
+    "bridge": "node server/bridge/audioBridge.js",
+    "electron": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "build:win": "node scripts/prepare-electron-build.js && npx electron-builder --win",
+    "build:mac": "node scripts/prepare-electron-build.js && npx electron-builder --mac",
+    "build:linux": "node scripts/prepare-electron-build.js && npx electron-builder --linux",
+    "package:win": "powershell -ExecutionPolicy Bypass -File scripts/package-release.ps1",
+    "package:mac": "bash scripts/package-release.sh macos",
+    "package:linux": "bash scripts/package-release.sh linux"
+  },
+  "build": {
+    "appId": "com.speakeasy.app",
+    "productName": "SpeakEasy",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "extraResources": [
+      {
+        "from": "electron-resources/bin",
+        "to": "bin",
+        "filter": ["**/*"]
+      }
+    ],
+    "files": [
+      "electron/**",
+      "frontend/**",
+      "server/**",
+      "package.json"
+    ],
+    "win": {
+      "target": ["nsis", "portable"],
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.music"
+    },
+    "linux": {
+      "target": ["AppImage", "deb"]
+    }
+  },
+  "overrides": {
+    "segfault-handler": "file:./patches/segfault-handler-stub"
   },
   "dependencies": {
     "naudiodon": "^2.3.6"
+  },
+  "devDependencies": {
+    "electron": "28.0.0",
+    "electron-builder": "^24.9.1"
   }
 }

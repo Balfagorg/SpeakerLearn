@@ -1,0 +1,6 @@
+{
+  "name": "segfault-handler",
+  "version": "1.0.0-stub",
+  "description": "Stub for Electron compatibility - naudiodon works without it",
+  "main": "index.js"
+}

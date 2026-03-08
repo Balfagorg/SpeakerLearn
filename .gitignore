@@ -27,8 +27,10 @@ env.bak/
 venv.bak/
 .python-version
 
-# ─── Node.js (if added later) ───
+# ─── Node.js / Electron ───
 node_modules/
+electron-resources/
+dist-electron/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

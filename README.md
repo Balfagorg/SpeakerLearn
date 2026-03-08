@@ -22,6 +22,15 @@ run.bat
 
 Requires: **Node.js**, CMake 3.20+, C++20 compiler. Builds backend automatically. (Python no longer required.)
 
+### Build .exe / Installer (Electron)
+
+```bash
+npm install
+npm run build:win   # → dist-electron/SpeakEasy Setup 0.1.0.exe
+```
+
+Produces a double-clickable installer and portable .exe. No Node.js needed for end users. See [docs/PACKAGING.md](docs/PACKAGING.md).
+
 **Installation:** See [docs/INSTALL.md](docs/INSTALL.md) for detailed setup of CMake, npm, and dependencies on **Windows** and **macOS**.
 
 ### SpeakEasy Bridge — Use as system output device
@@ -103,6 +112,7 @@ Backend/
 |-----|-------------|
 | [docs/OVERVIEW.md](docs/OVERVIEW.md) | **System overview** — How SpeakEasy works end-to-end |
 | [docs/INSTALL.md](docs/INSTALL.md) | **Install guide** — CMake, npm, dependencies (Windows & macOS) |
+| [docs/PACKAGING.md](docs/PACKAGING.md) | **Release packaging** — Create downloadable builds for Win/Mac/Linux |
 | [docs/FRONTEND.md](docs/FRONTEND.md) | Design system, CSS, components, responsive, API usage |
 | [backend/README.md](backend/README.md) | Backend build, pipeline, schema |
 | [backend/Mac OS/README.md](backend/Mac%20OS/README.md) | macOS-specific build instructions |
