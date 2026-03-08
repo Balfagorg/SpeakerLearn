@@ -164,9 +164,7 @@ temp/
 *.orig
 
 # ─── Local runner scripts (temporary testing) ───
-run_local.py
-run.bat
-run.sh
+
 
 # ─── Misc ───
 *.pid
