@@ -106,8 +106,8 @@
    .footer-links a { font-size: 0.8rem; color: rgba(255,255,255,0.45); text-decoration: none; transition: color 0.2s; letter-spacing: 0.04em; font-family: 'DM Sans', sans-serif; }
    .footer-links a:hover { color: var(--muted-teal); }
    .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
-   @media (max-width: 768px) { .mission-grid { grid-template-columns: 1fr; gap: 3rem; } .photo-grid.speakers { grid-template-columns: repeat(2, 1fr); } .photo-grid.team-members { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .hero-visual { display: none; } section { padding: 4rem 4vw; } }
-   @media (max-width: 480px) { .topbar { flex-direction: column; gap: 1rem; align-items: flex-start; padding: 1rem 4vw; } nav { flex-wrap: wrap; border-radius: 16px; gap: 0.2rem; } nav a { padding: 0.6rem 1rem; min-height: 44px; display: inline-flex; align-items: center; } .hero { padding: 4rem 0 3rem; } .hero h1 { font-size: clamp(2rem, 8vw, 3rem); } .photo-grid.speakers { grid-template-columns: 1fr 1fr; } .photo-grid.team-members { grid-template-columns: 1fr; gap: 1rem; } .mission-stats { grid-template-columns: 1fr; gap: 1rem; } .stat-card { padding: 1.2rem 1rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem 4vw; } .footer-links { flex-wrap: wrap; justify-content: center; gap: 1rem; } .btn-primary, .btn-outline { padding: 0.75rem 1.5rem; min-height: 44px; } }
+   @media (max-width: 768px) { .mission-grid { grid-template-columns: 1fr; gap: 3rem; } .photo-grid.speakers { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .photo-grid.team-members { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); } .hero-visual { display: none; } section { padding: 4rem 4vw; } }
+   @media (max-width: 480px) { .topbar { flex-direction: column; gap: 1rem; align-items: flex-start; padding: 1rem 4vw; } nav { flex-wrap: wrap; border-radius: 16px; gap: 0.2rem; } nav a { padding: 0.6rem 1rem; min-height: 44px; display: inline-flex; align-items: center; } .hero { padding: 4rem 0 3rem; } .hero h1 { font-size: clamp(2rem, 8vw, 3rem); } .photo-grid.speakers, .photo-grid.team-members { grid-template-columns: 1fr; gap: 1rem; } .mission-stats { grid-template-columns: 1fr; gap: 1rem; } .stat-card { padding: 1.2rem 1rem; } footer { flex-direction: column; gap: 1.5rem; text-align: center; padding: 2rem 4vw; } .footer-links { flex-wrap: wrap; justify-content: center; gap: 1rem; } .btn-primary, .btn-outline { padding: 0.75rem 1.5rem; min-height: 44px; } }
    @keyframes fade-up { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
    .hero-eyebrow { animation: fade-up 0.6s ease both 0.1s; }
    .hero h1       { animation: fade-up 0.7s ease both 0.25s; }
@@ -250,41 +250,49 @@
    <div class="photo-grid speakers">
      <div class="photo-card">
        <div class="photo-placeholder speaker-ph">
-         <img src="bigBlackSpeaker.png" alt="Bluetooth Speaker" style="width:100%; height:100%; object-fit:cover; object-position:center;"/>
+         <div class="ph-icon spk">🔊</div>
+         <div class="ph-text">Speaker Photo</div>
+         <div class="upload-hint">upload image</div>
        </div>
        <div class="card-info">
-         <div class="card-name">Beats Pill Speaker</div>
-         <div class="card-role spk">Biggest Range · Bluetooth</div>
+         <div class="card-name">Studio Monitor A</div>
+         <div class="card-role spk">Reference · Nearfield</div>
          <div class="card-desc">High-accuracy flat response for studio mastering reference.</div>
        </div>
      </div>
      <div class="photo-card">
        <div class="photo-placeholder speaker-ph">
-         <img src="boseHeadphones.png" alt="Bluetooth Speaker" style="width:100%; height:100%; object-fit:cover; object-position:center;"/>
+         <div class="ph-icon spk">🔉</div>
+         <div class="ph-text">Speaker Photo</div>
+         <div class="upload-hint">upload image</div>
        </div>
        <div class="card-info">
-         <div class="card-name">Bose Headphones</div>
-         <div class="card-role spk">Noise Cancelling · Bluetooth</div>
+         <div class="card-name">Bookshelf B</div>
+         <div class="card-role spk">Consumer · Hi-Fi</div>
          <div class="card-desc">Common home listening setup with mid-bass bloom tendencies.</div>
        </div>
      </div>
      <div class="photo-card">
        <div class="photo-placeholder speaker-ph">
-         <img src="panda.jpeg" alt="Bluetooth Speaker" style="width:100%; height:100%; object-fit:cover; object-position:center;"/>
+         <div class="ph-icon spk">📻</div>
+         <div class="ph-text">Speaker Photo</div>
+         <div class="upload-hint">upload image</div>
        </div>
        <div class="card-info">
-         <div class="card-name">Tiny Panda Speaker</div>
-         <div class="card-role spk">Smallest Range · Bluetooth</div>
+         <div class="card-name">Portable BT-1</div>
+         <div class="card-role spk">Bluetooth · Portable</div>
          <div class="card-desc">Compact form with aggressive DSP limiting at high volumes.</div>
        </div>
      </div>
      <div class="photo-card">
        <div class="photo-placeholder speaker-ph">
-         <img src="retroSpeaker.avif" alt="Bluetooth Speaker" style="width:100%; height:100%; object-fit:cover; object-position:center;"/>
+         <div class="ph-icon spk">🎚️</div>
+         <div class="ph-text">Speaker Photo</div>
+         <div class="upload-hint">upload image</div>
        </div>
        <div class="card-info">
-         <div class="card-name">Retro Vinage Mini Speaker</div>
-         <div class="card-role spk">Medium Function · Bluetooth</div>
+         <div class="card-name">PA Wedge C</div>
+         <div class="card-role spk">Live Sound · Stage</div>
          <div class="card-desc">High-SPL stage monitor with pronounced upper midrange peak.</div>
        </div>
      </div>

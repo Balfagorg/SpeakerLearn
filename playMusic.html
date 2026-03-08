@@ -436,51 +436,54 @@
       font-size: 0.58rem;
       color: var(--text-muted);
       margin-top: 2px;
+      min-width: 3.5em;
+      text-align: center;
     }
 
-    /* Upload zone */
+    /* Upload zone — aligned with preferencesPage */
     .upload-zone {
-      background: var(--surface);
-      border: 1px dashed rgba(255,255,255,0.15);
+      border: 2px dashed rgba(146,201,177,0.25);
+      background: rgba(146,201,177,0.03);
       border-radius: 20px;
       padding: 2.5rem;
       text-align: center;
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.25s ease;
       position: relative;
     }
     .upload-zone:hover, .upload-zone.drag-over {
       border-color: var(--muted-teal);
-      background: rgba(146,201,177,0.04);
+      background: rgba(146,201,177,0.07);
     }
     .upload-zone.has-file {
-      border-style: solid;
-      border-color: rgba(162,250,163,0.25);
-      background: rgba(162,250,163,0.04);
+      border-color: rgba(162,250,163,0.35);
+      background: rgba(162,250,163,0.05);
     }
 
-    .upload-icon { font-size: 2.2rem; display: block; margin-bottom: 0.75rem; }
+    .upload-icon { font-size: 2rem; margin-bottom: 0.6rem; display: block; }
 
     .upload-title {
-      font-weight: 500;
-      font-size: 0.95rem;
+      font-weight: 600;
+      font-size: 0.9rem;
       margin-bottom: 0.3rem;
     }
 
     .upload-hint {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
-    }
-
-    .upload-filename {
-      margin-top: 0.6rem;
       font-family: 'Space Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--light-green);
       letter-spacing: 0.04em;
     }
 
-    #fileInput { display: none; }
+    .upload-filename {
+      font-size: 0.78rem;
+      color: var(--light-green);
+      font-family: 'Space Mono', monospace;
+      margin-top: 0.4rem;
+      word-break: break-all;
+    }
+
+    #fileInput1, #fileInput2, #fileInput3 { display: none; }
 
     /* Player controls */
     .player-controls {
@@ -692,6 +695,90 @@
     }
     .genre-card.active .genre-active-dot { opacity: 1; }
 
+    /* ─── OUTPUT DEVICE CARD (compact, recycled from add-speaker) ─── */
+    .output-device-card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 16px;
+      padding: 1rem 1.2rem;
+    }
+    .output-device-card .output-device-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.6rem;
+    }
+    .output-device-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .output-device-row select {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.5rem 0.9rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2392c9b1' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      padding-right: 2rem;
+      cursor: pointer;
+    }
+    .output-device-row select:focus { outline: none; border-color: var(--muted-teal); }
+    .output-device-refresh {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .output-device-refresh:hover { border-color: var(--muted-teal); color: var(--text); }
+
+    /* My Presets: compact speaker selector (output only, no calibration) */
+    .speaker-selector-compact {
+      margin-top: 0.75rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .speaker-selector-compact .speaker-selector-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .speaker-selector-compact select {
+      width: 100%;
+      padding: 0.45rem 0.8rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.78rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a09ab0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.6rem center;
+      padding-right: 1.8rem;
+    }
+
     /* ─── EMPTY / PLACEHOLDER STATES ─── */
     .empty-state {
       text-align: center;
@@ -719,28 +806,6 @@
       display: inline-block;
     }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(162,250,163,0.3); }
-    .btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: var(--text-muted); }
-    .btn-ghost:hover { border-color: var(--muted-teal); color: var(--text); }
-
-    /* Bridge panel */
-    .bridge-layout { max-width: 560px; margin: 0 auto; padding: 2rem 1rem 4rem; display: flex; flex-direction: column; gap: 1.2rem; }
-    .bridge-card { background: var(--surface); border: 1px solid rgba(146,201,177,0.15); border-radius: 16px; padding: 1.4rem 1.6rem; }
-    .bridge-hero { border-color: rgba(162,250,163,0.25); background: linear-gradient(135deg, rgba(162,250,163,0.06), transparent); }
-    .bridge-hero-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--light-green); margin-bottom: 0.5rem; }
-    .bridge-hero-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
-    .bridge-card-title { font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted-teal); margin-bottom: 0.8rem; }
-    .bridge-steps { margin: 0; padding-left: 1.2rem; color: var(--text); font-size: 0.9rem; line-height: 1.9; }
-    .bridge-steps a { color: var(--light-green); text-decoration: none; }
-    .bridge-steps a:hover { text-decoration: underline; }
-    .bridge-device-row { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.6rem; }
-    .bridge-device-row label { min-width: 140px; font-size: 0.85rem; color: var(--text-muted); }
-    .bridge-device-row select { flex: 1; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.1); color: var(--text); padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.88rem; }
-    .bridge-eq-hint { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.75rem; }
-    .bridge-actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
-    .bridge-start-btn, .bridge-stop-btn { min-height: 44px; }
-    .bridge-status { font-size: 0.82rem; color: var(--muted-teal); }
-    .bridge-status.running { color: var(--light-green); }
-    .bridge-status.error { color: #f08080; }
 
     /* ─── TOAST ─── */
     .toast {
@@ -778,14 +843,33 @@
     .footer-links a:hover { color: var(--muted-teal); }
     .footer-copy { font-size: 0.72rem; color: rgba(255,255,255,0.25); font-family: 'Space Mono', monospace; }
 
-    @media (max-width: 750px) {
-      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; }
+    @media (max-width: 768px) {
+      .topbar { flex-direction: column; gap: 1.2rem; align-items: flex-start; padding: 1.5rem 4vw; }
       nav { flex-wrap: wrap; border-radius: 16px; }
-      .panel-layout { grid-template-columns: 1fr; }
+      .panel-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+      .selection-sidebar { min-width: 0; }
       .top-tab-bar { flex-wrap: wrap; width: 100%; }
-      .genre-grid { grid-template-columns: repeat(2, 1fr); }
-      footer { flex-direction: column; text-align: center; }
+      .top-tab { padding: 0.6rem 1.2rem; min-height: 44px; }
+      .genre-grid { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 0.75rem; }
+      main { padding: 3rem 4vw 4rem; }
+      .eq-display { overflow-x: auto; padding-bottom: 0.5rem; -webkit-overflow-scrolling: touch; }
+      .eq-col { min-width: 44px; }
+      .upload-zone { padding: 1.5rem 1rem; }
+      .player-controls { padding: 1.2rem; }
+      .ctrl-btn, .play-btn-big { min-width: 44px; min-height: 44px; }
+      .play-btn-big { width: 56px; height: 56px; }
+      footer { flex-direction: column; text-align: center; padding: 2rem 4vw; }
       .footer-links { justify-content: center; }
+    }
+    @media (max-width: 480px) {
+      .topbar { padding: 1rem 4vw; }
+      nav a { padding: 0.6rem 1rem; min-height: 44px; }
+      .page-title-strip { padding: 2rem 0 2.5rem; }
+      .genre-grid { grid-template-columns: 1fr; }
+      .genre-card { padding: 1.2rem 1rem; }
+      .sidebar-item { padding: 0.75rem 0.8rem; min-height: 44px; }
+      .active-preset-card { padding: 1.2rem; }
+      .track-name { font-size: 1rem; }
     }
   </style>
 </head>
@@ -793,13 +877,13 @@
 
 <header>
   <div class="topbar">
-    <a class="logo" href="index.html">Speak<span>Easy</span></a>
+    <a class="logo" href="homePage.html">Speak<span>Easy</span></a>
     <div class="tagline-top">Speaker · Frequency · Balance</div>
     <nav>
       <a href="homePage.html">Home</a>
       <a href="addSpeakerPage.html">Add Speaker</a>
       <a href="preferencesPage.html">Preferences</a>
-      <a href="music-presets.html" class="active">Play Music</a>
+      <a href="playMusic.html" class="active">Play Music</a>
     </nav>
   </div>
   <div class="page-title-strip">
@@ -815,7 +899,6 @@
     <button class="top-tab active" data-panel="my-speakers">My Speakers</button>
     <button class="top-tab" data-panel="my-presets">My Presets</button>
     <button class="top-tab" data-panel="genre-presets">Genre Presets</button>
-    <button class="top-tab" data-panel="bridge">SpeakEasy Bridge</button>
   </div>
 
   <!-- ══ MY SPEAKERS PANEL ══ -->
@@ -837,6 +920,15 @@
           <div class="preset-card-name" id="speakers-preset-name">—</div>
           <div class="preset-card-desc" id="speakers-preset-desc">Select a speaker to load its EQ profile.</div>
           <div class="eq-display" id="speakers-eq-display"></div>
+        </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="speakersOutputSelect" onchange="onPlayMusicOutputChange('speakers')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
         </div>
         <div class="upload-zone" id="uploadZone1" onclick="document.getElementById('fileInput1').click()"
              ondragover="handleDragOver(event,'uploadZone1')" ondragleave="handleDragLeave(event,'uploadZone1')" ondrop="handleDrop(event,'fileInput1')">
@@ -893,6 +985,21 @@
           <div class="preset-card-desc" id="presets-preset-desc">Select a preset to load its EQ settings.</div>
           <div class="eq-display" id="presets-eq-display"></div>
         </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="presetsOutputSelect" onchange="onPlayMusicOutputChange('presets')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
+          <div class="speaker-selector-compact">
+            <div class="speaker-selector-label">Optional: Calibrated speaker</div>
+            <select id="presetsSpeakerSelect" onchange="onPresetsSpeakerChange()">
+              <option value="">— None (EQ only) —</option>
+            </select>
+          </div>
+        </div>
         <div class="upload-zone" id="uploadZone2" onclick="document.getElementById('fileInput2').click()"
              ondragover="handleDragOver(event,'uploadZone2')" ondragleave="handleDragLeave(event,'uploadZone2')" ondrop="handleDrop(event,'fileInput2')">
           <span class="upload-icon">🎵</span>
@@ -943,6 +1050,15 @@
           <div class="preset-card-desc" id="genre-preset-desc">Choose a genre below to load its tuned EQ curve.</div>
           <div class="eq-display" id="genre-eq-display"></div>
         </div>
+        <div class="output-device-card">
+          <div class="output-device-label">Output Device</div>
+          <div class="output-device-row">
+            <select id="genreOutputSelect" onchange="onPlayMusicOutputChange('genre')">
+              <option value="">— Default output —</option>
+            </select>
+            <button class="output-device-refresh" onclick="refreshPlayMusicOutputDevices()" title="Refresh devices">↻</button>
+          </div>
+        </div>
         <div class="upload-zone" id="uploadZone3" onclick="document.getElementById('fileInput3').click()"
              ondragover="handleDragOver(event,'uploadZone3')" ondragleave="handleDragLeave(event,'uploadZone3')" ondrop="handleDrop(event,'fileInput3')">
           <span class="upload-icon">🎵</span>
@@ -978,50 +1094,6 @@
     </div>
   </div>
 
-  <!-- ══ SPEAKEASY BRIDGE PANEL ══ -->
-  <div class="tab-panel" id="panel-bridge">
-    <div class="bridge-layout">
-      <div class="bridge-card bridge-hero">
-        <div class="bridge-hero-title">Use SpeakEasy as your output device</div>
-        <div class="bridge-hero-desc">Set your system (or app) output to a virtual cable. SpeakEasy captures that audio, applies your EQ, and forwards it to your speakers. Spotify, YouTube, games — everything gets the same correction.</div>
-      </div>
-      <div class="bridge-card">
-        <div class="bridge-card-title">Setup</div>
-        <ol class="bridge-steps">
-          <li>Install <a href="https://vb-audio.com/Cable/" target="_blank" rel="noopener">VB-Audio Virtual Cable</a> (free)</li>
-          <li>In Windows Sound settings, set <strong>Output</strong> to <em>CABLE Input</em></li>
-          <li>Select devices below and click <strong>Start Bridge</strong></li>
-        </ol>
-      </div>
-      <div class="bridge-card">
-        <div class="bridge-card-title">Devices</div>
-        <div class="bridge-device-row">
-          <label>Input (capture from):</label>
-          <select id="bridgeInputSelect">
-            <option value="-1">— Default —</option>
-          </select>
-        </div>
-        <div class="bridge-device-row">
-          <label>Output (play to):</label>
-          <select id="bridgeOutputSelect">
-            <option value="-1">— Default —</option>
-          </select>
-        </div>
-        <button class="btn-primary" id="bridgeRefreshBtn" onclick="refreshBridgeDevices()">Refresh devices</button>
-      </div>
-      <div class="bridge-card">
-        <div class="bridge-card-title">EQ</div>
-        <div class="bridge-eq-hint">Uses the active EQ from My Speakers, My Presets, or Genre. Select one there first, then start the bridge.</div>
-        <div class="eq-display" id="bridge-eq-display"></div>
-      </div>
-      <div class="bridge-card bridge-actions">
-        <button class="btn-primary bridge-start-btn" id="bridgeStartBtn" onclick="startBridge()">Start Bridge</button>
-        <button class="btn-ghost bridge-stop-btn" id="bridgeStopBtn" onclick="stopBridge()" style="display:none">Stop Bridge</button>
-        <span class="bridge-status" id="bridgeStatus"></span>
-      </div>
-    </div>
-  </div>
-
 </main>
 
 <footer>
@@ -1036,6 +1108,8 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="js/api.js"></script>
+<script src="js/bands.js"></script>
 <script>
 // ═══════════════════════════════════════════
 // GENRE DEFINITIONS
@@ -1083,6 +1157,36 @@ const GENRES = [
 const FREQ_BANDS  = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 const FREQ_LABELS = ['32Hz','64Hz','125Hz','250Hz','500Hz','1kHz','2kHz','4kHz','8kHz','16kHz'];
 
+function bandsTo10Band(bands) {
+  const inputFreqs = [...new Set(
+    Object.keys(bands)
+      .map(k => parseInt(k, 10))
+      .filter(n => !isNaN(n) && (bands[n] ?? bands[String(n)]) !== undefined && (bands[n] ?? bands[String(n)]) !== null)
+  )].sort((a, b) => a - b);
+
+  const eqGains = {};
+  FREQ_BANDS.forEach(f => {
+    const direct = bands[f] ?? bands[String(f)];
+    if (direct !== undefined && direct !== null) {
+      eqGains[f] = parseFloat(direct);
+      return;
+    }
+    if (inputFreqs.length === 0) { eqGains[f] = 0; return; }
+    let lo = null, hi = null;
+    for (const freq of inputFreqs) {
+      if (freq <= f) lo = freq;
+      if (freq >= f && hi === null) { hi = freq; break; }
+    }
+    const vLo = lo !== null ? parseFloat(bands[lo] ?? bands[String(lo)] ?? 0) : 0;
+    const vHi = hi !== null ? parseFloat(bands[hi] ?? bands[String(hi)] ?? 0) : 0;
+    if (lo === null) eqGains[f] = vHi;
+    else if (hi === null) eqGains[f] = vLo;
+    else if (lo === hi) eqGains[f] = vLo;
+    else eqGains[f] = vLo + (vHi - vLo) * (f - lo) / (hi - lo);
+  });
+  return eqGains;
+}
+
 // ═══════════════════════════════════════════
 // PER-TAB AUDIO STATE
 // ═══════════════════════════════════════════
@@ -1103,9 +1207,14 @@ panels.forEach(p => {
     durationSec: 0,
     volume: 0.8,
     animFrame: null,
-    activeEQ: null    // { 60: dB, 500: dB, ... }
+    activeEQ: null,   // { 60: dB, 500: dB, ... }
+    _calBands: null,  // for per-song correction
+    _calIssues: null
   };
 });
+
+// Output device selection (per-panel, syncs to same device for system-wide routing)
+let playMusicOutputDeviceId = '';
 
 // ═══════════════════════════════════════════
 // TAB SWITCHING
@@ -1115,30 +1224,88 @@ document.querySelectorAll('.top-tab').forEach(btn => {
     const name = btn.dataset.panel;
     document.querySelectorAll('.top-tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
-    if (panelFromTabName(name) !== 'bridge') {
-      panels.forEach(p => { if (p !== panelFromTabName(name)) stopAudio(p); });
-    } else {
-      refreshBridgeUI();
-    }
+    // stop all other panels
+    panels.forEach(p => { if (p !== panelFromTabName(name) && state[p].isPlaying) stopAudio(p); });
   });
 });
 
 function panelFromTabName(name) {
-  const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre', 'bridge': 'bridge' };
+  const map = { 'my-speakers': 'speakers', 'my-presets': 'presets', 'genre-presets': 'genre' };
   return map[name] || name;
 }
 
 // ═══════════════════════════════════════════
-// LOAD SPEAKERS FROM LOCALSTORAGE
+// OUTPUT DEVICE (system-wide routing via setSinkId)
 // ═══════════════════════════════════════════
-function loadSpeakers() {
+async function populatePlayMusicOutputDevices() {
+  try {
+    if (typeof API !== 'undefined' && API.requestDeviceLabels) await API.requestDeviceLabels();
+  } catch (_) {}
+  let devices = [];
+  try {
+    if (typeof API !== 'undefined' && API.getAudioOutputDevices) devices = await API.getAudioOutputDevices();
+  } catch (_) {}
+  const opts = devices.map(d => ({ value: d.deviceId, text: d.label }));
+  const prev = playMusicOutputDeviceId;
+  ['speakersOutputSelect', 'presetsOutputSelect', 'genreOutputSelect'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— Default output —</option>';
+    opts.forEach(o => {
+      const opt = document.createElement('option');
+      opt.value = o.value;
+      opt.textContent = o.text;
+      sel.appendChild(opt);
+    });
+    if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) sel.value = prev;
+  });
+  const first = document.getElementById('speakersOutputSelect');
+  if (first) playMusicOutputDeviceId = first.value || '';
+}
+
+function onPlayMusicOutputChange(panel) {
+  const sel = document.getElementById(panel === 'speakers' ? 'speakersOutputSelect' : panel === 'presets' ? 'presetsOutputSelect' : 'genreOutputSelect');
+  playMusicOutputDeviceId = sel ? sel.value : '';
+  // Sync all three output selects (system-wide: one device for entire Play Music page)
+  ['speakersOutputSelect', 'presetsOutputSelect', 'genreOutputSelect'].forEach(id => {
+    const s = document.getElementById(id);
+    if (s && s.value !== playMusicOutputDeviceId) s.value = playMusicOutputDeviceId;
+  });
+  // Apply to all audio contexts so playback uses selected device
+  panels.forEach(p => {
+    const s = state[p];
+    if (s.audioCtx && s.audioCtx.setSinkId) {
+      s.audioCtx.setSinkId(playMusicOutputDeviceId || '').catch(() => {});
+    }
+  });
+}
+
+function refreshPlayMusicOutputDevices() {
+  populatePlayMusicOutputDevices().then(() => {
+    showToast('Device list refreshed');
+  });
+}
+
+// ═══════════════════════════════════════════
+// LOAD SPEAKERS (API + localStorage merge)
+// ═══════════════════════════════════════════
+async function loadSpeakers() {
   let saved = [];
-  try { saved = JSON.parse(localStorage.getItem('freqsync_speakers') || '[]'); } catch (_) {}
+  try {
+    if (typeof API !== 'undefined' && typeof API.getAllSpeakers === 'function') {
+      saved = await API.getAllSpeakers();
+      try { localStorage.setItem('freqsync_speakers', JSON.stringify(saved)); } catch (_) {}
+    } else {
+      saved = JSON.parse(localStorage.getItem('freqsync_speakers') || '[]');
+    }
+  } catch (_) {
+    try { saved = JSON.parse(localStorage.getItem('freqsync_speakers') || '[]'); } catch (_) {}
+  }
 
   const emptyEl  = document.getElementById('speakers-empty');
   const layoutEl = document.getElementById('speakers-layout');
 
-  if (saved.length === 0) {
+  if (!saved || saved.length === 0) {
     emptyEl.style.display  = 'block';
     layoutEl.style.display = 'none';
     return;
@@ -1147,12 +1314,19 @@ function loadSpeakers() {
   emptyEl.style.display  = 'none';
   layoutEl.style.display = 'grid';
 
+  let activeId = '';
+  try { activeId = await API.getActiveSpeakerFromBackend(); } catch (_) {}
+  if (!activeId) activeId = API.getActiveSpeaker();
+
+  let activeIdx = saved.findIndex(s => s.id === activeId);
+  if (activeIdx < 0) activeIdx = 0;
+
   const list = document.getElementById('speakers-sidebar-list');
   list.innerHTML = '';
 
   saved.forEach((spk, i) => {
     const item = document.createElement('div');
-    item.className = 'sidebar-item' + (i === 0 ? ' active' : '');
+    item.className = 'sidebar-item' + (i === activeIdx ? ' active' : '');
     item.innerHTML = `
       <div class="sidebar-item-icon">🔊</div>
       <div class="sidebar-item-info">
@@ -1164,49 +1338,103 @@ function loadSpeakers() {
     item.addEventListener('click', () => {
       list.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
       item.classList.add('active');
+      API.setActiveSpeaker(spk.id);
+      API.speakerSystemsSwitch(spk.id).catch(() => {});
       activateSpeakerEQ(spk);
     });
     list.appendChild(item);
-    if (i === 0) activateSpeakerEQ(spk);
+    if (i === activeIdx) activateSpeakerEQ(spk);
   });
 }
 
-function activateSpeakerEQ(spk) {
-  // Convert slider values (0-100, 50=neutral) to dB gains
-  const eqGains = {};
-  (spk.readings || []).forEach(r => {
-    const freq = parseInt(r.label);
-    if (FREQ_BANDS.includes(freq)) {
-      // 50 = 0dB, 0 = -8dB (computer louder = boost computer = cut speaker), 100 = +8dB
-      eqGains[freq] = ((r.val - 50) / 50) * 8;
+async function activateSpeakerEQ(spk) {
+  let calBands = null;
+  let calIssues = {};
+
+  if (spk.source === 'know' && spk.eqPresetKey) {
+    // Prefer speaker object's eqBands (updated when editing) — ensures edited calibrations load correctly
+    if (spk.eqBands && Object.keys(spk.eqBands).length > 0) {
+      calBands = spk.eqBands;
+    } else {
+      const raw = localStorage.getItem(spk.eqPresetKey);
+      if (raw) {
+        try { calBands = JSON.parse(raw); } catch (_) {}
+      }
+      if (!calBands) {
+        try {
+          const list = await API.eqPresetsList();
+          const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+          if (p && p.bands) calBands = p.bands;
+        } catch (_) {}
+      }
     }
-  });
-  // fill any missing bands
-  FREQ_BANDS.forEach(f => { if (eqGains[f] === undefined) eqGains[f] = 0; });
+    if (spk.issues_7) calIssues = spk.issues_7;
+  } else if (spk.bands_7) {
+    calBands = spk.bands_7;
+    if (spk.issues_7) calIssues = spk.issues_7;
+  } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+    const converted = learn5To7Band(spk.readings);
+    calBands = converted.bands;
+    calIssues = converted.issues || {};
+  } else {
+    try {
+      const cal = await API.speakerSystemsCalibration(spk.id);
+      if (Array.isArray(cal) && cal.length >= 5) {
+        const converted = learn5To7Band(cal);
+        calBands = converted.bands;
+        calIssues = converted.issues || {};
+      }
+    } catch (_) {}
+  }
+
+  let eqGains;
+  if (calBands && Object.keys(calBands).length > 0) {
+    eqGains = bandsTo10Band(calBands);
+  } else {
+    eqGains = {};
+    FREQ_BANDS.forEach(f => eqGains[f] = 0);
+  }
 
   state.speakers.activeEQ = eqGains;
+  state.speakers._calBands = calBands || {};
+  state.speakers._calIssues = calIssues;
   applyEQToNodes('speakers');
 
   document.getElementById('speakers-preset-name').innerHTML = spk.name || 'Speaker Profile';
+  const bandCount = calBands ? Object.keys(calBands).filter(k => calBands[k] !== 0).length : 0;
   document.getElementById('speakers-preset-desc').textContent =
-    `Calibrated speaker profile — ${(spk.readings || []).length} frequency bands active.`;
+    `Calibrated speaker profile — ${bandCount} frequency bands active.`;
   renderEQDisplay('speakers-eq-display', eqGains);
 }
 
 // ═══════════════════════════════════════════
-// LOAD PRESETS FROM LOCALSTORAGE
+// LOAD PRESETS (API + localStorage merge)
 // ═══════════════════════════════════════════
-function loadPresets() {
-  const keys = [];
+async function loadPresets() {
+  const keys = new Set();
+  try {
+    if (typeof API !== 'undefined' && typeof API.eqPresetsList === 'function') {
+      const apiList = await API.eqPresetsList();
+      if (Array.isArray(apiList)) {
+        apiList.forEach(p => {
+          keys.add(p.id);
+          try {
+            const data = { name: p.name, speaker: p.speaker_system_id || '', bands: p.bands || {} };
+            localStorage.setItem(p.id, JSON.stringify(data));
+          } catch (_) {}
+        });
+      }
+    }
+  } catch (_) {}
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && k.startsWith('freqsync_pref_')) keys.push(k);
+    if (k && (k.startsWith('freqsync_pref_') || k.startsWith('eq_'))) keys.add(k);
   }
 
   const emptyEl  = document.getElementById('presets-empty');
   const layoutEl = document.getElementById('presets-layout');
 
-  if (keys.length === 0) {
+  if (keys.size === 0) {
     emptyEl.style.display  = 'block';
     layoutEl.style.display = 'none';
     return;
@@ -1218,18 +1446,20 @@ function loadPresets() {
   const list = document.getElementById('presets-sidebar-list');
   list.innerHTML = '';
 
-  keys.forEach((k, i) => {
+  const keyArr = [...keys];
+  keyArr.forEach((k, i) => {
     let data;
     try { data = JSON.parse(localStorage.getItem(k)); } catch (_) { return; }
     if (!data) return;
 
     const item = document.createElement('div');
     item.className = 'sidebar-item' + (i === 0 ? ' active' : '');
+    item.dataset.presetKey = k;
     item.innerHTML = `
       <div class="sidebar-item-icon">🎛️</div>
       <div class="sidebar-item-info">
         <div class="sidebar-item-name">${data.name}</div>
-        <div class="sidebar-item-sub">${data.speaker ? 'Speaker: ' + data.speaker : 'Custom preset'}</div>
+        <div class="sidebar-item-sub">EQ preset from Preferences</div>
       </div>
       <div class="sidebar-check">✓</div>
     `;
@@ -1241,19 +1471,107 @@ function loadPresets() {
     list.appendChild(item);
     if (i === 0) activatePresetEQ(data);
   });
+  populatePresetsSpeakerSelect();
 }
 
-function activatePresetEQ(data) {
-  const bands = data.bands || {};
-  // Map whatever band keys exist onto our 5 standard bands
+async function populatePresetsSpeakerSelect() {
+  const sel = document.getElementById('presetsSpeakerSelect');
+  if (!sel) return;
+  let speakers = [];
+  try {
+    if (typeof API !== 'undefined' && API.getAllSpeakers) speakers = await API.getAllSpeakers();
+  } catch (_) {}
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">— None (EQ only) —</option>';
+  speakers.forEach(spk => {
+    const opt = document.createElement('option');
+    opt.value = spk.id;
+    opt.textContent = spk.name || 'Speaker ' + spk.id;
+    sel.appendChild(opt);
+  });
+  if (prev && sel.querySelector('option[value="' + CSS.escape(prev) + '"]')) sel.value = prev;
+  const data = getActivePresetData();
+  if (data) activatePresetEQ(data);
+}
+
+function onPresetsSpeakerChange() {
+  const data = getActivePresetData();
+  if (data) activatePresetEQ(data);
+}
+
+function getActivePresetData() {
+  const list = document.getElementById('presets-sidebar-list');
+  if (!list) return null;
+  const active = list.querySelector('.sidebar-item.active');
+  if (!active || !active.dataset.presetKey) return null;
+  try {
+    return JSON.parse(localStorage.getItem(active.dataset.presetKey));
+  } catch (_) {}
+  return null;
+}
+
+async function activatePresetEQ(data) {
+  // My Presets = EQ from preferences only (no speaker calibration by default)
+  const prefBands = data.bands || {};
+  const prefGains = bandsTo10Band(prefBands);
+
+  let calGains = {};
+  let calBands = null;
+  let calIssues = {};
+  const speakerSel = document.getElementById('presetsSpeakerSelect');
+  const speakerId = speakerSel ? speakerSel.value : '';
+
+  // Optional: apply speaker calibration when user selects a calibrated speaker
+  if (speakerId) {
+    try {
+      const speakers = await API.getAllSpeakers();
+      const spk = speakers.find(s => s.id === speakerId);
+      if (spk) {
+        if (spk.source === 'know' && spk.eqPresetKey) {
+          if (spk.eqBands && Object.keys(spk.eqBands).length > 0) {
+            calBands = spk.eqBands;
+          } else {
+            const raw = localStorage.getItem(spk.eqPresetKey);
+            if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
+            if (!calBands && typeof API !== 'undefined' && API.eqPresetsList) {
+              const list = await API.eqPresetsList();
+              const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+              if (p && p.bands) calBands = p.bands;
+            }
+          }
+          if (spk.issues_7) calIssues = spk.issues_7;
+        } else if (spk.bands_7) {
+          calBands = spk.bands_7;
+          if (spk.issues_7) calIssues = spk.issues_7;
+        } else if (Array.isArray(spk.readings) && spk.readings.length >= 5) {
+          const converted = learn5To7Band(spk.readings);
+          calBands = converted.bands;
+          calIssues = converted.issues || {};
+        } else if (typeof API !== 'undefined' && API.speakerSystemsCalibration) {
+          const cal = await API.speakerSystemsCalibration(spk.id);
+          if (Array.isArray(cal) && cal.length >= 5) {
+            const converted = learn5To7Band(cal);
+            calBands = converted.bands;
+            calIssues = converted.issues || {};
+          }
+        }
+        if (calBands) calGains = bandsTo10Band(calBands);
+      }
+    } catch (_) {}
+  }
+
   const eqGains = {};
-  FREQ_BANDS.forEach(f => { eqGains[f] = parseFloat(bands[f] || bands[String(f)] || 0); });
+  FREQ_BANDS.forEach(f => { eqGains[f] = (calGains[f] || 0) + (prefGains[f] || 0); });
 
   state.presets.activeEQ = eqGains;
+  state.presets._calBands = calBands || {};
+  state.presets._calIssues = calIssues;
   applyEQToNodes('presets');
 
   document.getElementById('presets-preset-name').innerHTML = `<em>${data.name}</em>`;
-  document.getElementById('presets-preset-desc').textContent = `Custom EQ preset${data.speaker ? ' · Speaker: ' + data.speaker : ''}.`;
+  document.getElementById('presets-preset-desc').textContent = speakerId
+    ? 'Custom EQ preset · Speaker calibration applied'
+    : 'Custom EQ preset from Preferences.';
   renderEQDisplay('presets-eq-display', eqGains);
 }
 
@@ -1328,7 +1646,7 @@ function renderEQDisplay(containerId, eqGains) {
       </div>
       <div class="eq-col-cut-label">Cut</div>
       <div class="eq-col-freq">${FREQ_LABELS[i]}</div>
-      <div class="eq-col-db">${gain > 0 ? '+' : ''}${gain} dB</div>
+      <div class="eq-col-db">${gain > 0 ? '+' : ''}${Number(gain).toFixed(2)} dB</div>
     `;
     el.appendChild(col);
   });
@@ -1341,6 +1659,11 @@ function ensureAudioCtx(panel) {
   const s = state[panel];
   if (!s.audioCtx) {
     s.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // Route to selected output device (system-wide)
+    if (s.audioCtx.setSinkId && playMusicOutputDeviceId) {
+      s.audioCtx.setSinkId(playMusicOutputDeviceId).catch(() => {});
+    }
 
     // Build EQ filter chain: one peaking filter per band
     // Lower bands get wider Q (more musical), higher bands get tighter Q
@@ -1363,6 +1686,8 @@ function ensureAudioCtx(panel) {
     }
     s.filters[s.filters.length - 1].connect(s.gainNode);
     s.gainNode.connect(s.audioCtx.destination);
+  } else if (s.audioCtx.setSinkId && playMusicOutputDeviceId) {
+    s.audioCtx.setSinkId(playMusicOutputDeviceId).catch(() => {});
   }
 }
 
@@ -1373,6 +1698,40 @@ function applyEQToNodes(panel) {
   FREQ_BANDS.forEach((f, i) => {
     s.filters[i].gain.setTargetAtTime(eq[f] || 0, s.audioCtx.currentTime, 0.05);
   });
+}
+
+// ═══════════════════════════════════════════
+// AUDIO OPTIMIZE ON LOAD
+// ═══════════════════════════════════════════
+async function tryOptimizeOnLoad(audioBuffer, panel) {
+  try {
+    const channelData = audioBuffer.getChannelData(0);
+    const step = Math.max(1, Math.floor(channelData.length / 2048));
+    const samples = [];
+    for (let i = 0; i < channelData.length && samples.length < 2048; i += step) {
+      samples.push(channelData[i]);
+    }
+
+    const calBands = state[panel]._calBands || {};
+    const calIssues = state[panel]._calIssues || {};
+    const speakerId = API.getActiveSpeaker();
+    const platform = localStorage.getItem('freqsync_platform') || 'local';
+
+    const speakerCalibration = { bands: calBands, issues: calIssues };
+    const result = await API.audioOptimize(samples, {}, platform, speakerCalibration, speakerId);
+    if (result && result.final_eq) {
+      const optimized = bandsTo10Band(result.final_eq);
+      const current = state[panel].activeEQ || {};
+      FREQ_BANDS.forEach(f => { current[f] = (current[f] || 0) + (optimized[f] || 0); });
+      state[panel].activeEQ = current;
+      applyEQToNodes(panel);
+
+      const displayId = panel + '-eq-display';
+      if (document.getElementById(displayId)) {
+        renderEQDisplay(displayId, current);
+      }
+    }
+  } catch (_) {}
 }
 
 // ═══════════════════════════════════════════
@@ -1434,8 +1793,8 @@ function loadFile(file, panel) {
       document.getElementById('trackStatus' + n).textContent = 'Ready';
       document.getElementById('trackStatus' + n).className = 'track-status';
       document.getElementById('playBtn' + n).disabled = false;
-      // apply current EQ immediately
       applyEQToNodes(panel);
+      tryOptimizeOnLoad(buf, panel);
     }, err => {
       document.getElementById('trackStatus' + n).textContent = 'Decode error';
       console.error(err);
@@ -1578,123 +1937,36 @@ function showToast(msg) {
 }
 
 // ═══════════════════════════════════════════
-// SPEAKEASY BRIDGE (virtual cable → EQ → speakers)
+// CROSS-TAB ACTIVE SPEAKER SYNC
 // ═══════════════════════════════════════════
-const BRIDGE_API = window.location.origin;
-
-async function refreshBridgeDevices() {
+window.addEventListener('storage', async (e) => {
+  if (e.key !== 'freqsync_active_speaker') return;
+  const newId = e.newValue || '';
   try {
-    const r = await fetch(BRIDGE_API + '/bridge/devices');
-    if (!r.ok) throw new Error('Bridge API unavailable');
-    const { inputs, outputs } = await r.json();
-    const inSel = document.getElementById('bridgeInputSelect');
-    const outSel = document.getElementById('bridgeOutputSelect');
-    if (!inSel || !outSel) return;
-    const prevIn = inSel.value, prevOut = outSel.value;
-    inSel.innerHTML = '<option value="-1">— Default —</option>';
-    (inputs || []).forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = d.name || 'Device ' + d.id;
-      inSel.appendChild(opt);
-    });
-    outSel.innerHTML = '<option value="-1">— Default —</option>';
-    (outputs || []).forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d.id;
-      opt.textContent = d.name || 'Device ' + d.id;
-      outSel.appendChild(opt);
-    });
-    if (prevIn && [...inSel.options].some(o => o.value === prevIn)) inSel.value = prevIn;
-    if (prevOut && [...outSel.options].some(o => o.value === prevOut)) outSel.value = prevOut;
-    showToast('Devices refreshed');
-  } catch (err) {
-    showToast('Bridge unavailable — run npm install and restart');
-    const st = document.getElementById('bridgeStatus');
-    if (st) { st.textContent = 'Bridge API unavailable'; st.className = 'bridge-status error'; }
-  }
-}
-
-async function refreshBridgeUI() {
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/status');
-    if (!r.ok) return;
-    const st = await r.json();
-    const startBtn = document.getElementById('bridgeStartBtn');
-    const stopBtn = document.getElementById('bridgeStopBtn');
-    const statusEl = document.getElementById('bridgeStatus');
-    if (startBtn && stopBtn && statusEl) {
-      if (st.running) {
-        startBtn.style.display = 'none';
-        stopBtn.style.display = 'inline-block';
-        statusEl.textContent = 'Bridge running';
-        statusEl.className = 'bridge-status running';
-      } else {
-        startBtn.style.display = 'inline-block';
-        stopBtn.style.display = 'none';
-        statusEl.textContent = '';
-        statusEl.className = 'bridge-status';
+    const speakers = await API.getAllSpeakers();
+    const spk = speakers.find(s => s.id === newId);
+    if (spk) {
+      const list = document.getElementById('speakers-sidebar-list');
+      if (list) {
+        const items = list.querySelectorAll('.sidebar-item');
+        items.forEach((el, i) => {
+          el.classList.toggle('active', speakers[i] && speakers[i].id === newId);
+        });
       }
-      const eq = st.eqGains || {};
-      renderEQDisplay('bridge-eq-display', eq);
+      await activateSpeakerEQ(spk);
     }
-    await refreshBridgeDevices();
   } catch (_) {}
-}
-
-function getActiveEQForBridge() {
-  for (const p of ['speakers', 'presets', 'genre']) {
-    const eq = state[p]?.activeEQ;
-    if (eq && Object.keys(eq).some(k => (eq[k] ?? eq[String(k)]) !== 0)) return eq;
-  }
-  return state.speakers?.activeEQ || state.presets?.activeEQ || state.genre?.activeEQ || {};
-}
-
-async function startBridge() {
-  const inputId = parseInt(document.getElementById('bridgeInputSelect')?.value || -1, 10);
-  const outputId = parseInt(document.getElementById('bridgeOutputSelect')?.value || -1, 10);
-  const eqGains = getActiveEQForBridge();
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ inputDeviceId: inputId, outputDeviceId: outputId, eqGains })
-    });
-    const result = await r.json();
-    const statusEl = document.getElementById('bridgeStatus');
-    if (result.ok) {
-      showToast('Bridge started — set system output to CABLE Input');
-      refreshBridgeUI();
-    } else {
-      showToast('Bridge error: ' + (result.error || 'Unknown'));
-      if (statusEl) { statusEl.textContent = result.error || 'Error'; statusEl.className = 'bridge-status error'; }
-    }
-  } catch (err) {
-    showToast('Bridge failed — ' + err.message);
-    const statusEl = document.getElementById('bridgeStatus');
-    if (statusEl) { statusEl.textContent = err.message; statusEl.className = 'bridge-status error'; }
-  }
-}
-
-async function stopBridge() {
-  try {
-    const r = await fetch(BRIDGE_API + '/bridge/stop', { method: 'POST' });
-    const result = await r.json();
-    if (result.ok) {
-      showToast('Bridge stopped');
-      refreshBridgeUI();
-    }
-  } catch (err) {
-    showToast('Stop failed');
-  }
-}
+});
 
 // ═══════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════
 buildGenreCards();
-loadSpeakers();
-loadPresets();
+(async () => {
+  await populatePlayMusicOutputDevices();
+  await loadSpeakers();
+  await loadPresets();
+})();
 </script>
 </body>
 </html>
