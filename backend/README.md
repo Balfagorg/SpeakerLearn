@@ -1,65 +1,177 @@
-# Adaptive Multi-System Audio Balancing Platform
+# SpeakerLearn Backend — Adaptive Multi-System Audio Balancing Platform
 
-A modular backend framework for **dynamically optimising audio playback** across different songs, streaming platforms, and speaker systems — while protecting hardware from distortion or overload.
+A **C++20 native backend** for dynamically optimizing audio playback across different songs, streaming platforms, and speaker systems — while protecting hardware from distortion or overload.
 
 > **Status:** Initial framework / prototype. Designed for expansion into a production-grade DSP system.
 
 ---
 
+## Tech Stack
+
+| Component | Technology |
+|-----------|------------|
+| **Language** | C++20 |
+| **Build System** | CMake 3.20+ |
+| **HTTP Server** | cpp-httplib v0.15.3 |
+| **JSON** | nlohmann/json v3.11.3 |
+| **Database** | SQLite3 (amalgamation) |
+| **DSP Engine** | C++ shared library (`dsp_engine/`) — C API for Python ctypes |
+
+---
+
 ## Quick Start
 
+### Prerequisites
+
+- CMake 3.20 or later
+- C++20-capable compiler (MSVC 2019+, GCC 10+, Clang 10+)
+
+### Build
+
 ```bash
-# 1. Create a virtual environment
-python -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # macOS / Linux
-
-# 2. Install dependencies
-pip install -r requirements.txt
-
-# 3. Start the API server
-uvicorn api.main:app --reload --port 8000
+cd backend
+mkdir build && cd build
+cmake ..
+cmake --build . --config Release
 ```
 
-Open **http://localhost:8000/docs** for interactive API documentation (Swagger UI).
+### Run
+
+```bash
+# From build directory
+./speakerlearn_serverd   # Linux/macOS
+# or
+Release\speakerlearn_serverd.exe   # Windows
+```
+
+The server starts on **http://0.0.0.0:8001** (port 8001 to avoid conflicts with Python services on 8000).
 
 ---
 
 ## Project Structure
 
 ```
-adaptive_audio_platform/
+backend/
 │
-├── api/                          # FastAPI application
-│   ├── main.py                   # App entry point, CORS, lifespan
-│   └── routers/
-│       ├── speakers.py           # Speaker system CRUD + calibration
-│       ├── preferences.py        # User preference management
-│       ├── audio.py              # Audio optimization endpoint
-│       └── devices.py            # Device detection endpoint
+├── src/
+│   ├── main.cpp                 # Entry point — DB init, HTTP server
+│   │
+│   ├── api/                     # HTTP API layer
+│   │   ├── HttpServer.cpp       # Route registration, CORS, handlers
+│   │   └── HttpServer.h
+│   │
+│   ├── db/                      # Database layer
+│   │   ├── DatabaseManager.cpp  # SQLite connection, migrations, CRUD
+│   │   ├── DatabaseManager.h
+│   │   └── Models.h            # ORM-like structs (User, SpeakerSystem, etc.)
+│   │
+│   ├── core/                    # Processing pipeline
+│   │   ├── AudioPipeline.cpp    # 8-stage orchestrator
+│   │   ├── AudioPipeline.h
+│   │   └── stages/
+│   │       ├── Stages.cpp       # SourceDetector, SpectrumAnalyzer, etc.
+│   │       └── Stages.h
+│   │
+│   └── platform/                # Platform-specific code (optional)
+│       ├── windows/
+│       ├── macos/
+│       └── linux/
 │
-├── core/                         # Processing pipeline modules
-│   ├── pipeline.py               # End-to-end orchestrator
-│   ├── source_detector.py        # Stage 1 — Source platform detection
-│   ├── spectrum_analyzer.py      # Stage 2 — FFT spectral analysis
-│   ├── track_profiler.py         # Stage 3 — Track classification
-│   ├── preference_engine.py      # Stage 4 — User preference → EQ curve
-│   ├── speaker_model.py          # Stage 5 — Speaker capability constraints
-│   ├── eq_optimizer.py           # Stage 6 — Adaptive EQ computation
-│   ├── dsp_processor.py          # Stage 7 — DSP engine (stub)
-│   ├── limiter.py                # Stage 8 — Safety limiter
-│   ├── calibration.py            # Speaker calibration system
-│   └── device_detector.py        # Audio device discovery
+├── dsp_engine/                  # Standalone DSP library (C API)
+│   └── engine.cpp              # Biquad EQ, Exciter, Compressor, Limiter
 │
-├── db/                           # Database layer
-│   ├── database.py               # Engine, sessions, init & seeding
-│   ├── models.py                 # SQLAlchemy ORM models
-│   └── schemas.py                # Pydantic request/response schemas
-│
-├── pyproject.toml                # Project metadata & dependencies
-├── requirements.txt              # Pinned dependencies
-└── README.md                     # ← you are here
+├── docs/
+│   ├── API.md                # Full API reference
+│   └── ARCHITECTURE.md        # Framework & component diagram
+├── CMakeLists.txt
+├── README.md
+└── speakerlearn_framework_plan.md
 ```
+
+---
+
+## API Reference
+
+Base URL: `http://localhost:8001`
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Health check — service info and status |
+| `/audio/optimize` | POST | Run the full 8-stage optimization pipeline |
+| `/speaker-systems/create` | POST | Create a speaker system (persists to DB) |
+| `/speaker-systems/list` | GET | List speaker systems for a user |
+| `/preferences` | GET | Get user preferences |
+| `/preferences/update` | POST | Update user preferences |
+| `/devices/detect` | GET | Detect audio devices (stub) |
+
+### `GET /`
+
+**Response:**
+```json
+{
+  "service": "Adaptive Audio Balancing Platform (C++ Native)",
+  "version": "0.1.0",
+  "status": "online"
+}
+```
+
+### `POST /audio/optimize`
+
+**Request body (JSON):**
+```json
+{
+  "samples": [0.1, -0.1, 0.2, -0.2],
+  "preferences": { "bass_boost": 0.5 },
+  "platform_hint": "spotify"
+}
+```
+
+**Response:**
+```json
+{
+  "final_eq": { "sub_bass": 0.0, "bass": 0.0, "low_mid": 0.0, "mid": 0.0, "high": 0.0, "air": 0.0 },
+  "headroom_db": 3.0,
+  "peak_limit_db": -1.0,
+  "track_profile": { "avg_loudness": -14.0, "dynamic_range": 8.0 },
+  "warnings": []
+}
+```
+
+### `POST /speaker-systems/create`
+
+**Request body:**
+```json
+{
+  "name": "Living Room Speakers",
+  "user_id": "default-user",
+  "device_identifier": "optional-device-id",
+  "channel_config": "stereo"
+}
+```
+
+**Response:** Persists to SQLite and returns created ID.
+
+### `GET /speaker-systems/list?user_id=default-user`
+
+**Response:** Array of speaker systems.
+
+### `GET /preferences?user_id=default-user`
+
+**Response:** Object of preference keys and weights.
+
+### `POST /preferences/update`
+
+**Request body:**
+```json
+{
+  "user_id": "default-user",
+  "preferences": { "bass_boost": 0.5, "treble": 0.3 }
+}
+```
+
+### `GET /devices/detect`
+
+**Response:** Array of detected audio devices (stub).
 
 ---
 
@@ -78,31 +190,25 @@ Audio Input → Source Detection → Spectrum Analysis → Track Profiling
 Final EQ = (User Preference + Source Correction − Track Bias) × Speaker Capability
 ```
 
-The pipeline runs continuously, re-analysing and adjusting every 200–500 ms during playback.
-
----
-
-## API Reference
-
-| Endpoint | Method | Description |
-|---|---|---|
-| `/speaker-systems/create` | POST | Create a named speaker system |
-| `/speaker-systems/list` | GET | List all systems for a user |
-| `/speaker-systems/calibrate` | POST | Submit calibration ratings |
-| `/speaker-systems/switch` | POST | Set the active speaker system |
-| `/preferences/update` | POST | Update listening preferences |
-| `/preferences` | GET | Get current preferences |
-| `/audio/optimize` | POST | Run the full optimisation pipeline |
-| `/devices/detect` | GET | Detect connected audio devices |
-
-Full interactive documentation at `/docs` when the server is running.
+| Stage | Class | Purpose |
+|-------|-------|---------|
+| 1 | `SourceDetector` | Platform hint → source profile (Spotify, Apple Music, etc.) |
+| 2 | `SpectrumAnalyzer` | FFT spectral analysis → band energies |
+| 3 | `TrackProfiler` | Track classification (loudness, dynamic range) |
+| 4 | `PreferenceEngine` | User preferences → target EQ curve |
+| 5 | `SpeakerModel` | Speaker capability constraints |
+| 6 | `EQOptimizer` | Compute final EQ from curve + constraints |
+| 7 | DSP Engine | Multiband EQ, compression (stub / pass-through) |
+| 8 | `SafetyLimiter` | Brickwall limiting, headroom check |
 
 ---
 
 ## Database Schema (SQLite)
 
+Database file: `adaptive_audio_cpp.db` (created on first run)
+
 | Table | Purpose |
-|---|---|
+|-------|---------|
 | `users` | Application users |
 | `speaker_systems` | Named speaker configurations with device mapping |
 | `speaker_capabilities` | Per-band frequency handling limits |
@@ -110,59 +216,64 @@ Full interactive documentation at `/docs` when the server is running.
 | `user_preferences` | Listening preference weights |
 | `source_profiles` | Per-platform audio correction offsets |
 
-Tables are auto-created on first startup. Default source profiles (Spotify, Apple Music, YouTube, Local FLAC) are seeded automatically.
+Tables are auto-created on startup. Default source profiles (Spotify, Apple Music, YouTube, Local FLAC) are seeded automatically.
 
 ---
 
-## Speaker Calibration Workflow
+## Architecture Overview
 
-SpeakerLearn uses a unique **two-step playback comparison** to map capabilities:
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     speakerlearn_serverd                         │
+├─────────────────────────────────────────────────────────────────┤
+│  HTTP Layer (cpp-httplib)                                        │
+│  ├── CORS pre-routing                                           │
+│  └── JSON request/response                                      │
+├─────────────────────────────────────────────────────────────────┤
+│  API Handlers → AudioPipeline → Stages (SourceDetector, etc.)     │
+├─────────────────────────────────────────────────────────────────┤
+│  DatabaseManager (Singleton)                                     │
+│  └── SQLite3 — speaker_systems, user_preferences, etc.          │
+└─────────────────────────────────────────────────────────────────┘
 
-1. **Test Tones:** The system triggers five specific audio profiles:
-   - Pure Bass
-   - Pure Mids
-   - Pure Treble
-   - Full Spectrum
-   - Troublesome Frequency Mix
-2. **Comparison:** Each tone is played first on the local device, then on the target speaker.
-3. **Rating:** The user rates *Volume* (1-5 scale relative to the local device) and *Quality* (Good/Bad).
-4. **EQ Generation:** The backend calculates a neutralizing EQ curve to flatten the response and cut troublesome distortions.
-
----
-
-## Architecture: Python & C++ Tandem
-
-SpeakerLearn uses a hybrid architecture to balance API flexibility with real-time DSP performance:
-
-- **Python (FastAPI):** Orchestrates calibration, manages the local SQLite database of offline profiles, and calculates EQ parameters.
-- **C++ DSP Engine (`dsp_engine/`):** A compiled shared library containing the raw audio processing logic (multiband EQ, dynamic compression, limiting). The Python backend loads this via `ctypes` and passes the optimized speaker configurations to it for real-time processing.
-
-### Offline & Background Operations
-
-SpeakerLearn runs continuously in the background, intercepting device audio output and applying the target EQ real-time. The local SQLite database ensures the application functions completely offline without internet connectivity.
+┌─────────────────────────────────────────────────────────────────┐
+│  dsp_engine (separate shared library)                            │
+│  C API: init_dsp, configure_eq, process_audio_interleaved         │
+│  Used by Python via ctypes for real-time audio processing        │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## Frontend Integration Guide
+## DSP Engine (`dsp_engine/`)
 
-This framework is **backend-only** by design. To build a frontend:
+The `dsp_engine` is a standalone C++ library exposing a C API for Python (ctypes) integration:
+
+- **Biquad** — Parametric peaking EQ
+- **Exciter** — Harmonic saturation for sub-bass
+- **Compressor** — Soft-knee RMS dynamics
+- **LookaheadLimiter** — Brickwall output protection
+
+The main C++ backend uses in-process stubs for the pipeline; full DSP integration can link this library directly or via FFI.
+
+---
+
+## Frontend Integration
 
 ### Key Endpoints for UI
 
-- **Speaker Setup Flow:** `POST /speaker-systems/create` → `POST /speaker-systems/calibrate`
-- **Preferences Panel:** `GET /preferences` → `POST /preferences/update`
+- **Speaker Setup:** `POST /speaker-systems/create` (stub — extend for full CRUD)
+- **Audio Optimization:** `POST /audio/optimize` — pass samples, preferences, platform
 
-### Recommended Frontend Stack
+### CORS
 
-- **Mobile/Desktop:** A cross-platform UI (React Native, Electron, Tauri) that communicates with this local Python/C++ tandem backend.
+All origins, methods, and headers are allowed for development. Restrict in production.
 
 ---
 
-## Tech Stack
+## Planned API Extensions
 
-| Component | Technology |
-|---|---|
-| Backend API | Python / FastAPI |
-| Database | SQLite / SQLAlchemy |
-| DSP Engine | C++ (`dsp_engine/` loaded via ctypes) |
-| Validation | Pydantic v2 |
+| Endpoint | Method | Status |
+|----------|--------|--------|
+| `/speaker-systems/calibrate` | POST | Planned |
+| `/speaker-systems/switch` | POST | Planned |
