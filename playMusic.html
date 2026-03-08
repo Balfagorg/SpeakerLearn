@@ -1352,17 +1352,23 @@ async function activateSpeakerEQ(spk) {
   let calIssues = {};
 
   if (spk.source === 'know' && spk.eqPresetKey) {
-    const raw = localStorage.getItem(spk.eqPresetKey);
-    if (raw) {
-      try { calBands = JSON.parse(raw); } catch (_) {}
+    // Prefer speaker object's eqBands (updated when editing) — ensures edited calibrations load correctly
+    if (spk.eqBands && Object.keys(spk.eqBands).length > 0) {
+      calBands = spk.eqBands;
+    } else {
+      const raw = localStorage.getItem(spk.eqPresetKey);
+      if (raw) {
+        try { calBands = JSON.parse(raw); } catch (_) {}
+      }
+      if (!calBands) {
+        try {
+          const list = await API.eqPresetsList();
+          const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+          if (p && p.bands) calBands = p.bands;
+        } catch (_) {}
+      }
     }
-    if (!calBands) {
-      try {
-        const list = await API.eqPresetsList();
-        const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
-        if (p && p.bands) calBands = p.bands;
-      } catch (_) {}
-    }
+    if (spk.issues_7) calIssues = spk.issues_7;
   } else if (spk.bands_7) {
     calBands = spk.bands_7;
     if (spk.issues_7) calIssues = spk.issues_7;
@@ -1522,13 +1528,18 @@ async function activatePresetEQ(data) {
       const spk = speakers.find(s => s.id === speakerId);
       if (spk) {
         if (spk.source === 'know' && spk.eqPresetKey) {
-          const raw = localStorage.getItem(spk.eqPresetKey);
-          if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
-          if (!calBands && typeof API !== 'undefined' && API.eqPresetsList) {
-            const list = await API.eqPresetsList();
-            const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
-            if (p && p.bands) calBands = p.bands;
+          if (spk.eqBands && Object.keys(spk.eqBands).length > 0) {
+            calBands = spk.eqBands;
+          } else {
+            const raw = localStorage.getItem(spk.eqPresetKey);
+            if (raw) try { calBands = JSON.parse(raw); } catch (_) {}
+            if (!calBands && typeof API !== 'undefined' && API.eqPresetsList) {
+              const list = await API.eqPresetsList();
+              const p = Array.isArray(list) ? list.find(x => x.id === spk.eqPresetKey) : null;
+              if (p && p.bands) calBands = p.bands;
+            }
           }
+          if (spk.issues_7) calIssues = spk.issues_7;
         } else if (spk.bands_7) {
           calBands = spk.bands_7;
           if (spk.issues_7) calIssues = spk.issues_7;

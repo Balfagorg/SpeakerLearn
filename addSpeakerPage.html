@@ -641,6 +641,28 @@
     select.problems-select:focus { outline: none; border-color: var(--muted-teal); }
     select.problems-select option { background: var(--surface-2); }
 
+    .know-issue-select {
+      width: 100%;
+      min-width: 0;
+      padding: 0.25rem 0.4rem;
+      background: var(--surface-2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.65rem;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a09ab0' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.3rem center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      margin-top: 0.25rem;
+    }
+    .know-issue-select:focus { outline: none; border-color: var(--muted-teal); }
+    .know-issue-select option { background: var(--surface-2); }
+
     .slide-nav {
       display: flex;
       align-items: center;
@@ -1513,6 +1535,23 @@
   const freqLabels = ['60 Hz', '500 Hz', '1,000 Hz', '3,500 Hz', '16,000 Hz'];
   const freqNames  = ['Sub-bass', 'Low midrange', 'Midrange', 'Upper midrange', 'Air / Treble'];
   const knowFrequencies = [60, 170, 350, 1000, 3500, 8000, 16000];
+  const ISSUE_OPTIONS = [
+    { value: 'none', label: 'None' },
+    { value: 'crackle', label: 'Crackle' },
+    { value: 'feedback', label: 'Feedback' },
+    { value: 'muffled', label: 'Muffled' },
+    { value: 'rattle', label: 'Rattle' },
+    { value: 'inconsistent', label: 'Inconsistent' },
+    { value: 'harsh', label: 'Harsh' },
+    { value: 'sibilance', label: 'Sibilance' },
+    { value: 'nasal', label: 'Nasal' },
+    { value: 'boxiness', label: 'Boxiness' },
+    { value: 'tinny', label: 'Tinny' },
+    { value: 'rolloff', label: 'Rolloff' },
+    { value: 'inaudible', label: 'Inaudible' },
+    { value: 'fatigue', label: 'Fatigue' },
+    { value: 'other', label: 'Other' }
+  ];
   const SPEAKERS_STORAGE_KEY = 'freqsync_speakers';
   let speakers = [];
   let currentTone = null;
@@ -1897,6 +1936,16 @@
       try { bands = JSON.parse(localStorage.getItem(spk.eqPresetKey) || '{}'); } catch (_) {}
     }
 
+    // Resolve issues for edit: Learn speaker from learn5To7Band, Know speaker from issues_7
+    let editIssues = {};
+    if (spk.source === 'learn' && spk.readings && typeof learn5To7Band === 'function') {
+      const converted = learn5To7Band(spk.readings);
+      editIssues = converted.issues || {};
+    } else if (spk.issues_7) {
+      editIssues = spk.issues_7;
+    }
+
+    const issueOptionsHtml = ISSUE_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
     knowFrequencies.forEach(freq => {
       // For know-type: speaker response is editable; correction is applied to audio
       let initialVal = 0;
@@ -1916,6 +1965,8 @@
         }
       }
 
+      const issueVal = editIssues[freq] || 'none';
+
       // Speaker response slider (editable)
       const block = document.createElement('div');
       block.className = 'sliderBlock';
@@ -1925,8 +1976,13 @@
         <div class="know-cut">Cut</div>
         <div class="know-sliderLabel">${freq >= 1000 ? (freq/1000) + 'k' : freq} Hz</div>
         <div class="know-value" id="editSpkVal${freq}">${initialVal >= 0 ? '+' : ''}${initialVal.toFixed(1)} dB</div>
+        <select class="know-issue-select" id="editIssue${freq}">${issueOptionsHtml}</select>
       `;
       speakerDiv.appendChild(block);
+      const issueSelect = document.getElementById('editIssue' + freq);
+      if (issueSelect && ISSUE_OPTIONS.some(o => o.value === issueVal)) {
+        issueSelect.value = issueVal;
+      }
 
       // Correction slider (read-only, auto-generated)
       const block2 = document.createElement('div');
@@ -1981,18 +2037,22 @@
     const spk = speakers.find(s => String(s.id) === String(editingSpkId));
     if (!spk) return;
 
-    // Collect: speaker response (editable) and correction (applied to audio)
+    // Collect: speaker response (editable), correction (applied to audio), and issues
     const speakerResponseBands = {};
     const eqBands = {};
+    const issues_7 = {};
     knowFrequencies.forEach(freq => {
       const spkVal = parseFloat(document.getElementById('editSpk' + freq).value);
       speakerResponseBands[freq] = spkVal;
       eqBands[freq] = -spkVal; // correction = inverse of speaker response
+      const issueEl = document.getElementById('editIssue' + freq);
+      issues_7[freq] = (issueEl && issueEl.value) ? issueEl.value : 'none';
     });
 
     spk.name = newName;
     spk.eqBands = eqBands;
     spk.speakerResponseBands = speakerResponseBands;
+    spk.issues_7 = issues_7;
 
     // Persist EQ preset for know-type speakers
     if (spk.eqPresetKey) {
@@ -2007,7 +2067,9 @@
         if (typeof sevenBandToLearn5 === 'function') {
           const bandsForConvert = {};
           knowFrequencies.forEach(f => { bandsForConvert[f] = eqBands[f] ?? 0; });
-          const readings = sevenBandToLearn5(bandsForConvert, {});
+          // sevenBandToLearn5 expects issues for 60, 500, 1000, 3500, 8000; map 350→500 for 7-band
+          const issuesForConvert = { ...issues_7, 500: issues_7[350] || issues_7[170] || 'none' };
+          const readings = sevenBandToLearn5(bandsForConvert, issuesForConvert);
           spk.readings = readings;
           await apiCall(() => API.speakerSystemsCalibrateReplace(spk.id, readings), 'Could not save calibration');
         }
@@ -2157,11 +2219,12 @@
     const audioElement = document.getElementById('knowPlayer');
     if (!speakerDiv || !correctionDiv) return;
 
+    const issueOptionsHtml = ISSUE_OPTIONS.map(o => `<option value="${o.value}">${o.label}</option>`).join('');
     knowFrequencies.forEach(freq => {
       const label = freq >= 1000 ? (freq/1000) + 'k' : freq;
       const block = document.createElement('div');
       block.className = 'sliderBlock';
-      block.innerHTML = `<div class="know-boost">Boost</div><input type="range" min="-12" max="12" step="0.1" value="0" id="knowSpeaker${freq}"><div class="know-cut">Cut</div><div class="know-sliderLabel">${label} Hz</div><div class="know-value" id="knowSpeakerVal${freq}">0 dB</div>`;
+      block.innerHTML = `<div class="know-boost">Boost</div><input type="range" min="-12" max="12" step="0.1" value="0" id="knowSpeaker${freq}"><div class="know-cut">Cut</div><div class="know-sliderLabel">${label} Hz</div><div class="know-value" id="knowSpeakerVal${freq}">0 dB</div><select class="know-issue-select" id="knowIssue${freq}">${issueOptionsHtml}</select>`;
       speakerDiv.appendChild(block);
 
       const block2 = document.createElement('div');
@@ -2250,10 +2313,13 @@
     // Correction = inverse of speaker response; this is what gets applied to audio and sent to /audio/optimize
     const correction = {};
     const speakerResponse = {};
+    const issues_7 = {};
     knowFrequencies.forEach(freq => {
       const spkVal = parseFloat(document.getElementById('knowSpeaker' + freq).value);
       speakerResponse[freq] = spkVal;
       correction[freq] = -spkVal;
+      const issueEl = document.getElementById('knowIssue' + freq);
+      issues_7[freq] = (issueEl && issueEl.value) ? issueEl.value : 'none';
     });
     const key = 'eq_' + name;
     localStorage.setItem(key, JSON.stringify(correction));
@@ -2261,7 +2327,7 @@
     knowPopulatePresetMenu();
     const existing = speakers.find(s => s.source === 'know' && s.eqPresetKey === key);
     if (!existing) {
-      const spk = { id: key + '_' + Date.now(), name, addedAt: new Date().toLocaleDateString(), source: 'know', eqPresetKey: key, eqBands: correction, speakerResponseBands: speakerResponse };
+      const spk = { id: key + '_' + Date.now(), name, addedAt: new Date().toLocaleDateString(), source: 'know', eqPresetKey: key, eqBands: correction, speakerResponseBands: speakerResponse, issues_7 };
       speakers.push(spk);
       saveSpeakers();
       updateSpeakerCount();
@@ -2270,6 +2336,7 @@
     } else {
       existing.eqBands = correction;
       existing.speakerResponseBands = speakerResponse;
+      existing.issues_7 = issues_7;
       saveSpeakers();
       rebuildSpeakerList();
       showToast('Speaker updated');
