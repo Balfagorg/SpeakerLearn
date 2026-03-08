@@ -163,12 +163,33 @@ Returns detected audio devices. **Currently a stub** — returns a default outpu
 
 ---
 
-## Planned Endpoints
+### Speaker Calibration & Switch
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/speaker-systems/calibrate` | POST | Submit calibration ratings |
-| `/speaker-systems/switch` | POST | Set active speaker system |
+#### `POST /speaker-systems/calibrate`
+
+Submit calibration ratings from the Learn flow.
+
+**Request body:** `{ "speaker_system_id": "...", "readings": [ { "label": "60 Hz", "val": 50, "issue": "none" }, ... ] }`
+
+#### `POST /speaker-systems/switch`
+
+Set the active speaker system for a user.
+
+**Request body:** `{ "user_id": "default-user", "speaker_system_id": "..." }`
+
+### EQ Presets
+
+#### `GET /eq-presets/list?user_id=default-user`
+
+Returns array of `{ id, name, speaker_system_id, bands }`.
+
+#### `POST /eq-presets/save`
+
+**Request body:** `{ "id": "eq_MyPreset", "name": "MyPreset", "speaker_system_id": "", "bands": { "60": 0, "500": -2, ... } }`
+
+#### `POST /eq-presets/delete`
+
+**Request body:** `{ "id": "eq_MyPreset" }`
 
 ---
 

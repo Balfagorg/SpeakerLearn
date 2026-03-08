@@ -40,7 +40,7 @@ void HttpServer::setup_routes() {
     // CORS middleware equivalent
     svr_.set_pre_routing_handler([](const httplib::Request& req, httplib::Response& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
-        res.set_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+        res.set_header("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS");
         res.set_header("Access-Control-Allow-Headers", "*");
         if (req.method == "OPTIONS") {
             return httplib::Server::HandlerResponse::Handled;
@@ -122,6 +122,56 @@ void HttpServer::setup_routes() {
         }
     });
 
+    // Speaker systems — calibrate (submit calibration ratings from Learn flow)
+    svr_.Post("/speaker-systems/calibrate", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto body = req.body.empty() ? json::object() : json::parse(req.body);
+            std::string speaker_system_id = body.value("speaker_system_id", "");
+            if (speaker_system_id.empty()) {
+                res.status = 400;
+                res.set_content(json{{"error", "Missing speaker_system_id"}}.dump(), "application/json");
+                return;
+            }
+            if (!body.contains("readings") || !body["readings"].is_array()) {
+                res.status = 400;
+                res.set_content(json{{"error", "Missing readings array"}}.dump(), "application/json");
+                return;
+            }
+            bool ok = true;
+            for (const auto& r : body["readings"]) {
+                db::CalibrationResult cr;
+                cr.id = generate_uuid();
+                cr.speaker_system_id = speaker_system_id;
+                cr.frequency_band = r.value("label", r.value("name", ""));
+                cr.volume_rating = r.value("val", 50);
+                cr.quality_rating = (r.value("issue", "none") == "none");
+                if (!db::DatabaseManager::getInstance().save_calibration_result(cr)) ok = false;
+            }
+            res.set_content(json{{"status", ok ? "saved" : "partial_save"}}.dump(), "application/json");
+        } catch (const std::exception& e) {
+            res.status = 400;
+            res.set_content(json{{"error", e.what()}}.dump(), "application/json");
+        }
+    });
+
+    // Speaker systems — switch active
+    svr_.Post("/speaker-systems/switch", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto body = req.body.empty() ? json::object() : json::parse(req.body);
+            std::string user_id = body.value("user_id", "default-user");
+            std::string speaker_system_id = body.value("speaker_system_id", "");
+            if (db::DatabaseManager::getInstance().set_active_speaker(user_id, speaker_system_id)) {
+                res.set_content(json{{"status", "switched"}}.dump(), "application/json");
+            } else {
+                res.status = 500;
+                res.set_content(json{{"error", "Failed to switch speaker"}}.dump(), "application/json");
+            }
+        } catch (const std::exception& e) {
+            res.status = 400;
+            res.set_content(json{{"error", e.what()}}.dump(), "application/json");
+        }
+    });
+
     // Speaker systems — list
     svr_.Get("/speaker-systems/list", [](const httplib::Request& req, httplib::Response& res) {
         std::string user_id = req.has_param("user_id") ? req.get_param_value("user_id") : "default-user";
@@ -163,6 +213,67 @@ void HttpServer::setup_routes() {
                 if (!db::DatabaseManager::getInstance().save_user_preference(pref)) ok = false;
             }
             res.set_content(json{{"status", ok ? "updated" : "partial_update"}}.dump(), "application/json");
+        } catch (const std::exception& e) {
+            res.status = 400;
+            res.set_content(json{{"error", e.what()}}.dump(), "application/json");
+        }
+    });
+
+    // EQ presets — list
+    svr_.Get("/eq-presets/list", [](const httplib::Request& req, httplib::Response& res) {
+        std::string user_id = req.has_param("user_id") ? req.get_param_value("user_id") : "default-user";
+        auto presets = db::DatabaseManager::getInstance().get_eq_presets(user_id);
+        json arr = json::array();
+        for (const auto& p : presets) {
+            json bands = json::object();
+            try { bands = json::parse(p.bands_json); } catch (...) {}
+            arr.push_back({{"id", p.id}, {"name", p.name}, {"speaker_system_id", p.speaker_system_id}, {"bands", bands}});
+        }
+        res.set_content(arr.dump(), "application/json");
+    });
+
+    // EQ presets — save
+    svr_.Post("/eq-presets/save", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto body = req.body.empty() ? json::object() : json::parse(req.body);
+            std::string user_id = body.value("user_id", "default-user");
+            std::string name = body.value("name", "");
+            std::string speaker_system_id = body.value("speaker_system_id", "");
+            if (name.empty()) {
+                res.status = 400;
+                res.set_content(json{{"error", "Missing preset name"}}.dump(), "application/json");
+                return;
+            }
+            json bands = body.value("bands", json::object());
+            std::string id = body.value("id", "eq_" + name);
+            if (db::DatabaseManager::getInstance().save_eq_preset(id, user_id, name, speaker_system_id, bands.dump())) {
+                res.set_content(json{{"status", "saved"}, {"id", id}}.dump(), "application/json");
+            } else {
+                res.status = 500;
+                res.set_content(json{{"error", "Failed to save preset"}}.dump(), "application/json");
+            }
+        } catch (const std::exception& e) {
+            res.status = 400;
+            res.set_content(json{{"error", e.what()}}.dump(), "application/json");
+        }
+    });
+
+    // EQ presets — delete
+    svr_.Post("/eq-presets/delete", [](const httplib::Request& req, httplib::Response& res) {
+        try {
+            auto body = req.body.empty() ? json::object() : json::parse(req.body);
+            std::string id = body.value("id", "");
+            if (id.empty()) {
+                res.status = 400;
+                res.set_content(json{{"error", "Missing preset id"}}.dump(), "application/json");
+                return;
+            }
+            if (db::DatabaseManager::getInstance().delete_eq_preset(id)) {
+                res.set_content(json{{"status", "deleted"}}.dump(), "application/json");
+            } else {
+                res.status = 404;
+                res.set_content(json{{"error", "Preset not found"}}.dump(), "application/json");
+            }
         } catch (const std::exception& e) {
             res.status = 400;
             res.set_content(json{{"error", e.what()}}.dump(), "application/json");

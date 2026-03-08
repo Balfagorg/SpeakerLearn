@@ -996,7 +996,7 @@
       <a href="homePage.html">Home</a>
       <a href="addSpeakerPage.html" class="active">Add Speaker</a>
       <a href="preferencesPage.html">Preferences</a>
-      <a href="#">Music Presets</a>
+      <a href="preferencesPage.html">Music Presets</a>
     </nav>
   </div>
 
@@ -1423,7 +1423,7 @@
       <div id="empty-speakers" class="empty-state">
         <div class="empty-icon">🔇</div>
         <h3>No speakers yet</h3>
-        <p>You haven't added any speakers. Use the "Learn My Speaker" tab to calibrate your first device.</p>
+        <p>You haven't added any speakers. Use "Learn My Speaker" or "I Know My Speaker" to add your first device.</p>
         <button class="btn-primary" onclick="switchTab('learn')">+ Add Your First Speaker</button>
       </div>
       <div id="speakers-list-wrap" class="speakers-list" style="display:none;"></div>
@@ -1464,20 +1464,69 @@
   <div class="footer-links">
     <a href="addSpeakerPage.html">Add Speaker</a>
     <a href="preferencesPage.html">Preferences</a>
-    <a href="#">Music Presets</a>
+    <a href="preferencesPage.html">Music Presets</a>
     <a href="#">Contact</a>
     <a href="#">Privacy</a>
   </div>
   <div class="footer-copy">© 2026 FreqSync. All rights reserved.</div>
 </footer>
 
+<script src="js/api.js"></script>
 <script>
   // ─── STATE ───
   const freqLabels = ['60 Hz', '500 Hz', '1,000 Hz', '3,500 Hz', '16,000 Hz'];
   const freqNames  = ['Sub-bass', 'Low midrange', 'Midrange', 'Upper midrange', 'Air / Treble'];
+  const SPEAKERS_STORAGE_KEY = 'freqsync_speakers';
   let speakers = [];
   let currentTone = null;
   let audioCtx = null;
+
+  async function loadSpeakers() {
+    try {
+      const raw = localStorage.getItem(SPEAKERS_STORAGE_KEY);
+      speakers = raw ? JSON.parse(raw) : [];
+      // Sync from backend when available
+      try {
+        const list = await API.speakerSystemsList();
+        if (Array.isArray(list) && list.length > 0) {
+          list.forEach(s => {
+            if (!speakers.some(sp => sp.id === s.id)) {
+              speakers.push({
+                id: s.id,
+                name: s.name,
+                addedAt: s.created_at ? new Date(s.created_at).toLocaleDateString() : new Date().toLocaleDateString(),
+                source: 'learn',
+                readings: []
+              });
+            }
+          });
+        }
+      } catch (_) {}
+      // Migrate existing eq_ presets into speakers list if not already present
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('eq_')) {
+          const name = key.replace('eq_', '');
+          if (!speakers.some(s => s.source === 'know' && s.eqPresetKey === key)) {
+            speakers.push({
+              id: 'eq_' + name + '_' + Date.now(),
+              name,
+              addedAt: new Date().toLocaleDateString(),
+              source: 'know',
+              eqPresetKey: key
+            });
+          }
+        }
+      }
+      saveSpeakers();
+    } catch (e) { speakers = []; }
+  }
+
+  function saveSpeakers() {
+    try {
+      localStorage.setItem(SPEAKERS_STORAGE_KEY, JSON.stringify(speakers));
+    } catch (e) {}
+  }
 
   // ─── TAB SWITCHING ───
   document.querySelectorAll('.top-tab').forEach(btn => {
@@ -1488,6 +1537,11 @@
     document.querySelectorAll('.top-tab').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
   }
+
+  // ─── INIT: Load speakers from storage ───
+  loadSpeakers().then(() => {});
+  updateSpeakerCount();
+  rebuildSpeakerList();
 
   // ─── SLIDE NAVIGATION ───
   function goToSlide(idx) {
@@ -1571,21 +1625,30 @@
   }
 
   // ─── ADD SPEAKER ───
-  function addSpeaker() {
+  async function addSpeaker() {
     stopTone();
-    const id = Date.now();
+    const readings = freqLabels.map((label, i) => ({
+      label,
+      name: freqNames[i],
+      val: parseInt(document.getElementById('slider-' + i).value),
+      issue: document.getElementById('issues-' + i).value
+    }));
+    let id = Date.now();
+    let name = 'Speaker ' + (speakers.filter(s => s.source === 'learn').length + 1);
+    try {
+      const created = await API.speakerSystemsCreate({ name });
+      id = created.id;
+      await API.speakerSystemsCalibrate(id, readings);
+    } catch (_) {}
     const spk = {
       id,
-      name: 'Speaker ' + (speakers.length + 1),
+      name,
       addedAt: new Date().toLocaleDateString(),
-      readings: freqLabels.map((label, i) => ({
-        label,
-        name: freqNames[i],
-        val: parseInt(document.getElementById('slider-' + i).value),
-        issue: document.getElementById('issues-' + i).value
-      }))
+      source: 'learn',
+      readings
     };
     speakers.push(spk);
+    saveSpeakers();
     updateSpeakerCount();
     rebuildSpeakerList();
     showAddedPage(spk);
@@ -1607,13 +1670,15 @@
     empty.style.display = 'none';
     wrap.style.display = 'grid';
     speakers.forEach(spk => {
+      const bands = spk.source === 'know' ? '7 frequency bands' : '5 frequency bands';
+      const method = spk.source === 'know' ? 'Manual' : 'Learn';
       const card = document.createElement('div');
       card.className = 'speaker-list-card';
       card.innerHTML = `
         <div class="spk-card-icon">🔊</div>
         <div class="spk-card-info">
           <div class="spk-card-name">${spk.name}</div>
-          <div class="spk-card-meta">Added ${spk.addedAt} · 5 frequency bands calibrated</div>
+          <div class="spk-card-meta">Added ${spk.addedAt} · ${bands} · ${method}</div>
         </div>
         <div class="spk-card-arrow">›</div>
       `;
@@ -1627,11 +1692,46 @@
     const page = document.getElementById('speaker-added-page');
     page.classList.add('active');
 
-    // Build prefs grid
+    // Build prefs grid (Learn speakers have readings; Know speakers don't)
     const grid = document.getElementById('prefs-grid');
     grid.innerHTML = '';
 
-    // Card 1: Frequency balance
+    if (spk.source === 'know') {
+      // Know speaker: show EQ preset summary
+      const preset = spk.eqPresetKey ? JSON.parse(localStorage.getItem(spk.eqPresetKey) || '{}') : {};
+      const card1 = document.createElement('div');
+      card1.className = 'pref-card';
+      card1.innerHTML = `<div class="pref-card-label">Manual Calibration</div>`;
+      Object.entries(preset).forEach(([freq, val]) => {
+        card1.innerHTML += `
+          <div class="pref-freq-row">
+            <span class="pref-freq-name">${freq} Hz</span>
+            <div class="pref-bar-wrap"><div class="pref-bar-fill" style="width:50%;"></div></div>
+            <span class="pref-val">${val > 0 ? '+' : ''}${val} dB</span>
+          </div>
+        `;
+      });
+      grid.appendChild(card1);
+      const card3 = document.createElement('div');
+      card3.className = 'pref-card';
+      card3.innerHTML = `
+        <div class="pref-card-label">Calibration Status</div>
+        <div style="display:flex; flex-direction:column; gap:0.75rem; margin-top:0.5rem;">
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
+            <span style="color:var(--text-muted);">Bands calibrated</span>
+            <span style="color:var(--light-green); font-family:'Space Mono',monospace; font-size:0.75rem;">7 / 7</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:0.82rem;">
+            <span style="color:var(--text-muted);">Method</span>
+            <span style="color:var(--muted-teal); font-family:'Space Mono',monospace; font-size:0.75rem;">Manual</span>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card3);
+      return;
+    }
+
+    // Card 1: Frequency balance (Learn only)
     const card1 = document.createElement('div');
     card1.className = 'pref-card';
     card1.innerHTML = `<div class="pref-card-label">Frequency Balance</div>`;
@@ -1809,16 +1909,36 @@
     document.getElementById('knowPlayer').pause();
   }
 
-  function knowSavePreset() {
+  async function knowSavePreset() {
     const name = document.getElementById('knowSpeakerName').value;
     if (!name) { alert('Enter a speaker name'); return; }
     const preset = {};
     knowFrequencies.forEach(freq => {
       preset[freq] = -parseFloat(document.getElementById('knowSpeaker' + freq).value);
     });
-    localStorage.setItem('eq_' + name, JSON.stringify(preset));
+    const key = 'eq_' + name;
+    try {
+      await API.eqPresetsSave({ id: key, name, speaker_system_id: '', bands: preset });
+    } catch (_) {}
+    localStorage.setItem(key, JSON.stringify(preset));
     knowPopulatePresetMenu();
-    alert('Preset saved!');
+    const existing = speakers.find(s => s.source === 'know' && s.eqPresetKey === key);
+    if (!existing) {
+      const spk = {
+        id: key + '_' + Date.now(),
+        name,
+        addedAt: new Date().toLocaleDateString(),
+        source: 'know',
+        eqPresetKey: key
+      };
+      speakers.push(spk);
+      saveSpeakers();
+      updateSpeakerCount();
+      rebuildSpeakerList();
+      showAddedPage(spk);
+    } else {
+      alert('Preset saved!');
+    }
   }
 
   function knowLoadPreset() {
@@ -1831,26 +1951,37 @@
     knowUpdateEQ();
   }
 
-  function knowDeletePreset() {
+  async function knowDeletePreset() {
     const key = document.getElementById('knowPresetMenu').value;
     if (!key) { alert('Select a preset'); return; }
     if (!confirm('Delete this preset?')) return;
+    try { await API.eqPresetsDelete(key); } catch (_) {}
     localStorage.removeItem(key);
+    speakers = speakers.filter(s => !(s.source === 'know' && s.eqPresetKey === key));
+    saveSpeakers();
+    updateSpeakerCount();
+    rebuildSpeakerList();
     knowPopulatePresetMenu();
   }
 
-  function knowPopulatePresetMenu() {
+  async function knowPopulatePresetMenu() {
     const menu = document.getElementById('knowPresetMenu');
     menu.innerHTML = '<option value="">Select preset...</option>';
+    const keys = new Set();
+    try {
+      const list = await API.eqPresetsList();
+      if (Array.isArray(list)) list.forEach(p => keys.add(p.id));
+    } catch (_) {}
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && key.startsWith('eq_')) {
-        const opt = document.createElement('option');
-        opt.value = key;
-        opt.textContent = key.replace('eq_', '');
-        menu.appendChild(opt);
-      }
+      if (key && key.startsWith('eq_')) keys.add(key);
     }
+    [...keys].sort().forEach(key => {
+      const opt = document.createElement('option');
+      opt.value = key;
+      opt.textContent = key.replace('eq_', '');
+      menu.appendChild(opt);
+    });
   }
 </script>
 

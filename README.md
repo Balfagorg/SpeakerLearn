@@ -18,7 +18,21 @@ Adaptive audio balancing platform that optimizes playback across different songs
 
 ## Quick Start
 
-### Backend (C++)
+### Local Runner (Backend + Frontend)
+
+For quick local testing, run both backend and frontend together:
+
+```bash
+python run_local.py
+# or on Windows: run.bat
+```
+
+- **Frontend:** http://localhost:8080/homePage.html  
+- **Backend:** http://localhost:8001  
+
+Requires: Python 3, CMake 3.20+, C++20 compiler. Builds the backend automatically if needed.
+
+### Backend Only (C++)
 
 ```bash
 cd backend

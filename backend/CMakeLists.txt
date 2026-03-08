@@ -71,7 +71,7 @@ target_include_directories(speakerlearn_core PUBLIC
 target_link_libraries(speakerlearn_core PUBLIC
     httplib::httplib
     nlohmann_json::nlohmann_json
-    sqlite3
+    SQLite3
 )
 
 # Core DSP engine links here (assuming it remains separate or we pull it into src/core later).

@@ -77,6 +77,15 @@ bool DatabaseManager::init_db(const std::string& db_path) {
             air_offset FLOAT DEFAULT 0.0,
             description TEXT
         );
+
+        CREATE TABLE IF NOT EXISTS eq_presets (
+            id VARCHAR(128) PRIMARY KEY,
+            user_id VARCHAR(36) NOT NULL,
+            name VARCHAR(128) NOT NULL,
+            speaker_system_id VARCHAR(36),
+            bands_json TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
     )";
 
     if (!execute_sql(create_tables_sql)) {
@@ -267,6 +276,114 @@ std::vector<UserPreference> DatabaseManager::get_user_preferences(const std::str
     }
     sqlite3_finalize(stmt);
     return prefs;
+}
+
+bool DatabaseManager::save_calibration_result(const CalibrationResult& result) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    const char* sql = "INSERT INTO calibration_results (id, speaker_system_id, frequency_band, volume_rating, quality_rating, tested_at) VALUES (?, ?, ?, ?, ?, COALESCE(?, CURRENT_TIMESTAMP));";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+
+    sqlite3_bind_text(stmt, 1, result.id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, result.speaker_system_id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, result.frequency_band.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int(stmt, 4, result.volume_rating);
+    sqlite3_bind_int(stmt, 5, result.quality_rating ? 1 : 0);
+    if (!result.tested_at.empty()) {
+        sqlite3_bind_text(stmt, 6, result.tested_at.c_str(), -1, SQLITE_TRANSIENT);
+    } else {
+        sqlite3_bind_null(stmt, 6);
+    }
+
+    bool success = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return success;
+}
+
+bool DatabaseManager::set_active_speaker(const std::string& user_id, const std::string& speaker_system_id) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    const char* clear_sql = "UPDATE speaker_systems SET is_active = 0 WHERE user_id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, clear_sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+    sqlite3_bind_text(stmt, 1, user_id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_step(stmt);
+    sqlite3_finalize(stmt);
+
+    if (speaker_system_id.empty()) return true;
+
+    const char* set_sql = "UPDATE speaker_systems SET is_active = 1 WHERE id = ? AND user_id = ?;";
+    if (sqlite3_prepare_v2(db_, set_sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+    sqlite3_bind_text(stmt, 1, speaker_system_id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, user_id.c_str(), -1, SQLITE_TRANSIENT);
+    bool success = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return success;
+}
+
+bool DatabaseManager::save_eq_preset(const std::string& id, const std::string& user_id, const std::string& name,
+                                     const std::string& speaker_system_id, const std::string& bands_json) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    const char* sql = "INSERT OR REPLACE INTO eq_presets (id, user_id, name, speaker_system_id, bands_json) VALUES (?, ?, ?, ?, ?);";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+
+    sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, user_id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, name.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, speaker_system_id.empty() ? nullptr : speaker_system_id.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, bands_json.c_str(), -1, SQLITE_TRANSIENT);
+
+    bool success = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return success;
+}
+
+std::vector<EqPreset> DatabaseManager::get_eq_presets(const std::string& user_id) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    std::vector<EqPreset> presets;
+    const char* sql = "SELECT id, name, speaker_system_id, bands_json FROM eq_presets WHERE user_id = ? ORDER BY created_at DESC;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return presets;
+
+    sqlite3_bind_text(stmt, 1, user_id.c_str(), -1, SQLITE_TRANSIENT);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        EqPreset p;
+        p.id = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        p.name = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        const char* spk = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2));
+        if (spk) p.speaker_system_id = spk;
+        p.bands_json = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3));
+        presets.push_back(p);
+    }
+    sqlite3_finalize(stmt);
+    return presets;
+}
+
+bool DatabaseManager::delete_eq_preset(const std::string& id) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    const char* sql = "DELETE FROM eq_presets WHERE id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return false;
+    sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_TRANSIENT);
+    bool success = (sqlite3_step(stmt) == SQLITE_DONE);
+    sqlite3_finalize(stmt);
+    return success;
+}
+
+std::optional<std::string> DatabaseManager::get_eq_preset_bands(const std::string& id) {
+    std::lock_guard<std::mutex> lock(db_mutex_);
+    const char* sql = "SELECT bands_json FROM eq_presets WHERE id = ?;";
+    sqlite3_stmt* stmt = nullptr;
+    if (sqlite3_prepare_v2(db_, sql, -1, &stmt, nullptr) != SQLITE_OK) return std::nullopt;
+    sqlite3_bind_text(stmt, 1, id.c_str(), -1, SQLITE_TRANSIENT);
+
+    std::optional<std::string> result;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        result = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+    }
+    sqlite3_finalize(stmt);
+    return result;
 }
 
 } // namespace db

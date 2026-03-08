@@ -37,6 +37,19 @@ public:
     bool save_user_preference(const UserPreference& pref);
     std::vector<UserPreference> get_user_preferences(const std::string& user_id);
 
+    // Calibration results
+    bool save_calibration_result(const CalibrationResult& result);
+
+    // Active speaker
+    bool set_active_speaker(const std::string& user_id, const std::string& speaker_system_id);
+
+    // EQ presets (name, speaker_id, bands as JSON)
+    bool save_eq_preset(const std::string& id, const std::string& user_id, const std::string& name,
+                        const std::string& speaker_system_id, const std::string& bands_json);
+    std::vector<EqPreset> get_eq_presets(const std::string& user_id);
+    bool delete_eq_preset(const std::string& id);
+    std::optional<std::string> get_eq_preset_bands(const std::string& id);
+
 private:
     DatabaseManager() = default;
     ~DatabaseManager();

@@ -103,6 +103,11 @@ Base URL: `http://localhost:8001`
 | `/preferences` | GET | Get user preferences |
 | `/preferences/update` | POST | Update user preferences |
 | `/devices/detect` | GET | Detect audio devices (stub) |
+| `/speaker-systems/calibrate` | POST | Submit calibration ratings (Learn flow) |
+| `/speaker-systems/switch` | POST | Set active speaker system |
+| `/eq-presets/list` | GET | List EQ presets for user |
+| `/eq-presets/save` | POST | Save EQ preset |
+| `/eq-presets/delete` | POST | Delete EQ preset (body: `{ "id": "..." }`) |
 
 ### `GET /`
 
@@ -271,9 +276,6 @@ All origins, methods, and headers are allowed for development. Restrict in produ
 
 ---
 
-## Planned API Extensions
+## Frontend Integration
 
-| Endpoint | Method | Status |
-|----------|--------|--------|
-| `/speaker-systems/calibrate` | POST | Planned |
-| `/speaker-systems/switch` | POST | Planned |
+The HTML pages (`homePage.html`, `addSpeakerPage.html`, `preferencesPage.html`) use `js/api.js` to sync with the backend. All operations dual-write to localStorage and the API when available, preserving full functionality offline.

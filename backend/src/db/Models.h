@@ -81,6 +81,13 @@ struct UserPreference {
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(UserPreference, id, user_id, preference_key, weight)
 };
 
+struct EqPreset {
+    std::string id;
+    std::string name;
+    std::string speaker_system_id;
+    std::string bands_json;
+};
+
 struct SourceProfile {
     std::string id;
     std::string platform_name;
