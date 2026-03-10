@@ -1,0 +1,36 @@
+directories:
+  output: dist-electron
+  buildResources: build
+appId: com.speakeasy.app
+productName: SpeakEasy
+extraResources:
+  - from: electron-resources/bin
+    to: bin
+    filter:
+      - '**/*'
+files:
+  - filter:
+      - electron/**
+      - frontend/**
+      - server/**
+      - package.json
+win:
+  target:
+    - nsis
+    - portable
+  signAndEditExecutable: false
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.music
+linux:
+  target:
+    - AppImage
+    - deb
+electronVersion: 28.0.0
